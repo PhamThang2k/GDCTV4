@@ -1,0 +1,6 @@
+{
+  "name": "GDCT Vùng 4 Hải Quân",
+  "description": "Ứng dụng Giáo dục Chính trị Vùng 4 Hải quân - Học tập bài giảng chính trị, trình chiếu slide, video, trắc nghiệm đánh giá kiến thức và theo dõi tiến độ học tập.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
