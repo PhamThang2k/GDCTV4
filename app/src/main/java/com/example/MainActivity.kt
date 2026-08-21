@@ -1,6 +1,7 @@
 package com.example
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -9,9 +10,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ui.components.AddNoteDialog
 import com.example.ui.components.DailyQuoteDialog
@@ -19,10 +22,8 @@ import com.example.ui.components.GdctBottomNavigation
 import com.example.ui.components.GdctTopBar
 import com.example.ui.components.LawDetailDialog
 import com.example.ui.components.LessonDetailView
-import com.example.ui.components.NewsDetailDialog
 import com.example.ui.components.QuizEngineDialog
 import com.example.ui.screens.HomeScreen
-import com.example.ui.screens.NewsScreen
 import com.example.ui.screens.ProfileAdminScreen
 import com.example.ui.screens.StudyScreen
 import com.example.ui.screens.UtilitiesScreen
@@ -44,11 +45,19 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun GdctApp(viewModel: GdctViewModel = viewModel()) {
+  val context = LocalContext.current
   val uiState by viewModel.uiState.collectAsState()
   val progressMap by viewModel.studyProgressMap.collectAsState()
   val quizSubmissions by viewModel.quizSubmissions.collectAsState()
   val personalNotes by viewModel.personalNotes.collectAsState()
-  val bookmarkedIds by viewModel.bookmarkedIds.collectAsState()
+
+  // Toast listener for Web CMS & downloads
+  LaunchedEffect(uiState.toastMessage) {
+    uiState.toastMessage?.let { msg ->
+      Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+      viewModel.clearToast()
+    }
+  }
 
   // Full Screen Lesson Viewer
   if (uiState.selectedLesson != null) {
@@ -64,6 +73,10 @@ fun GdctApp(viewModel: GdctViewModel = viewModel()) {
       isVideoPlaying = uiState.isVideoPlaying,
       videoSeconds = uiState.videoCurrentSeconds,
       videoSpeed = uiState.videoSpeed,
+      isAudioPlaying = uiState.isAudioPlaying,
+      audioSeconds = uiState.audioCurrentSeconds,
+      audioSpeed = uiState.audioSpeed,
+      downloadedDocIds = uiState.downloadedDocIds,
       onBack = { viewModel.closeLesson() },
       onModeChange = { viewModel.setStudyMode(it) },
       onNextSlide = { viewModel.nextSlide() },
@@ -73,6 +86,10 @@ fun GdctApp(viewModel: GdctViewModel = viewModel()) {
       onToggleVideoPlay = { viewModel.toggleVideoPlay() },
       onVideoSeek = { viewModel.seekVideo(it) },
       onVideoSpeedChange = { viewModel.setVideoSpeed(it) },
+      onToggleAudioPlay = { viewModel.toggleAudioPlay() },
+      onAudioSeek = { viewModel.seekAudio(it) },
+      onAudioSpeedChange = { viewModel.setAudioSpeed(it) },
+      onDownloadDoc = { viewModel.downloadDoc(it) },
       onStartQuiz = { viewModel.startQuiz(currentLesson) },
       onAddNote = { viewModel.setAddNoteDialog(true) }
     )
@@ -102,27 +119,14 @@ fun GdctApp(viewModel: GdctViewModel = viewModel()) {
         when (uiState.currentTab) {
           AppTab.HOME -> HomeScreen(
             lessons = viewModel.allLessons,
-            news = viewModel.allNews,
             progressMap = progressMap,
             quizSubmissions = quizSubmissions,
             onNavigateTab = { viewModel.setTab(it) },
             onOpenLesson = { viewModel.openLesson(it) },
-            onOpenNews = { viewModel.openNews(it) },
             onStartQuiz = { viewModel.startQuiz(it) },
             onOpenQuoteDialog = { viewModel.setDailyQuoteDialog(true) },
             onOpenPartyNotebook = { viewModel.setTab(AppTab.UTILITIES) },
             onOpenCommanderReport = { viewModel.setTab(AppTab.PROFILE) }
-          )
-
-          AppTab.NEWS -> NewsScreen(
-            newsList = viewModel.allNews,
-            selectedCategory = uiState.selectedNewsCategory,
-            searchQuery = uiState.searchQuery,
-            bookmarkedIds = bookmarkedIds,
-            onCategorySelected = { viewModel.setNewsCategory(it) },
-            onSearchChange = { viewModel.setSearchQuery(it) },
-            onOpenArticle = { viewModel.openNews(it) },
-            onToggleBookmark = { viewModel.toggleBookmarkArticle(it) }
           )
 
           AppTab.STUDY -> StudyScreen(
@@ -175,17 +179,6 @@ fun GdctApp(viewModel: GdctViewModel = viewModel()) {
   if (uiState.showDailyQuoteDialog) {
     DailyQuoteDialog(
       onDismiss = { viewModel.setDailyQuoteDialog(false) }
-    )
-  }
-
-  if (uiState.selectedNews != null) {
-    val article = uiState.selectedNews!!
-    val isBookmarked = bookmarkedIds.contains(article.id)
-    NewsDetailDialog(
-      article = article,
-      isBookmarked = isBookmarked,
-      onToggleBookmark = { viewModel.toggleBookmarkArticle(article.id) },
-      onDismiss = { viewModel.closeNews() }
     )
   }
 

@@ -7,10 +7,14 @@ import com.example.data.local.AppDatabase
 import com.example.data.local.PersonalNoteEntity
 import com.example.data.local.QuizSubmissionEntity
 import com.example.data.local.StudyProgressEntity
+import com.example.data.model.DocAttachment
 import com.example.data.model.LawDoc
 import com.example.data.model.Lesson
-import com.example.data.model.NewsArticle
+import com.example.data.model.LessonSection
+import com.example.data.model.QuizQuestion
+import com.example.data.model.SlideItem
 import com.example.data.model.StudyMode
+import com.example.data.model.UserAccount
 import com.example.data.model.UserProfile
 import com.example.data.repository.GdctRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,7 +27,6 @@ import kotlinx.coroutines.launch
 
 enum class AppTab(val title: String, val testTag: String) {
   HOME("Trang chủ", "tab_home"),
-  NEWS("Tin tức", "tab_news"),
   STUDY("Học tập GDCT", "tab_study"),
   UTILITIES("Tiện ích", "tab_utilities"),
   PROFILE("Cá nhân", "tab_profile")
@@ -35,22 +38,37 @@ data class GdctUiState(
   val studyMode: StudyMode = StudyMode.SLIDE,
   val currentSlideIndex: Int = 0,
   val checkedSections: Set<Int> = emptySet(),
-  val selectedNews: NewsArticle? = null,
   val selectedLaw: LawDoc? = null,
   val activeQuizLesson: Lesson? = null,
   val activeQuizAnswers: Map<Int, Int> = emptyMap(),
   val quizSubmittedResult: QuizSubmissionEntity? = null,
-  val selectedNewsCategory: String = "Tất cả",
   val selectedLessonCategory: String = "Tất cả",
   val isVideoPlaying: Boolean = false,
   val videoCurrentSeconds: Int = 0,
   val videoSpeed: Float = 1.0f,
+  val isAudioPlaying: Boolean = false,
+  val audioCurrentSeconds: Int = 0,
+  val audioSpeed: Float = 1.0f,
+  val downloadedDocIds: Set<String> = emptySet(),
   val userProfile: UserProfile = UserProfile(),
   val showPartyNotebookDialog: Boolean = false,
   val showCommanderReportDialog: Boolean = false,
   val showDailyQuoteDialog: Boolean = false,
   val showAddNoteDialog: Boolean = false,
-  val searchQuery: String = ""
+  val searchQuery: String = "",
+  // Web Admin CMS states
+  val adminLessons: List<Lesson> = emptyList(),
+  val adminUserAccounts: List<UserAccount> = emptyList(),
+  val adminSelectedCategory: String = "Tất cả",
+  val adminSearchQuery: String = "",
+  val adminSelectedUnit: String = "Tất cả đơn vị",
+  val adminSelectedStatus: String = "Tất cả trạng thái",
+  val selectedUserDetail: UserAccount? = null,
+  val showAddLessonDialog: Boolean = false,
+  val editingLesson: Lesson? = null,
+  val showAddAccountDialog: Boolean = false,
+  val adminActiveSubTab: Int = 0, // 0: Nội dung GDCT, 1: Quản lý tài khoản, 2: Thống kê báo cáo
+  val toastMessage: String? = null
 )
 
 class GdctViewModel(application: Application) : AndroidViewModel(application) {
@@ -60,7 +78,6 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
   val uiState: StateFlow<GdctUiState> = _uiState.asStateFlow()
 
   val allLessons: List<Lesson>
-  val allNews: List<NewsArticle>
   val allLaws: List<LawDoc>
 
   val studyProgressMap: StateFlow<Map<String, StudyProgressEntity>>
@@ -72,8 +89,13 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
     val db = AppDatabase.getDatabase(application)
     repository = GdctRepository(db)
     allLessons = repository.getLessons()
-    allNews = repository.getNewsArticles()
     allLaws = repository.getLawDocs()
+
+    val initialAccounts = repository.getUserAccounts()
+    _uiState.value = _uiState.value.copy(
+      adminLessons = allLessons,
+      adminUserAccounts = initialAccounts
+    )
 
     studyProgressMap = repository.allProgress
       .combine(MutableStateFlow(Unit)) { progressList, _ ->
@@ -121,14 +143,17 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
       currentSlideIndex = 0,
       checkedSections = emptySet(),
       isVideoPlaying = false,
-      videoCurrentSeconds = 0
+      videoCurrentSeconds = 0,
+      isAudioPlaying = false,
+      audioCurrentSeconds = 0
     )
   }
 
   fun closeLesson() {
     _uiState.value = _uiState.value.copy(
       selectedLesson = null,
-      isVideoPlaying = false
+      isVideoPlaying = false,
+      isAudioPlaying = false
     )
   }
 
@@ -190,6 +215,34 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
     updateStudyProgress(lesson)
   }
 
+  // Audio Playback
+  fun toggleAudioPlay() {
+    val nextPlaying = !_uiState.value.isAudioPlaying
+    _uiState.value = _uiState.value.copy(isAudioPlaying = nextPlaying)
+    val lesson = _uiState.value.selectedLesson ?: return
+    updateStudyProgress(lesson)
+  }
+
+  fun setAudioSpeed(speed: Float) {
+    _uiState.value = _uiState.value.copy(audioSpeed = speed)
+  }
+
+  fun seekAudio(seconds: Int) {
+    _uiState.value = _uiState.value.copy(audioCurrentSeconds = seconds.coerceAtLeast(0))
+    val lesson = _uiState.value.selectedLesson ?: return
+    updateStudyProgress(lesson)
+  }
+
+  // Document downloads
+  fun downloadDoc(doc: DocAttachment) {
+    val currentDownloaded = _uiState.value.downloadedDocIds.toMutableSet()
+    currentDownloaded.add(doc.id)
+    _uiState.value = _uiState.value.copy(
+      downloadedDocIds = currentDownloaded,
+      toastMessage = "Đã tải xuống thành công tài liệu: ${doc.fileName} (${doc.fileSize})"
+    )
+  }
+
   private fun updateStudyProgress(lesson: Lesson) {
     viewModelScope.launch {
       val totalSections = lesson.sections.size
@@ -200,6 +253,7 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
         StudyMode.SLIDE -> slideProgress
         StudyMode.DOCUMENT -> sectionProgress
         StudyMode.VIDEO -> if (_uiState.value.videoCurrentSeconds > 30 || _uiState.value.isVideoPlaying) 75 else 25
+        StudyMode.AUDIO -> if (_uiState.value.audioCurrentSeconds > 30 || _uiState.value.isAudioPlaying) 80 else 30
       }
 
       val calculatedPercent = maxOf(slideProgress, sectionProgress, modeBonus).coerceIn(10, 100)
@@ -251,7 +305,6 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
         totalQuestions = lesson.quizQuestions.size
       )
 
-      // Also mark study progress as 100% completed
       repository.saveStudyProgress(
         lessonId = lesson.id,
         progressPercent = 100,
@@ -285,26 +338,6 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
       quizSubmittedResult = null,
       activeQuizAnswers = emptyMap()
     )
-  }
-
-  // News handling
-  fun openNews(article: NewsArticle) {
-    _uiState.value = _uiState.value.copy(selectedNews = article)
-  }
-
-  fun closeNews() {
-    _uiState.value = _uiState.value.copy(selectedNews = null)
-  }
-
-  fun toggleBookmarkArticle(articleId: String) {
-    val isCurrentlyBookmarked = bookmarkedIds.value.contains(articleId)
-    viewModelScope.launch {
-      repository.toggleBookmark(articleId, isCurrentlyBookmarked)
-    }
-  }
-
-  fun setNewsCategory(category: String) {
-    _uiState.value = _uiState.value.copy(selectedNewsCategory = category)
   }
 
   fun setLessonCategory(category: String) {
@@ -352,5 +385,91 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
     viewModelScope.launch {
       repository.deleteNote(id)
     }
+  }
+
+  // Web Admin CMS Operations
+  fun setAdminActiveSubTab(tabIndex: Int) {
+    _uiState.value = _uiState.value.copy(adminActiveSubTab = tabIndex)
+  }
+
+  fun setAdminCategory(category: String) {
+    _uiState.value = _uiState.value.copy(adminSelectedCategory = category)
+  }
+
+  fun setAdminSearchQuery(query: String) {
+    _uiState.value = _uiState.value.copy(adminSearchQuery = query)
+  }
+
+  fun setAdminUnit(unit: String) {
+    _uiState.value = _uiState.value.copy(adminSelectedUnit = unit)
+  }
+
+  fun setAdminStatus(status: String) {
+    _uiState.value = _uiState.value.copy(adminSelectedStatus = status)
+  }
+
+  fun setSelectedUserDetail(account: UserAccount?) {
+    _uiState.value = _uiState.value.copy(selectedUserDetail = account)
+  }
+
+  fun setShowAddLessonDialog(show: Boolean, lessonToEdit: Lesson? = null) {
+    _uiState.value = _uiState.value.copy(
+      showAddLessonDialog = show,
+      editingLesson = lessonToEdit
+    )
+  }
+
+  fun setShowAddAccountDialog(show: Boolean) {
+    _uiState.value = _uiState.value.copy(showAddAccountDialog = show)
+  }
+
+  fun saveOrUpdateAdminLesson(lesson: Lesson) {
+    val currentLessons = _uiState.value.adminLessons.toMutableList()
+    val index = currentLessons.indexOfFirst { it.id == lesson.id }
+    if (index >= 0) {
+      currentLessons[index] = lesson
+      _uiState.value = _uiState.value.copy(
+        adminLessons = currentLessons,
+        showAddLessonDialog = false,
+        editingLesson = null,
+        toastMessage = "Đã cập nhật thành công bài giảng: ${lesson.title}"
+      )
+    } else {
+      currentLessons.add(0, lesson)
+      _uiState.value = _uiState.value.copy(
+        adminLessons = currentLessons,
+        showAddLessonDialog = false,
+        editingLesson = null,
+        toastMessage = "Đã thêm mới bài giảng GDCT: ${lesson.title}"
+      )
+    }
+  }
+
+  fun deleteAdminLesson(lessonId: String) {
+    val currentLessons = _uiState.value.adminLessons.filterNot { it.id == lessonId }
+    _uiState.value = _uiState.value.copy(
+      adminLessons = currentLessons,
+      toastMessage = "Đã xóa bài giảng khỏi danh mục hệ thống"
+    )
+  }
+
+  fun addAdminUserAccount(account: UserAccount) {
+    val currentAccounts = _uiState.value.adminUserAccounts.toMutableList()
+    currentAccounts.add(0, account)
+    _uiState.value = _uiState.value.copy(
+      adminUserAccounts = currentAccounts,
+      showAddAccountDialog = false,
+      toastMessage = "Đã thêm tài khoản quân nhân: ${account.fullName}"
+    )
+  }
+
+  fun sendReminderToUser(account: UserAccount) {
+    _uiState.value = _uiState.value.copy(
+      toastMessage = "Đã gửi thông báo đôn đốc học tập đến: ${account.fullName} (${account.unit})"
+    )
+  }
+
+  fun clearToast() {
+    _uiState.value = _uiState.value.copy(toastMessage = null)
   }
 }

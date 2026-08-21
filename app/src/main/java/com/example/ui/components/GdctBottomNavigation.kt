@@ -8,23 +8,23 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Article
+import androidx.compose.material.icons.filled.AdminPanelSettings
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.outlined.Article
+import androidx.compose.material.icons.outlined.AdminPanelSettings
 import androidx.compose.material.icons.outlined.GridView
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -67,7 +67,7 @@ fun GdctBottomNavigation(
         modifier = Modifier
           .fillMaxWidth()
           .height(68.dp)
-          .padding(horizontal = 8.dp),
+          .padding(horizontal = 4.dp),
         horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically
       ) {
@@ -81,20 +81,10 @@ fun GdctBottomNavigation(
           onClick = { onTabSelected(AppTab.HOME) }
         )
 
-        // Tab 2: Tin tức
-        GeometricNavItem(
-          title = "Tin tức",
-          icon = Icons.Outlined.Article,
-          selectedIcon = Icons.Filled.Article,
-          isSelected = currentTab == AppTab.NEWS,
-          testTag = AppTab.NEWS.testTag,
-          onClick = { onTabSelected(AppTab.NEWS) }
-        )
-
-        // Tab 3 (Centerpiece Floating Action): Học tập GDCT
+        // Tab 2 (Centerpiece Floating Action): Học tập GDCT
         Box(
           modifier = Modifier
-            .offset(y = (-10).dp)
+            .offset(y = (-8).dp)
             .testTag(AppTab.STUDY.testTag)
             .clickable(
               interactionSource = remember { MutableInteractionSource() },
@@ -107,7 +97,7 @@ fun GdctBottomNavigation(
           ) {
             Box(
               modifier = Modifier
-                .size(52.dp)
+                .size(50.dp)
                 .shadow(elevation = 6.dp, shape = CircleShape)
                 .clip(CircleShape)
                 .background(CrimsonRed)
@@ -118,7 +108,7 @@ fun GdctBottomNavigation(
                 imageVector = Icons.Filled.MenuBook,
                 contentDescription = "Học tập GDCT",
                 tint = Color.White,
-                modifier = Modifier.size(26.dp)
+                modifier = Modifier.size(24.dp)
               )
             }
 
@@ -132,7 +122,7 @@ fun GdctBottomNavigation(
           }
         }
 
-        // Tab 4: Tiện ích
+        // Tab 3: Tiện ích & Sổ tay
         GeometricNavItem(
           title = "Tiện ích",
           icon = Icons.Outlined.GridView,
@@ -142,7 +132,7 @@ fun GdctBottomNavigation(
           onClick = { onTabSelected(AppTab.UTILITIES) }
         )
 
-        // Tab 5: Cá nhân / Chỉ huy
+        // Tab 4: Cá nhân & Báo cáo
         GeometricNavItem(
           title = "Cá nhân",
           icon = Icons.Outlined.Person,
@@ -174,7 +164,7 @@ private fun GeometricNavItem(
         interactionSource = interactionSource,
         indication = null
       ) { onClick() }
-      .padding(horizontal = 6.dp, vertical = 4.dp),
+      .padding(horizontal = 4.dp, vertical = 4.dp),
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Center
   ) {
@@ -182,15 +172,14 @@ private fun GeometricNavItem(
       imageVector = if (isSelected) selectedIcon else icon,
       contentDescription = title,
       tint = if (isSelected) NavyPrimary else Color(0xFF64748B),
-      modifier = Modifier.size(24.dp)
+      modifier = Modifier.size(23.dp)
     )
     Text(
       text = title,
-      fontSize = 10.sp,
+      fontSize = 9.5.sp,
       fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
       color = if (isSelected) NavyPrimary else Color(0xFF64748B),
       modifier = Modifier.padding(top = 2.dp)
     )
   }
 }
-

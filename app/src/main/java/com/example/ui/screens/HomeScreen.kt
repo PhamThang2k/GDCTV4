@@ -23,16 +23,21 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.AdminPanelSettings
 import androidx.compose.material.icons.filled.Assignment
+import androidx.compose.material.icons.filled.Audiotrack
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.FormatQuote
-import androidx.compose.material.icons.filled.HistoryEdu
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.LibraryBooks
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.MilitaryTech
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Quiz
+import androidx.compose.material.icons.filled.Slideshow
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material3.Button
@@ -62,7 +67,6 @@ import com.example.R
 import com.example.data.local.QuizSubmissionEntity
 import com.example.data.local.StudyProgressEntity
 import com.example.data.model.Lesson
-import com.example.data.model.NewsArticle
 import com.example.ui.components.DongSonMotifCanvas
 import com.example.ui.theme.BorderLight
 import com.example.ui.theme.CanvasLight
@@ -79,12 +83,10 @@ import com.example.ui.viewmodel.AppTab
 @Composable
 fun HomeScreen(
   lessons: List<Lesson>,
-  news: List<NewsArticle>,
   progressMap: Map<String, StudyProgressEntity>,
   quizSubmissions: List<QuizSubmissionEntity>,
   onNavigateTab: (AppTab) -> Unit,
   onOpenLesson: (Lesson) -> Unit,
-  onOpenNews: (NewsArticle) -> Unit,
   onStartQuiz: (Lesson) -> Unit,
   onOpenQuoteDialog: () -> Unit,
   onOpenPartyNotebook: () -> Unit,
@@ -100,7 +102,7 @@ fun HomeScreen(
     totalPct / quizSubmissions.size
   } else 0
 
-  val featuredLesson = lessons.firstOrNull { it.id == "cd-04" } ?: lessons.firstOrNull()
+  val featuredLesson = lessons.firstOrNull { it.id == "cd-04" || it.id == "bai_1" } ?: lessons.firstOrNull()
 
   LazyColumn(
     modifier = modifier
@@ -128,7 +130,7 @@ fun HomeScreen(
             verticalAlignment = Alignment.CenterVertically
           ) {
             Text(
-              text = "TIẾN ĐỘ HỌC TẬP",
+              text = "TIẾN ĐỘ HỌC TẬP CHÍNH TRỊ",
               fontSize = 12.5.sp,
               fontWeight = FontWeight.Black,
               color = NavyPrimary,
@@ -165,7 +167,7 @@ fun HomeScreen(
             horizontalArrangement = Arrangement.SpaceBetween
           ) {
             Text(
-              text = "Đã học: $completedLessonsCount/$totalLessons bài",
+              text = "Đã học: $completedLessonsCount/$totalLessons bài giảng",
               color = Color(0xFF64748B),
               fontSize = 11.5.sp,
               fontWeight = FontWeight.Medium
@@ -181,12 +183,12 @@ fun HomeScreen(
       }
     }
 
-    // 2. Featured Lecture (Bài giảng tiêu biểu - Geometric Balance card)
+    // 2. Featured Hero Lesson
     if (featuredLesson != null) {
       item {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
           Text(
-            text = "BÀI GIẢNG TIÊU BIỂU",
+            text = "BÀI GIẢNG TRỌNG TÂM",
             fontSize = 11.5.sp,
             fontWeight = FontWeight.Black,
             color = Color(0xFF64748B),
@@ -195,15 +197,16 @@ fun HomeScreen(
 
           Card(
             shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = NavyDeep),
-            elevation = CardDefaults.cardElevation(4.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            border = androidx.compose.foundation.BorderStroke(1.dp, BorderLight),
+            elevation = CardDefaults.cardElevation(3.dp),
             modifier = Modifier
               .fillMaxWidth()
               .clickable { onOpenLesson(featuredLesson) }
               .testTag("featured_lesson_card")
           ) {
             Column {
-              // Top Banner Area with Play Icon and Video Badge
+              // Top Banner Area
               Box(
                 modifier = Modifier
                   .fillMaxWidth()
@@ -231,7 +234,7 @@ fun HomeScreen(
                     )
                 )
 
-                // Top Video Pill
+                // Top Video & Audio Badge
                 Surface(
                   shape = RoundedCornerShape(4.dp),
                   color = CrimsonRed,
@@ -240,7 +243,7 @@ fun HomeScreen(
                     .padding(10.dp)
                 ) {
                   Text(
-                    text = "VIDEO & SLIDE",
+                    text = "SLIDE • DOCX • VIDEO • AUDIO",
                     color = Color.White,
                     fontSize = 9.sp,
                     fontWeight = FontWeight.Black,
@@ -351,7 +354,7 @@ fun HomeScreen(
       }
     }
 
-    // 3. Quick Utilities Grid (2x2 Geometric Balanced Tiles)
+    // 4. Quick Utilities Grid (2x2 Geometric Balanced Tiles)
     item {
       Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(
@@ -410,8 +413,8 @@ fun HomeScreen(
           )
 
           GeometricGridCard(
-            title = "Báo cáo Chỉ huy",
-            subtitle = "Nhật ký & Duyệt điểm",
+            title = "Báo cáo kết quả",
+            subtitle = "Tiến độ & Điểm thi",
             icon = Icons.Default.MilitaryTech,
             iconBgColor = Color(0xFFDCFCE7),
             iconTint = SuccessGreen,
@@ -423,7 +426,7 @@ fun HomeScreen(
       }
     }
 
-    // 4. Daily Quote Card ("Lời Bác dạy")
+    // 5. Daily Quote Card ("Lời Bác dạy")
     item {
       Card(
         shape = RoundedCornerShape(16.dp),
@@ -502,7 +505,7 @@ fun HomeScreen(
       }
     }
 
-    // 5. All Political Education Lessons Row
+    // 6. All Political Education Lessons Row
     item {
       Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(
@@ -511,7 +514,7 @@ fun HomeScreen(
           verticalAlignment = Alignment.CenterVertically
         ) {
           Text(
-            text = "CHUYÊN ĐỀ HỌC TẬP",
+            text = "CHUYÊN ĐỀ GDCT PHÂN THEO MỤC",
             fontSize = 11.5.sp,
             fontWeight = FontWeight.Black,
             color = Color(0xFF64748B),
@@ -541,7 +544,7 @@ fun HomeScreen(
               border = androidx.compose.foundation.BorderStroke(1.dp, BorderLight),
               elevation = CardDefaults.cardElevation(2.dp),
               modifier = Modifier
-                .width(250.dp)
+                .width(260.dp)
                 .clickable { onOpenLesson(lesson) }
                 .testTag("card_lesson_home_${lesson.id}")
             ) {
@@ -588,11 +591,32 @@ fun HomeScreen(
 
                 Spacer(modifier = Modifier.height(6.dp))
 
-                Text(
-                  text = "${lesson.durationMinutes} phút • ${lesson.slides.size} slides",
-                  color = Color(0xFF64748B),
-                  fontSize = 11.sp
-                )
+                // Multichannel tags
+                Row(
+                  horizontalArrangement = Arrangement.spacedBy(4.dp),
+                  verticalAlignment = Alignment.CenterVertically
+                ) {
+                  Text(
+                    text = "${lesson.slides.size} slides",
+                    color = NavyPrimary,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Medium
+                  )
+                  Text(text = "•", color = Color(0xFFCBD5E1), fontSize = 10.sp)
+                  Text(
+                    text = "${lesson.docAttachments.size} docs",
+                    color = Color(0xFF0284C7),
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Medium
+                  )
+                  Text(text = "•", color = Color(0xFFCBD5E1), fontSize = 10.sp)
+                  Text(
+                    text = "Audio ${lesson.audioDuration}",
+                    color = Color(0xFFD97706),
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Medium
+                  )
+                }
 
                 Spacer(modifier = Modifier.height(10.dp))
 
@@ -703,4 +727,3 @@ private fun GeometricGridCard(
     }
   }
 }
-

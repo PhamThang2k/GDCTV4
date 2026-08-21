@@ -41,5 +41,6 @@ val TextSecondaryDark = Color(0xFF94A3B8)
 val SuccessGreen = Color(0xFF16A34A)
 val WarningOrange = Color(0xFFEA580C)
 val InfoCyan = Color(0xFF0284C7)
+val CardBg = Color.White
 
 

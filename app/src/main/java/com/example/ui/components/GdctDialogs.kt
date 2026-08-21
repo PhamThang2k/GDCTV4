@@ -19,8 +19,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Bookmark
-import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.EditNote
@@ -56,10 +54,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.example.data.local.PersonalNoteEntity
-import com.example.data.local.QuizSubmissionEntity
 import com.example.data.model.LawDoc
-import com.example.data.model.NewsArticle
 import com.example.ui.theme.CrimsonRed
 import com.example.ui.theme.GoldYellow
 import com.example.ui.theme.NavyDeep
@@ -99,38 +94,36 @@ fun DailyQuoteDialog(onDismiss: () -> Unit) {
           Text(
             text = "\"Ngày trước ta chỉ có đêm và rừng. Ngày nay ta có ngày, có trời, có biển. Bờ biển ta dài, tươi đẹp, ta phải biết giữ gìn lấy nó.\"",
             color = NavyDeep,
-            fontSize = 15.5.sp,
+            fontSize = 15.sp,
+            fontWeight = FontWeight.Bold,
             fontStyle = FontStyle.Italic,
-            fontWeight = FontWeight.Bold,
-            lineHeight = 24.sp
+            lineHeight = 22.sp
           )
 
-          Spacer(modifier = Modifier.height(10.dp))
+          Spacer(modifier = Modifier.height(12.dp))
 
-          Text(
-            text = "— Lời Chủ tịch Hồ Chí Minh căn dặn khi về thăm Bộ đội Hải quân (15/3/1961)",
-            color = CrimsonRed,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.SemiBold
-          )
+          Surface(
+            shape = RoundedCornerShape(10.dp),
+            color = Color(0xFFF1F5F9),
+            modifier = Modifier.fillMaxWidth()
+          ) {
+            Column(modifier = Modifier.padding(12.dp)) {
+              Text(
+                text = "📍 Bối cảnh lịch sử:",
+                color = NavyPrimary,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold
+              )
+              Text(
+                text = "Bác Hồ căn dặn cán bộ, chiến sĩ Hải quân nhân dân Việt Nam ngày 15/3/1961 tại vùng biển Đông Bắc.",
+                color = Color(0xFF475569),
+                fontSize = 12.sp,
+                lineHeight = 17.sp
+              )
+            }
+          }
 
-          HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
-
-          Text(
-            text = "💡 Ý nghĩa & Liên hệ thực tiễn:",
-            fontWeight = FontWeight.Bold,
-            fontSize = 13.sp,
-            color = NavyPrimary
-          )
-          Spacer(modifier = Modifier.height(4.dp))
-          Text(
-            text = "Lời dạy của Bác là kim chỉ nam cho các thế hệ chiến sĩ Vùng 4 Hải quân. Mỗi cán bộ, chiến sĩ trên các đảo Trường Sa và trên các biên đội tàu chiến luôn nêu cao tinh thần cảnh giác, quyết tâm bảo vệ vững chắc từng sải biển, tấc đảo thiêng liêng của Tổ quốc.",
-            fontSize = 13.sp,
-            color = Color(0xFF334155),
-            lineHeight = 19.sp
-          )
-
-          Spacer(modifier = Modifier.height(16.dp))
+          Spacer(modifier = Modifier.height(14.dp))
 
           Row(
             modifier = Modifier.fillMaxWidth(),
@@ -138,12 +131,12 @@ fun DailyQuoteDialog(onDismiss: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically
           ) {
             Surface(
-              shape = RoundedCornerShape(20.dp),
-              color = if (isAudioPlaying) GoldYellow else Color(0xFFEFF6FF),
+              shape = RoundedCornerShape(8.dp),
+              color = if (isAudioPlaying) GoldYellow else Color(0xFFE2E8F0),
               modifier = Modifier.clickable { isAudioPlaying = !isAudioPlaying }
             ) {
               Row(
-                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
                 verticalAlignment = Alignment.CenterVertically
               ) {
                 Icon(
@@ -167,137 +160,6 @@ fun DailyQuoteDialog(onDismiss: () -> Unit) {
               colors = ButtonDefaults.buttonColors(containerColor = NavyPrimary)
             ) {
               Text("Đã tiếp thu", fontSize = 12.sp)
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
-@Composable
-fun NewsDetailDialog(
-  article: NewsArticle,
-  isBookmarked: Boolean,
-  onToggleBookmark: () -> Unit,
-  onDismiss: () -> Unit
-) {
-  Dialog(
-    onDismissRequest = onDismiss,
-    properties = DialogProperties(usePlatformDefaultWidth = false)
-  ) {
-    Surface(
-      modifier = Modifier
-        .fillMaxWidth(0.95f)
-        .fillMaxHeight(0.9f)
-        .clip(RoundedCornerShape(20.dp)),
-      color = Color.White,
-      tonalElevation = 6.dp
-    ) {
-      Column(modifier = Modifier.fillMaxSize()) {
-        Surface(color = NavyPrimary, modifier = Modifier.fillMaxWidth()) {
-          Row(
-            modifier = Modifier.padding(14.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-          ) {
-            Surface(shape = RoundedCornerShape(6.dp), color = CrimsonRed) {
-              Text(
-                text = article.category,
-                color = Color.White,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
-              )
-            }
-
-            Row {
-              IconButton(onClick = onToggleBookmark) {
-                Icon(
-                  imageVector = if (isBookmarked) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
-                  contentDescription = "Lưu tin",
-                  tint = GoldYellow
-                )
-              }
-              IconButton(onClick = onDismiss) {
-                Icon(Icons.Default.Close, contentDescription = "Đóng", tint = Color.White)
-              }
-            }
-          }
-        }
-
-        LazyColumn(
-          modifier = Modifier
-            .weight(1f)
-            .padding(16.dp),
-          verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-          item {
-            Text(
-              text = article.title,
-              color = NavyDeep,
-              fontSize = 17.sp,
-              fontWeight = FontWeight.Black,
-              lineHeight = 24.sp
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-              text = "Ngày đăng: ${article.publishedDate} • Thời gian đọc: ${article.readTimeMinutes} phút",
-              color = Color(0xFF64748B),
-              fontSize = 11.5.sp
-            )
-            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-          }
-
-          item {
-            Surface(
-              shape = RoundedCornerShape(10.dp),
-              color = Color(0xFFF1F5F9),
-              modifier = Modifier.fillMaxWidth()
-            ) {
-              Text(
-                text = article.summary,
-                color = Color(0xFF334155),
-                fontSize = 13.5.sp,
-                fontStyle = FontStyle.Italic,
-                lineHeight = 20.sp,
-                modifier = Modifier.padding(12.dp)
-              )
-            }
-          }
-
-          item {
-            Text(
-              text = article.content,
-              color = Color(0xFF1E293B),
-              fontSize = 14.sp,
-              lineHeight = 23.sp
-            )
-          }
-
-          if (article.keyPoints.isNotEmpty()) {
-            item {
-              Card(
-                shape = RoundedCornerShape(10.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFEFF6FF)),
-                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFBFDBFE))
-              ) {
-                Column(modifier = Modifier.padding(14.dp)) {
-                  Text(
-                    text = "📌 NỘI DUNG CỐT LÕI CẦN NẮM:",
-                    color = NavyPrimary,
-                    fontSize = 12.5.sp,
-                    fontWeight = FontWeight.Bold
-                  )
-                  Spacer(modifier = Modifier.height(6.dp))
-                  article.keyPoints.forEach { point ->
-                    Row(modifier = Modifier.padding(vertical = 3.dp), verticalAlignment = Alignment.Top) {
-                      Text("• ", color = CrimsonRed, fontWeight = FontWeight.Bold)
-                      Text(point, color = Color(0xFF1E3A8A), fontSize = 12.5.sp, lineHeight = 18.sp)
-                    }
-                  }
-                }
-              }
             }
           }
         }

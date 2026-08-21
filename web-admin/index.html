@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cổng Quản trị GDCT - Bộ Tư lệnh Vùng 4 Hải quân</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <!-- SIDEBAR NAVIGATION -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="insignia-badge">
+        <i class="fa-solid fa-anchor"></i>
+      </div>
+      <div class="header-title">
+        <h1>VÙNG 4 HẢI QUÂN</h1>
+        <p>Quản trị Giáo dục Chính trị</p>
+      </div>
+    </div>
+
+    <div class="sidebar-nav">
+      <div class="nav-section-label">Hệ thống điều hành</div>
+      <div class="nav-item active" data-tab="overview">
+        <span class="icon"><i class="fa-solid fa-chart-pie"></i></span>
+        <span>Tổng quan & Báo cáo</span>
+      </div>
+      <div class="nav-item" data-tab="lessons">
+        <span class="icon"><i class="fa-solid fa-book-open"></i></span>
+        <span>Quản lý Bài giảng GDCT</span>
+      </div>
+      <div class="nav-item" data-tab="users">
+        <span class="icon"><i class="fa-solid fa-users"></i></span>
+        <span>Quản lý Tài khoản & Hồ sơ</span>
+      </div>
+
+      <div class="nav-section-label">Học liệu & Đánh giá</div>
+      <div class="nav-item" data-tab="quizzes">
+        <span class="icon"><i class="fa-solid fa-list-check"></i></span>
+        <span>Ngân hàng Đề trắc nghiệm</span>
+      </div>
+      <div class="nav-item" data-tab="laws">
+        <span class="icon"><i class="fa-solid fa-scale-balanced"></i></span>
+        <span>Tủ sách Pháp luật & Kỷ luật</span>
+      </div>
+
+      <div class="nav-section-label">Hệ thống & Dữ liệu</div>
+      <div class="nav-item" data-tab="settings">
+        <span class="icon"><i class="fa-solid fa-database"></i></span>
+        <span>Sao lưu & Đồng bộ App</span>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="admin-avatar">
+        <i class="fa-solid fa-user-shield"></i>
+      </div>
+      <div class="admin-info">
+        <div class="admin-name">Đại tá Nguyễn Văn Hiến</div>
+        <div class="admin-role">Phòng Chính trị Vùng 4</div>
+      </div>
+      <button class="btn-outline btn-sm" id="btn-logout" title="Đăng xuất" style="padding: 4px 8px; color: #94A3B8; background: transparent; border: none;">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN WRAPPER -->
+  <div class="main-wrapper">
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <div class="breadcrumb-title" id="page-title">
+          <i class="fa-solid fa-chart-pie" style="color: var(--navy-primary);"></i>
+          <span>Tổng quan & Báo cáo Tiến độ Toàn Vùng</span>
+        </div>
+        <span class="classified-tag"><i class="fa-solid fa-shield-halved"></i> LƯU HÀNH NỘI BỘ</span>
+      </div>
+
+      <div class="topbar-right">
+        <div class="sync-badge">
+          <span class="sync-dot"></span>
+          <span>Đã kết nối máy chủ dữ liệu</span>
+        </div>
+        <button class="btn btn-outline btn-sm" id="btn-quick-export" title="Xuất báo cáo Excel">
+          <i class="fa-solid fa-file-excel" style="color: var(--green-600);"></i>
+          <span>Xuất Báo cáo</span>
+        </button>
+        <button class="btn btn-danger btn-sm" id="btn-urge-all" title="Gửi thông báo đôn đốc toàn vùng">
+          <i class="fa-solid fa-bell"></i>
+          <span>Đôn đốc học tập</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- CONTENT BODY -->
+    <main class="content-body">
+
+      <!-- ================= 1. TAB: OVERVIEW ================= -->
+      <section id="tab-overview" class="tab-pane active">
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon-wrapper" style="background: #E0E7FF; color: #3730A3;">
+              <i class="fa-solid fa-book-bookmark"></i>
+            </div>
+            <div class="stat-info">
+              <div class="stat-label">BÀI GIẢNG CHÍNH TRỊ</div>
+              <div class="stat-value" id="stat-total-lessons">5</div>
+              <div class="stat-desc">Đầy đủ Slide, PDF, Video, Audio</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon-wrapper" style="background: #DCFCE7; color: #166534;">
+              <i class="fa-solid fa-user-group"></i>
+            </div>
+            <div class="stat-info">
+              <div class="stat-label">QUÂN NHÂN THEO DÕI</div>
+              <div class="stat-value" id="stat-total-users">1,280</div>
+              <div class="stat-desc">Sĩ quan, QNCN, HSQ-BS các Lữ đoàn</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon-wrapper" style="background: #FEF3C7; color: #92400E;">
+              <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+            <div class="stat-info">
+              <div class="stat-label">TỶ LỆ HOÀN THÀNH</div>
+              <div class="stat-value" id="stat-completion-rate">86.4%</div>
+              <div class="stat-desc">Tăng 4.2% so với tháng trước</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon-wrapper" style="background: #FEE2E2; color: #991B1B;">
+              <i class="fa-solid fa-medal"></i>
+            </div>
+            <div class="stat-info">
+              <div class="stat-label">ĐIỂM TRẮC NGHIỆM TB</div>
+              <div class="stat-value" id="stat-avg-score">8.8 / 10</div>
+              <div class="stat-desc">Xếp loại: Giỏi (42%), Khá (46%)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Unit Progress Table & Chart Section -->
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+          <!-- Left: Unit Progress -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <i class="fa-solid fa-ship" style="color: var(--navy-primary);"></i>
+                <span>Tiến độ Học tập theo các Lữ đoàn, Đơn vị trực thuộc</span>
+              </div>
+              <span class="badge badge-navy">Năm huấn luyện 2026</span>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Đơn vị</th>
+                      <th>Quân số</th>
+                      <th>Tiến độ</th>
+                      <th>Điểm TB</th>
+                      <th>Trạng thái</th>
+                      <th>Hành động</th>
+                    </tr>
+                  </thead>
+                  <tbody id="unit-progress-tbody">
+                    <!-- Dynamic rendering in JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Multimedia Distribution & Activity Feed -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <i class="fa-solid fa-chart-column" style="color: var(--gold-primary);"></i>
+                <span>Phương thức Học tập</span>
+              </div>
+            </div>
+            <div class="card-body">
+              <div style="display: flex; flex-direction: column; gap: 14px;">
+                <div>
+                  <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+                    <span><i class="fa-solid fa-chalkboard-user" style="color: #3B82F6;"></i> Trình chiếu Slide</span>
+                    <b>38% (486 đ/c)</b>
+                  </div>
+                  <div class="progress-bar-container"><div class="progress-bar-fill" style="width: 38%; background: #3B82F6;"></div></div>
+                </div>
+
+                <div>
+                  <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+                    <span><i class="fa-solid fa-file-pdf" style="color: #EF4444;"></i> Đọc DOCX / PDF tải về</span>
+                    <b>26% (332 đ/c)</b>
+                  </div>
+                  <div class="progress-bar-container"><div class="progress-bar-fill" style="width: 26%; background: #EF4444;"></div></div>
+                </div>
+
+                <div>
+                  <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+                    <span><i class="fa-solid fa-play" style="color: #10B981;"></i> Video bài giảng HD</span>
+                    <b>22% (281 đ/c)</b>
+                  </div>
+                  <div class="progress-bar-container"><div class="progress-bar-fill" style="width: 22%; background: #10B981;"></div></div>
+                </div>
+
+                <div>
+                  <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+                    <span><i class="fa-solid fa-headphones" style="color: #F59E0B;"></i> Audio phát thanh GDCT</span>
+                    <b>14% (181 đ/c)</b>
+                  </div>
+                  <div class="progress-bar-container"><div class="progress-bar-fill" style="width: 14%; background: #F59E0B;"></div></div>
+                </div>
+              </div>
+
+              <hr style="margin: 18px 0; border: none; border-top: 1px solid var(--slate-200);">
+
+              <div style="font-size: 12px; font-weight: 700; color: var(--navy-primary); margin-bottom: 8px;">
+                <i class="fa-solid fa-clock-rotate-left"></i> Hoạt động học tập gần đây
+              </div>
+              <div id="recent-activity-list" style="display: flex; flex-direction: column; gap: 8px; font-size: 11.5px; color: var(--slate-600);">
+                <!-- Dynamic stream in JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 2. TAB: LESSONS MANAGEMENT ================= -->
+      <section id="tab-lessons" class="tab-pane">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <i class="fa-solid fa-book-bookmark" style="color: var(--navy-primary);"></i>
+              <span>Quản lý Kho Bài giảng Giáo dục Chính trị Đa phương tiện</span>
+            </div>
+            <button class="btn btn-primary btn-sm" id="btn-add-lesson">
+              <i class="fa-solid fa-plus"></i>
+              <span>Soạn Bài giảng mới</span>
+            </button>
+          </div>
+          <div class="card-body">
+            <!-- Controls Bar -->
+            <div class="controls-bar">
+              <div class="search-input-wrapper">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="lesson-search" placeholder="Tìm tên bài, mã chuyên đề, giảng viên...">
+              </div>
+
+              <div style="display: flex; gap: 10px;">
+                <select class="filter-select" id="lesson-filter-category">
+                  <option value="ALL">Tất cả chuyên đề</option>
+                  <option value="Sĩ quan & QNCN">Sĩ quan & QNCN</option>
+                  <option value="Lịch sử & Truyền thống">Lịch sử & Truyền thống</option>
+                  <option value="Pháp luật & Kỷ luật">Pháp luật & Kỷ luật</option>
+                  <option value="Học tập Bác Hồ">Học tập Bác Hồ</option>
+                  <option value="Hạ sĩ quan - Binh sĩ">Hạ sĩ quan - Binh sĩ</option>
+                </select>
+
+                <select class="filter-select" id="lesson-filter-audience">
+                  <option value="ALL">Tất cả đối tượng</option>
+                  <option value="Sĩ quan, QNCN">Sĩ quan, QNCN</option>
+                  <option value="Hạ sĩ quan, Chiến sĩ">Hạ sĩ quan, Chiến sĩ</option>
+                  <option value="Đảng viên">Đảng viên</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Lessons Table -->
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Mã bài</th>
+                    <th>Tên chuyên đề bài giảng</th>
+                    <th>Danh mục</th>
+                    <th>Đối tượng</th>
+                    <th>Thời lượng</th>
+                    <th>Tài nguyên đa phương tiện</th>
+                    <th>Trắc nghiệm</th>
+                    <th>Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody id="lessons-tbody">
+                  <!-- Dynamic lessons rendering in JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 3. TAB: USER ACCOUNTS ================= -->
+      <section id="tab-users" class="tab-pane">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <i class="fa-solid fa-users-gear" style="color: var(--navy-primary);"></i>
+              <span>Quản lý Danh sách & Hồ sơ Quân nhân tham gia Học tập</span>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-outline btn-sm" id="btn-import-users">
+                <i class="fa-solid fa-file-import"></i>
+                <span>Nhập Excel/JSON</span>
+              </button>
+              <button class="btn btn-outline btn-sm" id="btn-export-users">
+                <i class="fa-solid fa-file-export"></i>
+                <span>Xuất Danh sách</span>
+              </button>
+              <button class="btn btn-primary btn-sm" id="btn-add-user">
+                <i class="fa-solid fa-user-plus"></i>
+                <span>Thêm Quân nhân</span>
+              </button>
+            </div>
+          </div>
+          <div class="card-body">
+            <!-- Controls Bar -->
+            <div class="controls-bar">
+              <div class="search-input-wrapper">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="user-search" placeholder="Tìm theo họ tên, mã quân nhân, chức vụ, SĐT...">
+              </div>
+
+              <div style="display: flex; gap: 10px;">
+                <select class="filter-select" id="user-filter-unit">
+                  <option value="ALL">Tất cả đơn vị</option>
+                  <option value="Lữ đoàn 162">Lữ đoàn 162</option>
+                  <option value="Lữ đoàn 146">Lữ đoàn 146 (Trường Sa)</option>
+                  <option value="Lữ đoàn 955">Lữ đoàn 955</option>
+                  <option value="Lữ đoàn 101">Lữ đoàn 101</option>
+                  <option value="Lữ đoàn 685">Lữ đoàn 685</option>
+                  <option value="Trung tâm BĐKT">Trung tâm BĐKT</option>
+                </select>
+
+                <select class="filter-select" id="user-filter-status">
+                  <option value="ALL">Tất cả trạng thái</option>
+                  <option value="COMPLETED">Đã hoàn thành (100%)</option>
+                  <option value="IN_PROGRESS">Đang học tập</option>
+                  <option value="NEEDS_URGE">Cần đôn đốc (<50%)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Users Table -->
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Mã QN</th>
+                    <th>Họ và tên</th>
+                    <th>Cấp bậc</th>
+                    <th>Chức vụ</th>
+                    <th>Đơn vị</th>
+                    <th>Tiến độ GDCT</th>
+                    <th>Điểm thi TB</th>
+                    <th>Lần học cuối</th>
+                    <th>Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody id="users-tbody">
+                  <!-- Dynamic users rendering in JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 4. TAB: QUIZ BANK ================= -->
+      <section id="tab-quizzes" class="tab-pane">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <i class="fa-solid fa-list-check" style="color: var(--navy-primary);"></i>
+              <span>Ngân hàng Câu hỏi Trắc nghiệm Đánh giá Nhận thức Chính trị</span>
+            </div>
+            <button class="btn btn-primary btn-sm" id="btn-add-question">
+              <i class="fa-solid fa-plus"></i>
+              <span>Soạn Câu hỏi mới</span>
+            </button>
+          </div>
+          <div class="card-body">
+            <div class="controls-bar">
+              <div class="search-input-wrapper">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="quiz-search" placeholder="Tìm nội dung câu hỏi, đáp án, chuyên đề...">
+              </div>
+              <select class="filter-select" id="quiz-filter-lesson">
+                <option value="ALL">Tất cả bài giảng</option>
+              </select>
+            </div>
+
+            <div id="quiz-questions-list" style="display: flex; flex-direction: column; gap: 14px;">
+              <!-- Dynamic questions in JS -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 5. TAB: LAWS & REGULATIONS ================= -->
+      <section id="tab-laws" class="tab-pane">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <i class="fa-solid fa-scale-balanced" style="color: var(--navy-primary);"></i>
+              <span>Tủ sách Văn bản Pháp luật, Điều lệnh & Kỷ luật Quân đội</span>
+            </div>
+            <button class="btn btn-primary btn-sm" id="btn-add-law">
+              <i class="fa-solid fa-plus"></i>
+              <span>Thêm Văn bản mới</span>
+            </button>
+          </div>
+          <div class="card-body">
+            <div id="laws-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px;">
+              <!-- Dynamic laws rendering in JS -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 6. TAB: BACKUP & DATABASE ================= -->
+      <section id="tab-settings" class="tab-pane">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <i class="fa-solid fa-database" style="color: var(--navy-primary);"></i>
+              <span>Quản lý Cơ sở Dữ liệu & Đồng bộ với Ứng dụng Di động Android</span>
+            </div>
+          </div>
+          <div class="card-body">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+              <!-- Backup card -->
+              <div style="border: 1px solid var(--slate-200); border-radius: 10px; padding: 20px; background: var(--slate-50);">
+                <h3 style="font-size: 14px; color: var(--navy-primary); margin-bottom: 8px;">
+                  <i class="fa-solid fa-cloud-arrow-down" style="color: var(--navy-primary);"></i> Sao lưu Cơ sở Dữ liệu Hệ thống
+                </h3>
+                <p style="font-size: 12px; color: var(--slate-600); margin-bottom: 16px;">
+                  Tải toàn bộ dữ liệu bài giảng GDCT, slide, tài liệu đính kèm, ngân hàng câu hỏi và danh sách hồ sơ quân nhân ra tệp tin JSON an toàn.
+                </p>
+                <button class="btn btn-primary" id="btn-export-database">
+                  <i class="fa-solid fa-download"></i>
+                  <span>Tải tệp Sao lưu (gdct_vung4_db.json)</span>
+                </button>
+              </div>
+
+              <!-- Restore card -->
+              <div style="border: 1px solid var(--slate-200); border-radius: 10px; padding: 20px; background: var(--slate-50);">
+                <h3 style="font-size: 14px; color: var(--crimson-red); margin-bottom: 8px;">
+                  <i class="fa-solid fa-cloud-arrow-up" style="color: var(--crimson-red);"></i> Phục hồi & Nạp Cơ sở Dữ liệu
+                </h3>
+                <p style="font-size: 12px; color: var(--slate-600); margin-bottom: 16px;">
+                  Nạp tệp tin JSON cấu hình bài giảng và danh sách quân nhân từ Phòng Tuyên huấn Vùng 4 hoặc khôi phục dữ liệu từ bản sao lưu trước.
+                </p>
+                <input type="file" id="input-restore-file" accept=".json" style="display: none;">
+                <button class="btn btn-outline" id="btn-restore-database" style="color: var(--crimson-red); border-color: var(--crimson-red);">
+                  <i class="fa-solid fa-upload"></i>
+                  <span>Chọn tệp JSON để Phục hồi</span>
+                </button>
+              </div>
+            </div>
+
+            <hr style="margin: 24px 0; border: none; border-top: 1px solid var(--slate-200);">
+
+            <!-- Mobile App APK Sync Instructions -->
+            <div style="background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 10px; padding: 18px;">
+              <h4 style="font-size: 13px; color: #1E40AF; margin-bottom: 6px;">
+                <i class="fa-solid fa-mobile-screen"></i> Hướng dẫn Đồng bộ Cổng Web Quản trị với Ứng dụng Di động
+              </h4>
+              <p style="font-size: 12px; color: #1E3A8A; line-height: 1.6;">
+                Hệ thống Cổng Quản trị Web CMS này hoạt động độc lập trên mọi trình duyệt web máy tính của cán bộ tuyên huấn, trợ lý chính trị các cấp. Dữ liệu bài giảng và tài khoản được chuẩn hóa JSON theo cấu trúc Room Database của ứng dụng Android <b>GDCT Vùng 4 Hải Quân</b>, cho phép trích xuất hoặc đẩy dữ liệu tự động.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ================= MODALS ================= -->
+
+  <!-- 1. LESSON MODAL (CREATE / EDIT) -->
+  <div class="modal-backdrop" id="modal-lesson">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title" id="modal-lesson-title">Soạn Bài giảng Giáo dục Chính trị</div>
+        <button class="btn-close" onclick="closeModal('modal-lesson')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="form-lesson">
+          <input type="hidden" id="lesson-id">
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Mã chuyên đề bài giảng *</label>
+              <input type="text" class="form-control" id="lesson-code" placeholder="VD: cd-01, cd-06" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Danh mục chuyên đề *</label>
+              <select class="form-control" id="lesson-category" required>
+                <option value="Sĩ quan & QNCN">Sĩ quan & QNCN</option>
+                <option value="Lịch sử & Truyền thống">Lịch sử & Truyền thống</option>
+                <option value="Pháp luật & Kỷ luật">Pháp luật & Kỷ luật</option>
+                <option value="Học tập Bác Hồ">Học tập Bác Hồ</option>
+                <option value="Hạ sĩ quan - Binh sĩ">Hạ sĩ quan - Binh sĩ</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Tên bài giảng đầy đủ *</label>
+            <input type="text" class="form-control" id="lesson-title" placeholder="VD: Nâng cao bản lĩnh chính trị của sĩ quan trẻ..." required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Đối tượng học tập *</label>
+              <input type="text" class="form-control" id="lesson-audience" placeholder="VD: Toàn thể Sĩ quan, QNCN Vùng 4" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Thời lượng ước tính *</label>
+              <input type="text" class="form-control" id="lesson-duration" placeholder="VD: 45 phút, 2 tiết" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Tóm tắt nội dung trọng tâm</label>
+            <textarea class="form-control" id="lesson-summary" placeholder="Tóm tắt mục đích, yêu cầu và nội dung cốt lõi của bài giảng..."></textarea>
+          </div>
+
+          <!-- Tabs inside Modal for Multimedia -->
+          <div style="margin-top: 14px; border: 1px solid var(--slate-200); border-radius: 8px; padding: 14px; background: var(--slate-50);">
+            <div style="font-size: 13px; font-weight: 700; color: var(--navy-primary); margin-bottom: 10px;">
+              <i class="fa-solid fa-photo-film"></i> Cấu hình Đa phương tiện (Slide, DOCX/PDF, Video, Audio)
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label"><i class="fa-solid fa-file-word" style="color: #2563EB;"></i> Tên tệp DOCX đính kèm</label>
+                <input type="text" class="form-control" id="lesson-docx-name" placeholder="VD: Bai_Giang_Chuyen_De.docx">
+              </div>
+              <div class="form-group">
+                <label class="form-label"><i class="fa-solid fa-file-pdf" style="color: #DC2626;"></i> Tên tệp PDF đính kèm</label>
+                <input type="text" class="form-control" id="lesson-pdf-name" placeholder="VD: Tai_Lieu_Nghien_Cuu.pdf">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label"><i class="fa-solid fa-video" style="color: #059669;"></i> Link Video bài giảng (MP4/HLS)</label>
+                <input type="text" class="form-control" id="lesson-video-url" placeholder="VD: https://video.gdct.vung4.vn/lesson.mp4">
+              </div>
+              <div class="form-group">
+                <label class="form-label"><i class="fa-solid fa-headphones" style="color: #D97706;"></i> Link Audio phát thanh (MP3)</label>
+                <input type="text" class="form-control" id="lesson-audio-url" placeholder="VD: https://audio.gdct.vung4.vn/lesson.mp3">
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modal-lesson')">Hủy bỏ</button>
+        <button class="btn btn-primary" id="btn-save-lesson">
+          <i class="fa-solid fa-floppy-disk"></i>
+          <span>Lưu Bài giảng</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. USER MODAL (CREATE / EDIT) -->
+  <div class="modal-backdrop" id="modal-user">
+    <div class="modal-dialog" style="max-width: 600px;">
+      <div class="modal-header">
+        <div class="modal-title" id="modal-user-title">Thêm Tài khoản Quân nhân</div>
+        <button class="btn-close" onclick="closeModal('modal-user')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="form-user">
+          <input type="hidden" id="user-id">
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Mã số quân nhân *</label>
+              <input type="text" class="form-control" id="user-code" placeholder="VD: QN-0128" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Cấp bậc quân hàm *</label>
+              <select class="form-control" id="user-rank" required>
+                <option value="Binh nhì">Binh nhì</option>
+                <option value="Binh nhất">Binh nhất</option>
+                <option value="Hạ sĩ">Hạ sĩ</option>
+                <option value="Trung sĩ">Trung sĩ</option>
+                <option value="Thượng sĩ">Thượng sĩ</option>
+                <option value="Thiếu úy">Thiếu úy</option>
+                <option value="Trung úy">Trung úy</option>
+                <option value="Thượng úy">Thượng úy</option>
+                <option value="Đại úy">Đại úy</option>
+                <option value="Thiếu tá">Thiếu tá</option>
+                <option value="Trung tá">Trung tá</option>
+                <option value="Thượng tá">Thượng tá</option>
+                <option value="Đại tá">Đại tá</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Họ và tên quân nhân *</label>
+            <input type="text" class="form-control" id="user-fullname" placeholder="VD: Nguyễn Văn Nam" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Chức vụ *</label>
+              <input type="text" class="form-control" id="user-position" placeholder="VD: Thuyền phó, Khẩu đội trưởng" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Đơn vị trực thuộc *</label>
+              <select class="form-control" id="user-unit" required>
+                <option value="Lữ đoàn 162">Lữ đoàn 162</option>
+                <option value="Lữ đoàn 146">Lữ đoàn 146 (Trường Sa)</option>
+                <option value="Lữ đoàn 955">Lữ đoàn 955</option>
+                <option value="Lữ đoàn 101">Lữ đoàn 101</option>
+                <option value="Lữ đoàn 685">Lữ đoàn 685</option>
+                <option value="Trung tâm BĐKT">Trung tâm BĐKT</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Số điện thoại liên hệ</label>
+              <input type="text" class="form-control" id="user-phone" placeholder="VD: 0988.123.456">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tiến độ khởi tạo (%)</label>
+              <input type="number" class="form-control" id="user-progress" min="0" max="100" value="0">
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modal-user')">Hủy</button>
+        <button class="btn btn-primary" id="btn-save-user">
+          <i class="fa-solid fa-check"></i>
+          <span>Lưu thông tin</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. PREVIEW MODAL -->
+  <div class="modal-backdrop" id="modal-preview">
+    <div class="modal-dialog" style="max-width: 700px;">
+      <div class="modal-header">
+        <div class="modal-title" id="preview-modal-title">Xem trước Bài giảng</div>
+        <button class="btn-close" onclick="closeModal('modal-preview')">&times;</button>
+      </div>
+      <div class="modal-body" id="preview-modal-body">
+        <!-- Live preview injected in JS -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="closeModal('modal-preview')">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- SCRIPT ENGINE -->
+  <script src="admin.js"></script>
+</body>
+</html>
