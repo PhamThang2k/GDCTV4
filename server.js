@@ -38,7 +38,7 @@ const INITIAL_USERS = [
     phone: "0988.112.233",
     progress: 100,
     avgScore: 9.8,
-    lastActive: "Hôm nay, 08:30",
+    lastActive: "Vừa xong",
     isInternalAccess: true
   },
   {
@@ -155,10 +155,289 @@ const INITIAL_USERS = [
   }
 ];
 
+const INITIAL_LESSONS = [
+  {
+    id: "bai_1",
+    code: "CĐ-01/2026",
+    title: "Nâng cao bản lĩnh chính trị, ý chí quyết chiến quyết thắng của cán bộ, chiến sĩ Vùng 4 Hải quân",
+    category: "Chuyên đề Sĩ quan & QNCN",
+    targetAudience: "Cán bộ, Sĩ quan, QNCN toàn Vùng",
+    durationMinutes: 45,
+    estimatedMinutes: 45,
+    summary: "Quán triệt sâu sắc các quan điểm của Đảng, Quân ủy Trung ương về nhiệm vụ bảo vệ chủ quyền biển, đảo trong tình hình mới; xây dựng bản lĩnh kiên định, tinh thần dũng cảm, sẵn sàng chiến đấu hy sinh bảo vệ thềm lục địa và Trường Sa thân yêu.",
+    lecturer: "Đại tá Nguyễn Văn Bách - Phó Tư lệnh Vùng 4",
+    videoUrl: "https://video.gdct.vung4.vn/cd-01-hd.mp4",
+    videoDuration: "18:40",
+    audioUrl: "https://audio.gdct.vung4.vn/cd-01-phat-thanh.mp3",
+    audioDuration: "18:40",
+    audioSpeaker: "Thượng tá Nguyễn Văn A - Ban Tuyên huấn",
+    slidesCount: 8,
+    docxAttachment: "Chuyen_de_01_Ban_linh_chinh_tri.docx",
+    pdfAttachment: "Chuyen_de_01_Ban_linh_chinh_tri.pdf",
+    isInternal: false,
+    securityLevel: "Công khai",
+    quizCount: 4,
+    questions: [
+      {
+        id: 1,
+        question: "Phương châm chỉ đạo xuyên suốt của Đảng ta trong giải quyết tranh chấp trên biển là gì?",
+        options: ["Bị động đối phó", "Kiên quyết, kiên trì, bình tĩnh, khôn khéo", "Đơn phương giải quyết quân sự", "Chờ đợi đối tác phản hồi"],
+        correctOptionIndex: 1,
+        correctAnswer: 1,
+        explanation: "Phương châm: Kiên quyết, kiên trì đấu tranh bảo vệ vững chắc độc lập, chủ quyền, thống nhất, toàn vẹn lãnh thổ của Tổ quốc."
+      },
+      {
+        id: 2,
+        question: "Bộ Tư lệnh Vùng 4 Hải quân có nhiệm vụ nòng cốt bảo vệ vùng biển nào?",
+        options: ["Vịnh Bắc Bộ", "Quần đảo Hoàng Sa", "Quần đảo Trường Sa và vùng biển Nam Trung Bộ", "Vịnh Thái Lan"],
+        correctOptionIndex: 2,
+        correctAnswer: 2,
+        explanation: "Vùng 4 Hải quân quản lý vùng biển chiến lược Nam Trung Bộ và quần đảo Trường Sa."
+      }
+    ]
+  },
+  {
+    id: "bai_2",
+    code: "CĐ-02/2026",
+    title: "Xây dựng bản lĩnh chính trị kiên định, vững vàng cho bộ đội tàu ngầm, tàu mặt nước chiến đấu Vùng 4 Hải quân",
+    category: "Chuyên đề Sĩ quan & QNCN",
+    targetAudience: "Sĩ quan, QNCN, Thủy thủ các Lữ đoàn tàu",
+    durationMinutes: 50,
+    estimatedMinutes: 50,
+    summary: "Xây dựng ý chí quyết tâm, tinh thần dũng cảm, sẵn sàng hy sinh bảo vệ biển đảo; làm chủ vũ khí trang bị kỹ thuật hiện đại, khắc phục mọi khó khăn sóng gió.",
+    lecturer: "Thượng tá Nguyễn Văn Dương - Lữ đoàn 162",
+    videoUrl: "https://video.gdct.vung4.vn/cd-02-hd.mp4",
+    videoDuration: "20:15",
+    audioUrl: "https://audio.gdct.vung4.vn/cd-02-phat-thanh.mp3",
+    audioDuration: "20:15",
+    audioSpeaker: "Trung tá Trần Văn B - Lữ đoàn 162",
+    slidesCount: 10,
+    docxAttachment: "Chuyen_de_02_Ban_linh_thuy_thu.docx",
+    pdfAttachment: "Chuyen_de_02_Ban_linh_thuy_thu.pdf",
+    isInternal: true,
+    securityLevel: "Lưu hành nội bộ",
+    quizCount: 4,
+    questions: [
+      {
+        id: 1,
+        question: "Yếu tố quyết định thắng lợi trong tác chiến hiện đại trên biển của Bộ đội Hải quân là gì?",
+        options: ["Vũ khí tối tân hoàn toàn", "Con người với bản lĩnh chính trị kiên định và làm chủ VKTB", "Thời tiết thuận lợi", "Số lượng tàu thuyền"],
+        correctOptionIndex: 1,
+        correctAnswer: 1,
+        explanation: "Con người là nhân tố quyết định, bản lĩnh chính trị kiên định vững vàng là nền tảng."
+      }
+    ]
+  },
+  {
+    id: "bai_3",
+    code: "CĐ-03/2026",
+    title: "Truyền thống anh hùng của Bộ đội Hải quân và Vùng 4 Hải quân - 50 năm xây dựng, chiến đấu và trưởng thành",
+    category: "Lịch sử & Truyền thống",
+    targetAudience: "Toàn thể cán bộ, chiến sĩ, nhân viên",
+    durationMinutes: 40,
+    estimatedMinutes: 40,
+    summary: "Khắc sâu truyền thống Chiến đấu anh dũng, mưu trí sáng tạo, làm chủ vùng biển, quyết chiến quyết thắng; gương hy sinh anh dũng bảo vệ đảo Gạc Ma, Cô Lin, Len Đao.",
+    lecturer: "Đại tá Trần Hữu Quân - Ban Tuyên huấn Vùng 4",
+    videoUrl: "https://video.gdct.vung4.vn/cd-03-hd.mp4",
+    videoDuration: "16:30",
+    audioUrl: "https://audio.gdct.vung4.vn/cd-03-phat-thanh.mp3",
+    audioDuration: "16:30",
+    audioSpeaker: "Thiếu tá Lê Thị C - Tuyên huấn Vùng 4",
+    slidesCount: 12,
+    docxAttachment: "Chuyen_de_03_Truyen_thong_Vung4.docx",
+    pdfAttachment: "Chuyen_de_03_Truyen_thong_Vung4.pdf",
+    isInternal: false,
+    securityLevel: "Công khai",
+    quizCount: 4,
+    questions: [
+      {
+        id: 1,
+        question: "Truyền thống vẻ vang 16 chữ vàng của Quân chủng Hải quân là gì?",
+        options: [
+          "Đoàn kết, kỷ luật, tự lực, tự cường",
+          "Chiến đấu anh dũng; mưu trí, sáng tạo; làm chủ vùng biển; quyết chiến, quyết thắng",
+          "Trung dũng, kiên cường, toàn dân đánh giặc",
+          "Thần tốc, táo bạo, bất ngờ, chắc thắng"
+        ],
+        correctOptionIndex: 1,
+        correctAnswer: 1,
+        explanation: "Truyền thống 16 chữ vàng do Đảng và Nhà nước trao tặng Quân chủng Hải quân."
+      }
+    ]
+  },
+  {
+    id: "bai_4",
+    code: "CĐ-04/2026",
+    title: "Tăng cường quản lý, chấp hành nghiêm pháp luật Nhà nước, kỷ luật Quân đội và an toàn tuyệt đối trong mọi hoạt động",
+    category: "Pháp luật & Kỷ luật",
+    targetAudience: "Sĩ quan, QNCN, Hạ sĩ quan - Binh sĩ",
+    durationMinutes: 45,
+    estimatedMinutes: 45,
+    summary: "Nâng cao ý thức chấp hành Thông tư 143/2023/TT-BQP, Điều lệnh Quân đội; tuyệt đối không vi phạm nồng độ cồn, vay mượn trái phép, giữ nghiêm tác phong quân nhân.",
+    lecturer: "Trung tá Lê Hồng Minh - Phòng Chính trị Vùng 4",
+    videoUrl: "https://video.gdct.vung4.vn/cd-04-hd.mp4",
+    videoDuration: "19:10",
+    audioUrl: "https://audio.gdct.vung4.vn/cd-04-phat-thanh.mp3",
+    audioDuration: "19:10",
+    audioSpeaker: "Trung tá Lê Hồng Minh",
+    slidesCount: 9,
+    docxAttachment: "Chuyen_de_04_Ky_luat_an_toan.docx",
+    pdfAttachment: "Chuyen_de_04_Ky_luat_an_toan.pdf",
+    isInternal: false,
+    securityLevel: "Công khai",
+    quizCount: 4,
+    questions: [
+      {
+        id: 1,
+        question: "Thông tư 143/2023/TT-BQP quy định xử lý nghiêm nhất hành vi vi phạm nào?",
+        options: ["Đi muộn giờ", "Vi phạm nồng độ cồn khi tham gia giao thông và vay mượn tài chính bất hợp pháp", "Không mặc đúng quân phục dạo mát", "Đọc sách ngoài giờ"],
+        correctOptionIndex: 1,
+        correctAnswer: 1,
+        explanation: "Thông tư 143/2023/TT-BQP xử lý nghiêm khắc vi phạm nồng độ cồn, tệ nạn, vay nợ bất hợp pháp."
+      }
+    ]
+  },
+  {
+    id: "bai_5",
+    code: "CĐ-05/2026",
+    title: "Học tập và làm theo tư tưởng, đạo đức, phong cách Hồ Chí Minh về tinh thần trách nhiệm, nêu gương của người quân nhân cách mạng",
+    category: "Học tập Bác Hồ",
+    targetAudience: "Cán bộ, Đảng viên, Đoàn viên thanh niên",
+    durationMinutes: 40,
+    estimatedMinutes: 40,
+    summary: "Học tập phong cách tận tụy, cần kiệm liêm chính, chí công vô tư của Bác; lời căn dặn của Bác với Hải quân: Ngày nay ta có ngày, có trời, có biển, ta phải biết giữ gìn lấy nó.",
+    lecturer: "Đại tá Nguyễn Văn Hiến - Ban Tuyên huấn Vùng 4",
+    videoUrl: "https://video.gdct.vung4.vn/cd-05-hd.mp4",
+    videoDuration: "17:50",
+    audioUrl: "https://audio.gdct.vung4.vn/cd-05-phat-thanh.mp3",
+    audioDuration: "17:50",
+    audioSpeaker: "Đại tá Nguyễn Văn Hiến",
+    slidesCount: 8,
+    docxAttachment: "Chuyen_de_05_Tu_tuong_Bac_Ho.docx",
+    pdfAttachment: "Chuyen_de_05_Tu_tuong_Bac_Ho.pdf",
+    isInternal: false,
+    securityLevel: "Công khai",
+    quizCount: 4,
+    questions: [
+      {
+        id: 1,
+        question: "Lời Bác Hồ căn dặn Bộ đội Hải quân khi về thăm Vạn Hoa (Hải Phòng) năm 1961 là gì?",
+        options: [
+          "Không có gì quý hơn độc lập tự do",
+          "Ngày trước ta chỉ có đêm và rừng. Ngày nay ta có ngày, có trời, có biển. Bờ biển ta dài, tươi đẹp, ta phải biết giữ gìn lấy nó",
+          "Quyết tử để Tổ quốc quyết sinh",
+          "Vì lợi ích mười năm trồng cây, vì lợi ích trăm năm trồng người"
+        ],
+        correctOptionIndex: 1,
+        correctAnswer: 1,
+        explanation: "Lời dạy bất hủ của Chủ tịch Hồ Chí Minh tại đảo Vạn Hoa năm 1961."
+      }
+    ]
+  },
+  {
+    id: "bai_6",
+    code: "CĐ-06/2026",
+    title: "Công tác bảo vệ bí mật quân sự, an ninh mạng và an toàn thông tin trên không gian mạng trong tình hình mới",
+    category: "Bảo vệ an ninh",
+    targetAudience: "Sĩ quan, QNCN, Nhân viên cơ yếu, Thông tin",
+    durationMinutes: 45,
+    estimatedMinutes: 45,
+    summary: "Quán triệt quy định bảo mật tài liệu quân sự; tuyệt đối không chụp ảnh quân sự đăng lên mạng xã hội; phòng chống gián điệp mạng và chiến tranh thông tin.",
+    lecturer: "Thượng tá Đỗ Minh Tuấn - Ban Bảo vệ An ninh Vùng 4",
+    videoUrl: "https://video.gdct.vung4.vn/cd-06-hd.mp4",
+    videoDuration: "18:00",
+    audioUrl: "https://audio.gdct.vung4.vn/cd-06-phat-thanh.mp3",
+    audioDuration: "18:00",
+    audioSpeaker: "Thượng tá Đỗ Minh Tuấn",
+    slidesCount: 9,
+    docxAttachment: "Chuyen_de_06_Bao_mat_thong_tin.docx",
+    pdfAttachment: "Chuyen_de_06_Bao_mat_thong_tin.pdf",
+    isInternal: true,
+    securityLevel: "Lưu hành nội bộ",
+    quizCount: 4,
+    questions: [
+      {
+        id: 1,
+        question: "Quy định nào sau đây là BẮT BUỘC đối với quân nhân khi sử dụng mạng xã hội?",
+        options: [
+          "Được chia sẻ vị trí đóng quân nếu bật chế độ bạn bè",
+          "Tuyệt đối không đăng tải hình ảnh vũ khí, tài liệu mật, tọa độ tàu và doanh trại",
+          "Được thảo luận nhiệm vụ với gia đình qua tin nhắn",
+          "Tự do chia sẻ thông tin huấn luyện"
+        ],
+        correctOptionIndex: 1,
+        correctAnswer: 1,
+        explanation: "Bảo vệ bí mật quân sự là kỷ luật sắt, cấm tuyệt đối đăng tải thông tin huấn luyện, tọa độ, khí tài."
+      }
+    ]
+  }
+];
+
+const INITIAL_LAWS = [
+  {
+    id: "law-01",
+    title: "Luật Biển Việt Nam năm 2012",
+    issuedBy: "Quốc hội Nước CHXHCN Việt Nam",
+    category: "Pháp luật Nhà nước",
+    summary: "Quy định về đường cơ sở, nội thủy, lãnh hải, vùng tiếp giáp lãnh hải, vùng đặc quyền kinh tế, thềm lục địa, các đảo và quần đảo Hoàng Sa, Trường Sa thuộc chủ quyền Việt Nam."
+  },
+  {
+    id: "law-02",
+    title: "Thông tư 143/2023/TT-BQP",
+    issuedBy: "Bộ Quốc phòng",
+    category: "Kỷ luật Quân đội",
+    summary: "Quy định xử lý kỷ luật trong Quân đội nhân dân Việt Nam; các chế tài nghiêm khắc đối với hành vi vi phạm pháp luật, vi phạm nồng độ cồn, gây mất an toàn."
+  },
+  {
+    id: "law-03",
+    title: "Luật Sĩ quan Quân đội nhân dân Việt Nam",
+    issuedBy: "Quốc hội Nước CHXHCN Việt Nam",
+    category: "Chế độ chính sách",
+    summary: "Quy định chức vụ, cấp bậc quân hàm, quyền lợi, trách nhiệm và nghĩa vụ vẻ vang của Sĩ quan QĐND Việt Nam."
+  }
+];
+
+const INITIAL_SUBMISSIONS = [
+  {
+    id: 101,
+    username: "phamtatthang_162",
+    soldierName: "Phạm Tất Thắng",
+    soldierRank: "Đại úy",
+    soldierUnit: "Lữ đoàn 162",
+    lessonId: "bai_1",
+    lessonTitle: "Nâng cao bản lĩnh chính trị, ý chí quyết chiến quyết thắng của cán bộ, chiến sĩ Vùng 4 Hải quân",
+    score: 4,
+    totalQuestions: 4,
+    percentage: 100,
+    passed: true,
+    timestamp: Date.now() - 3600000 * 4,
+    commanderReviewStatus: "Chính trị viên đã duyệt - Xếp loại Giỏi",
+    commanderComment: "Đồng chí nắm rất vững nội dung chính trị, liên hệ sâu sắc thực tiễn tàu và đơn vị."
+  },
+  {
+    id: 102,
+    username: "nguyenvanbinh_162",
+    soldierName: "Nguyễn Văn Bình",
+    soldierRank: "Thượng úy",
+    soldierUnit: "Lữ đoàn 162",
+    lessonId: "bai_2",
+    lessonTitle: "Xây dựng bản lĩnh chính trị kiên định, vững vàng cho bộ đội tàu ngầm, tàu mặt nước chiến đấu Vùng 4 Hải quân",
+    score: 4,
+    totalQuestions: 4,
+    percentage: 100,
+    passed: true,
+    timestamp: Date.now() - 3600000 * 2,
+    commanderReviewStatus: "Chính trị viên đã duyệt - Xếp loại Giỏi",
+    commanderComment: "Nắm tốt kiến thức cơ bản, gương mẫu trong học tập và công tác."
+  }
+];
+
 // Load or Initialize DB
 let inMemoryDB = {
   users: INITIAL_USERS,
-  lessons: [],
+  lessons: INITIAL_LESSONS,
+  submissions: INITIAL_SUBMISSIONS,
+  laws: INITIAL_LAWS,
   syncLogs: []
 };
 
@@ -166,11 +445,17 @@ function loadDatabase() {
   try {
     if (fs.existsSync(DB_FILE)) {
       const data = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
-      if (data.users && data.users.length > 0) {
+      if (data.users && Array.isArray(data.users) && data.users.length > 0) {
         inMemoryDB.users = data.users;
       }
-      if (data.lessons && data.lessons.length > 0) {
+      if (data.lessons && Array.isArray(data.lessons) && data.lessons.length > 0) {
         inMemoryDB.lessons = data.lessons;
+      }
+      if (data.submissions && Array.isArray(data.submissions)) {
+        inMemoryDB.submissions = data.submissions;
+      }
+      if (data.laws && Array.isArray(data.laws) && data.laws.length > 0) {
+        inMemoryDB.laws = data.laws;
       }
       if (data.syncLogs) {
         inMemoryDB.syncLogs = data.syncLogs;
@@ -179,12 +464,16 @@ function loadDatabase() {
       saveDatabase();
     }
   } catch (err) {
-    console.error("Failed to load DB:", err);
+    console.error("Failed to load DB, resetting to defaults:", err);
+    saveDatabase();
   }
 }
 
 function saveDatabase() {
   try {
+    if (!fs.existsSync(WEB_ADMIN_DIR)) {
+      fs.mkdirSync(WEB_ADMIN_DIR, { recursive: true });
+    }
     fs.writeFileSync(DB_FILE, JSON.stringify(inMemoryDB, null, 2), 'utf8');
   } catch (err) {
     console.error("Failed to save DB:", err);
@@ -233,12 +522,123 @@ const server = http.createServer(async (req, res) => {
   // ================= REST API ENDPOINTS =================
   if (pathname.startsWith('/api/')) {
     try {
-      // 1. GET /api/users
-      if (pathname === '/api/users' && req.method === 'GET') {
-        return sendJSON(res, { success: true, count: inMemoryDB.users.length, users: inMemoryDB.users });
+      // 1. GET & POST /api/sync (Full Bidirectional Sync)
+      if (pathname === '/api/sync') {
+        if (req.method === 'GET') {
+          return sendJSON(res, {
+            success: true,
+            timestamp: Date.now(),
+            serverTime: new Date().toISOString(),
+            users: inMemoryDB.users,
+            lessons: inMemoryDB.lessons,
+            submissions: inMemoryDB.submissions,
+            laws: inMemoryDB.laws,
+            syncLogs: inMemoryDB.syncLogs.slice(-20)
+          });
+        } else if (req.method === 'POST') {
+          const body = await parseRequestBody(req);
+          
+          if (body.users && Array.isArray(body.users) && body.users.length > 0) {
+            // Merge users by id/username
+            body.users.forEach(incomingUser => {
+              const idx = inMemoryDB.users.findIndex(u => 
+                (u.id && u.id === incomingUser.id) ||
+                (u.username && incomingUser.username && u.username.toLowerCase() === incomingUser.username.toLowerCase()) ||
+                (u.militaryCode && incomingUser.militaryCode && u.militaryCode.toLowerCase() === incomingUser.militaryCode.toLowerCase())
+              );
+              if (idx >= 0) {
+                inMemoryDB.users[idx] = { ...inMemoryDB.users[idx], ...incomingUser };
+              } else {
+                inMemoryDB.users.push(incomingUser);
+              }
+            });
+          }
+
+          if (body.lessons && Array.isArray(body.lessons) && body.lessons.length > 0) {
+            body.lessons.forEach(incomingLesson => {
+              const idx = inMemoryDB.lessons.findIndex(l => l.id === incomingLesson.id || (l.code && l.code === incomingLesson.code));
+              if (idx >= 0) {
+                inMemoryDB.lessons[idx] = { ...inMemoryDB.lessons[idx], ...incomingLesson };
+              } else {
+                inMemoryDB.lessons.push(incomingLesson);
+              }
+            });
+          }
+
+          if (body.submissions && Array.isArray(body.submissions)) {
+            body.submissions.forEach(incomingSub => {
+              const subId = incomingSub.id || incomingSub.timestamp || Date.now();
+              const idx = inMemoryDB.submissions.findIndex(s => s.id === subId);
+              if (idx >= 0) {
+                inMemoryDB.submissions[idx] = { ...inMemoryDB.submissions[idx], ...incomingSub };
+              } else {
+                inMemoryDB.submissions.unshift({ ...incomingSub, id: subId });
+              }
+            });
+          }
+
+          if (body.laws && Array.isArray(body.laws)) {
+            body.laws.forEach(incomingLaw => {
+              const idx = inMemoryDB.laws.findIndex(l => l.id === incomingLaw.id);
+              if (idx >= 0) inMemoryDB.laws[idx] = incomingLaw;
+              else inMemoryDB.laws.push(incomingLaw);
+            });
+          }
+
+          inMemoryDB.syncLogs.push({
+            time: new Date().toLocaleTimeString('vi-VN'),
+            type: "Đồng bộ hai chiều Web & App",
+            detail: `Cập nhật ${inMemoryDB.users.length} tài khoản, ${inMemoryDB.lessons.length} chuyên đề`
+          });
+
+          saveDatabase();
+          return sendJSON(res, {
+            success: true,
+            message: "Đồng bộ hai chiều hoàn tất thành công!",
+            timestamp: Date.now(),
+            users: inMemoryDB.users,
+            lessons: inMemoryDB.lessons,
+            submissions: inMemoryDB.submissions,
+            laws: inMemoryDB.laws
+          });
+        }
       }
 
-      // 2. POST /api/users/update-profile (Called by Android App or Web Admin)
+      // 2. GET & POST /api/users
+      if (pathname === '/api/users') {
+        if (req.method === 'GET') {
+          return sendJSON(res, { success: true, count: inMemoryDB.users.length, users: inMemoryDB.users });
+        } else if (req.method === 'POST') {
+          const body = await parseRequestBody(req);
+          const id = body.id || `acc_${Date.now()}`;
+          const existingIdx = inMemoryDB.users.findIndex(u => u.id === id || (u.username && u.username.toLowerCase() === (body.username||'').toLowerCase()));
+          
+          if (existingIdx >= 0) {
+            inMemoryDB.users[existingIdx] = { ...inMemoryDB.users[existingIdx], ...body };
+          } else {
+            inMemoryDB.users.push({
+              id,
+              orderNumber: inMemoryDB.users.length + 1,
+              username: body.username || `user_${Date.now()}`,
+              password: body.password || "12345@abc",
+              militaryCode: body.militaryCode || "QN-NEW",
+              fullName: body.fullName || "Quân nhân mới",
+              rank: body.rank || "Chiến sĩ",
+              position: body.position || body.role || "Chiến sĩ",
+              unit: body.unit || "Lữ đoàn 162",
+              phone: body.phone || "",
+              progress: body.progress || 0,
+              avgScore: body.avgScore || 0.0,
+              lastActive: "Vừa khởi tạo",
+              isInternalAccess: body.isInternalAccess !== false
+            });
+          }
+          saveDatabase();
+          return sendJSON(res, { success: true, message: "Đã lưu tài khoản quân nhân thành công!", users: inMemoryDB.users });
+        }
+      }
+
+      // 3. POST /api/users/update-profile
       if (pathname === '/api/users/update-profile' && req.method === 'POST') {
         const body = await parseRequestBody(req);
         const { username, fullName, rank, role, unit, phone, militaryId, militaryCode } = body;
@@ -252,7 +652,6 @@ const server = http.createServer(async (req, res) => {
         );
 
         if (userIndex >= 0) {
-          // Update existing
           inMemoryDB.users[userIndex] = {
             ...inMemoryDB.users[userIndex],
             fullName: fullName || inMemoryDB.users[userIndex].fullName,
@@ -264,7 +663,6 @@ const server = http.createServer(async (req, res) => {
             lastActive: "Vừa cập nhật từ App Mobile"
           };
         } else if (fullName) {
-          // Create new user if not found
           const newUser = {
             id: `acc_${Date.now()}`,
             orderNumber: inMemoryDB.users.length + 1,
@@ -286,7 +684,6 @@ const server = http.createServer(async (req, res) => {
         }
 
         saveDatabase();
-
         const updatedUser = inMemoryDB.users[userIndex];
         return sendJSON(res, {
           success: true,
@@ -295,7 +692,7 @@ const server = http.createServer(async (req, res) => {
         });
       }
 
-      // 3. POST /api/users/change-password
+      // 4. POST /api/users/change-password
       if (pathname === '/api/users/change-password' && req.method === 'POST') {
         const body = await parseRequestBody(req);
         const { username, oldPassword, newPassword } = body;
@@ -315,7 +712,21 @@ const server = http.createServer(async (req, res) => {
         return sendJSON(res, { success: false, message: "Không tìm thấy tài khoản quân nhân!" }, 404);
       }
 
-      // 4. POST /api/users/sync-progress
+      // 5. POST /api/users/reset-password
+      if (pathname === '/api/users/reset-password' && req.method === 'POST') {
+        const body = await parseRequestBody(req);
+        const { userId, username } = body;
+        const user = inMemoryDB.users.find(u => u.id === userId || (username && u.username.toLowerCase() === username.toLowerCase()));
+        if (user) {
+          user.password = "12345@abc";
+          user.lastActive = "Đã đặt lại MK";
+          saveDatabase();
+          return sendJSON(res, { success: true, message: `Đã đặt lại mật khẩu về 12345@abc cho tài khoản ${user.username}` });
+        }
+        return sendJSON(res, { success: false, message: "Không tìm thấy quân nhân" }, 404);
+      }
+
+      // 6. POST /api/users/sync-progress
       if (pathname === '/api/users/sync-progress' && req.method === 'POST') {
         const body = await parseRequestBody(req);
         const { username, progress, avgScore, lastActive } = body;
@@ -332,29 +743,126 @@ const server = http.createServer(async (req, res) => {
         return sendJSON(res, { success: false, message: "User not found" }, 404);
       }
 
-      // 5. POST /api/sync (Full Bidirectional Sync)
-      if (pathname === '/api/sync') {
+      // 7. GET & POST /api/lessons
+      if (pathname === '/api/lessons') {
         if (req.method === 'GET') {
-          return sendJSON(res, {
-            success: true,
-            serverTime: new Date().toISOString(),
-            users: inMemoryDB.users,
-            lessonsCount: inMemoryDB.lessons.length
-          });
+          return sendJSON(res, { success: true, count: inMemoryDB.lessons.length, lessons: inMemoryDB.lessons });
         } else if (req.method === 'POST') {
           const body = await parseRequestBody(req);
-          if (body.users && Array.isArray(body.users)) {
-            inMemoryDB.users = body.users;
+          const id = body.id || `bai_${Date.now()}`;
+          const existingIdx = inMemoryDB.lessons.findIndex(l => l.id === id || (l.code && l.code === body.code));
+          
+          const lessonObj = {
+            id,
+            code: body.code || "CĐ-NEW/2026",
+            title: body.title || "Chuyên đề Giáo dục Chính trị mới",
+            category: body.category || "Chuyên đề Sĩ quan & QNCN",
+            targetAudience: body.targetAudience || "Cán bộ, chiến sĩ Vùng 4",
+            durationMinutes: body.durationMinutes || body.estimatedMinutes || 45,
+            estimatedMinutes: body.durationMinutes || body.estimatedMinutes || 45,
+            summary: body.summary || "Nội dung học tập chính trị trọng tâm",
+            lecturer: body.lecturer || "Phòng Chính trị Vùng 4",
+            videoUrl: body.videoUrl || "https://video.gdct.vung4.vn/cd-new.mp4",
+            videoDuration: body.videoDuration || "18:00",
+            audioUrl: body.audioUrl || "https://audio.gdct.vung4.vn/cd-new.mp3",
+            audioDuration: body.audioDuration || "18:00",
+            audioSpeaker: body.audioSpeaker || "Ban Tuyên huấn Vùng 4",
+            slidesCount: body.slidesCount || 8,
+            docxAttachment: body.docxAttachment || "Tai_Lieu.docx",
+            pdfAttachment: body.pdfAttachment || "Tai_Lieu.pdf",
+            isInternal: body.isInternal === true,
+            securityLevel: body.isInternal ? "Lưu hành nội bộ" : "Công khai",
+            quizCount: body.questions ? body.questions.length : 4,
+            questions: body.questions || []
+          };
+
+          if (existingIdx >= 0) {
+            inMemoryDB.lessons[existingIdx] = { ...inMemoryDB.lessons[existingIdx], ...lessonObj };
+          } else {
+            inMemoryDB.lessons.unshift(lessonObj);
           }
-          if (body.lessons && Array.isArray(body.lessons)) {
-            inMemoryDB.lessons = body.lessons;
-          }
+
           saveDatabase();
-          return sendJSON(res, { success: true, message: "Đã đồng bộ toàn diện dữ liệu hệ thống!" });
+          return sendJSON(res, { success: true, message: "Đã lưu chuyên đề GDCT thành công!", lessons: inMemoryDB.lessons });
         }
       }
 
-      // 6. GET /api/stats
+      // 8. DELETE /api/lessons/:id
+      if (pathname.startsWith('/api/lessons/') && req.method === 'DELETE') {
+        const id = pathname.replace('/api/lessons/', '');
+        inMemoryDB.lessons = inMemoryDB.lessons.filter(l => l.id !== id);
+        saveDatabase();
+        return sendJSON(res, { success: true, message: "Đã xóa bài giảng thành công!", lessons: inMemoryDB.lessons });
+      }
+
+      // 9. GET & POST /api/submissions (Quiz submissions from mobile app)
+      if (pathname === '/api/submissions') {
+        if (req.method === 'GET') {
+          return sendJSON(res, { success: true, count: inMemoryDB.submissions.length, submissions: inMemoryDB.submissions });
+        } else if (req.method === 'POST') {
+          const body = await parseRequestBody(req);
+          const subId = body.id || Date.now();
+          const newSubmission = {
+            id: subId,
+            username: body.username || "quan_nhan",
+            soldierName: body.soldierName || body.fullName || "Quân nhân",
+            soldierRank: body.soldierRank || body.rank || "Chiến sĩ",
+            soldierUnit: body.soldierUnit || body.unit || "Vùng 4 Hải quân",
+            lessonId: body.lessonId || "bai_1",
+            lessonTitle: body.lessonTitle || "Chuyên đề GDCT",
+            score: body.score || 0,
+            totalQuestions: body.totalQuestions || 4,
+            percentage: body.percentage || 0,
+            passed: body.passed !== false,
+            timestamp: body.timestamp || Date.now(),
+            commanderReviewStatus: body.commanderReviewStatus || "Chờ Chính trị viên ký duyệt",
+            commanderComment: body.commanderComment || ""
+          };
+
+          inMemoryDB.submissions.unshift(newSubmission);
+
+          // Update user score
+          const user = inMemoryDB.users.find(u => u.username && u.username.toLowerCase() === (body.username || '').toLowerCase());
+          if (user) {
+            user.lastActive = `Vừa nộp bài thi (${newSubmission.score}/${newSubmission.totalQuestions}đ)`;
+          }
+
+          saveDatabase();
+          return sendJSON(res, {
+            success: true,
+            message: "Đã ghi nhận bài thi trắc nghiệm trên hệ thống Quản trị!",
+            submission: newSubmission
+          });
+        }
+      }
+
+      // 10. POST /api/submissions/review (Commander grading / reviewing from Web Admin)
+      if (pathname === '/api/submissions/review' && req.method === 'POST') {
+        const body = await parseRequestBody(req);
+        const { submissionId, commanderReviewStatus, commanderComment } = body;
+        const sub = inMemoryDB.submissions.find(s => s.id == submissionId);
+        if (sub) {
+          sub.commanderReviewStatus = commanderReviewStatus || "Chính trị viên đã phê duyệt";
+          sub.commanderComment = commanderComment || "Nắm chắc nội dung bài giảng, phát huy tốt.";
+          saveDatabase();
+          return sendJSON(res, { success: true, message: "Đã lưu nhận xét và chữ ký duyệt của Cán bộ!", submission: sub });
+        }
+        return sendJSON(res, { success: false, message: "Không tìm thấy bài nộp" }, 404);
+      }
+
+      // 11. GET & POST /api/laws
+      if (pathname === '/api/laws') {
+        if (req.method === 'GET') {
+          return sendJSON(res, { success: true, laws: inMemoryDB.laws });
+        } else if (req.method === 'POST') {
+          const body = await parseRequestBody(req);
+          inMemoryDB.laws.push(body);
+          saveDatabase();
+          return sendJSON(res, { success: true, message: "Đã thêm văn bản pháp luật mới!", laws: inMemoryDB.laws });
+        }
+      }
+
+      // 12. GET /api/stats
       if (pathname === '/api/stats' && req.method === 'GET') {
         const totalUsers = inMemoryDB.users.length;
         const completedUsers = inMemoryDB.users.filter(u => u.progress >= 100).length;
@@ -375,18 +883,15 @@ const server = http.createServer(async (req, res) => {
   }
 
   // ================= STATIC FILES SERVING =================
-  // Normalize path
   if (pathname === '/' || pathname === '/index.html') {
     pathname = '/index.html';
   }
 
-  // Strip leading /web-admin if present
   let relativePath = pathname;
   if (relativePath.startsWith('/web-admin/')) {
     relativePath = relativePath.slice('/web-admin'.length);
   }
 
-  // Find file in web-admin dir or workspace dir
   let filePath = path.join(WEB_ADMIN_DIR, relativePath);
   if (!fs.existsSync(filePath)) {
     filePath = path.join(__dirname, pathname);
@@ -398,7 +903,6 @@ const server = http.createServer(async (req, res) => {
     res.writeHead(200, { 'Content-Type': contentType });
     fs.createReadStream(filePath).pipe(res);
   } else {
-    // Fallback to web-admin index.html
     const fallbackIndex = path.join(WEB_ADMIN_DIR, 'index.html');
     if (fs.existsSync(fallbackIndex)) {
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });

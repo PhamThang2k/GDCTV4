@@ -114,6 +114,9 @@ fun GdctApp(viewModel: GdctViewModel = viewModel()) {
         )
       }
     ) { innerPadding ->
+      val activeLessons = uiState.adminLessons.ifEmpty { viewModel.allLessons }
+      val activeLaws = uiState.adminLaws.ifEmpty { viewModel.allLaws }
+
       Box(
         modifier = Modifier
           .fillMaxSize()
@@ -121,7 +124,7 @@ fun GdctApp(viewModel: GdctViewModel = viewModel()) {
       ) {
         when (uiState.currentTab) {
           AppTab.HOME -> HomeScreen(
-            lessons = viewModel.allLessons,
+            lessons = activeLessons,
             progressMap = progressMap,
             quizSubmissions = quizSubmissions,
             onNavigateTab = { viewModel.setTab(it) },
@@ -133,7 +136,7 @@ fun GdctApp(viewModel: GdctViewModel = viewModel()) {
           )
 
           AppTab.STUDY -> StudyScreen(
-            lessons = viewModel.allLessons,
+            lessons = activeLessons,
             selectedCategory = uiState.selectedLessonCategory,
             searchQuery = uiState.searchQuery,
             progressMap = progressMap,
@@ -145,8 +148,8 @@ fun GdctApp(viewModel: GdctViewModel = viewModel()) {
           )
 
           AppTab.UTILITIES -> UtilitiesScreen(
-            lessons = viewModel.allLessons,
-            lawDocs = viewModel.allLaws,
+            lessons = activeLessons,
+            lawDocs = activeLaws,
             notes = personalNotes,
             onOpenLaw = { viewModel.openLaw(it) },
             onStartQuiz = { viewModel.startQuiz(it) },
@@ -157,7 +160,7 @@ fun GdctApp(viewModel: GdctViewModel = viewModel()) {
 
           AppTab.PROFILE -> ProfileAdminScreen(
             userProfile = uiState.userProfile,
-            lessons = viewModel.allLessons,
+            lessons = activeLessons,
             progressMap = progressMap,
             quizSubmissions = quizSubmissions,
             onOpenLesson = { viewModel.openLesson(it) },
@@ -179,7 +182,7 @@ fun GdctApp(viewModel: GdctViewModel = viewModel()) {
   // Modals & Dialogs
   if (uiState.showLoginDialog) {
     LoginDialog(
-      userAccounts = uiState.adminUserAccounts.ifEmpty { viewModel.allLessons.let { emptyList() } },
+      userAccounts = uiState.adminUserAccounts,
       onLoginWithCredentials = { username, password -> viewModel.loginWithCredentials(username, password) },
       onQuickLogin = { viewModel.loginQuick(it) },
       onContinueAsGuest = { viewModel.setShowLoginDialog(false) },

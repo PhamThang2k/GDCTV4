@@ -75,6 +75,10 @@ class GdctRepository(private val database: AppDatabase) {
     return database.quizDao().insertSubmission(submission)
   }
 
+  suspend fun insertOrUpdateQuizSubmission(submission: QuizSubmissionEntity): Long {
+    return database.quizDao().insertSubmission(submission)
+  }
+
   suspend fun addNote(lessonId: String, title: String, content: String, category: String) {
     val note = PersonalNoteEntity(
       lessonId = lessonId,

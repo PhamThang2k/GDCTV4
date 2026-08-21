@@ -354,6 +354,7 @@ class AdminDataStore {
     this.lessons = this.load("gdct_admin_lessons", DEFAULT_LESSONS);
     this.users = this.load("gdct_admin_users", DEFAULT_USERS);
     this.laws = this.load("gdct_admin_laws", DEFAULT_LAWS);
+    this.submissions = this.load("gdct_admin_submissions", []);
     
     this.users = this.users.map((u, idx) => ({
       ...u,
@@ -362,28 +363,79 @@ class AdminDataStore {
       password: u.password || "12345@abc"
     }));
 
-    // Initial server fetch & polling
+    // Initial server fetch & polling every 3 seconds for real-time 2-way sync
     this.fetchFromServer();
-    setInterval(() => this.fetchFromServer(true), 5000);
+    setInterval(() => this.fetchFromServer(true), 3000);
   }
 
   async fetchFromServer(silent = false) {
     try {
-      const res = await fetch('/api/users');
+      const res = await fetch('/api/sync');
       if (res.ok) {
         const data = await res.json();
-        if (data.success && Array.isArray(data.users) && data.users.length > 0) {
-          const currentCount = this.users.length;
-          this.users = data.users;
-          this.save("gdct_admin_users", this.users);
-          if (!silent || currentCount !== this.users.length) {
+        if (data.success) {
+          let hasChange = false;
+
+          if (Array.isArray(data.users) && data.users.length > 0) {
+            const currentStr = JSON.stringify(this.users);
+            const incomingStr = JSON.stringify(data.users);
+            if (currentStr !== incomingStr) {
+              this.users = data.users;
+              this.save("gdct_admin_users", this.users);
+              hasChange = true;
+            }
+          }
+
+          if (Array.isArray(data.lessons) && data.lessons.length > 0) {
+            const currentStr = JSON.stringify(this.lessons);
+            const incomingStr = JSON.stringify(data.lessons);
+            if (currentStr !== incomingStr) {
+              this.lessons = data.lessons;
+              this.save("gdct_admin_lessons", this.lessons);
+              hasChange = true;
+            }
+          }
+
+          if (Array.isArray(data.submissions)) {
+            const currentStr = JSON.stringify(this.submissions);
+            const incomingStr = JSON.stringify(data.submissions);
+            if (currentStr !== incomingStr) {
+              this.submissions = data.submissions;
+              this.save("gdct_admin_submissions", this.submissions);
+              hasChange = true;
+            }
+          }
+
+          if (Array.isArray(data.laws) && data.laws.length > 0) {
+            const currentStr = JSON.stringify(this.laws);
+            const incomingStr = JSON.stringify(data.laws);
+            if (currentStr !== incomingStr) {
+              this.laws = data.laws;
+              this.save("gdct_admin_laws", this.laws);
+              hasChange = true;
+            }
+          }
+
+          if (hasChange) {
             if (typeof renderUsersTable === 'function') renderUsersTable();
-            if (typeof renderStats === 'function') renderStats();
+            if (typeof renderLessonsTable === 'function') renderLessonsTable();
+            if (typeof renderOverview === 'function') renderOverview();
+            if (typeof renderQuizBank === 'function') renderQuizBank();
+            if (typeof renderLaws === 'function') renderLaws();
+            if (typeof renderSubmissionsTable === 'function') renderSubmissionsTable();
+          }
+
+          const syncBadge = document.querySelector(".sync-badge");
+          if (syncBadge) {
+            syncBadge.innerHTML = '<span class="sync-dot" style="background:#10B981; animation: pulse 1.5s infinite;"></span> <span style="color:#065F46; font-weight:600;">Đồng bộ thời gian thực với App Mobile</span>';
           }
         }
       }
     } catch (e) {
-      // offline / local fallback
+      const syncBadge = document.querySelector(".sync-badge");
+      if (syncBadge) {
+        syncBadge.innerHTML = '<span class="sync-dot" style="background:#F59E0B;"></span> <span>Chế độ ngoại tuyến (Cục bộ)</span>';
+      }
     }
   }
 
@@ -404,17 +456,30 @@ class AdminDataStore {
     }
   }
 
-  saveAll() {
+  async saveAll() {
     this.save("gdct_admin_lessons", this.lessons);
     this.save("gdct_admin_users", this.users);
     this.save("gdct_admin_laws", this.laws);
+    this.save("gdct_admin_submissions", this.submissions);
 
-    // Sync to backend
-    fetch('/api/sync', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ users: this.users, lessons: this.lessons })
-    }).catch(err => console.log('Sync to server note:', err));
+    // Sync to backend immediately
+    try {
+      const res = await fetch('/api/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          users: this.users,
+          lessons: this.lessons,
+          submissions: this.submissions,
+          laws: this.laws
+        })
+      });
+      if (res.ok) {
+        showToast("Dữ liệu đã được lưu và đồng bộ tức thì sang Ứng dụng Di động!");
+      }
+    } catch (err) {
+      console.log('Sync to server note:', err);
+    }
   }
 }
 

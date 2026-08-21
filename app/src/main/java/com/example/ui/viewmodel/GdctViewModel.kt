@@ -18,6 +18,7 @@ import com.example.data.model.UserAccount
 import com.example.data.model.UserProfile
 import com.example.data.repository.GdctRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -26,7 +27,10 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.json.JSONArray
 import org.json.JSONObject
+import java.io.BufferedReader
+import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 
@@ -67,6 +71,7 @@ data class GdctUiState(
   // Web Admin CMS states
   val adminLessons: List<Lesson> = emptyList(),
   val adminUserAccounts: List<UserAccount> = emptyList(),
+  val adminLaws: List<LawDoc> = emptyList(),
   val adminSelectedCategory: String = "Tất cả",
   val adminSearchQuery: String = "",
   val adminSelectedUnit: String = "Tất cả đơn vị",
@@ -104,7 +109,8 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
     _uiState.value = _uiState.value.copy(
       userProfile = initialProfile,
       adminLessons = allLessons,
-      adminUserAccounts = initialAccounts
+      adminUserAccounts = initialAccounts,
+      adminLaws = allLaws
     )
 
     studyProgressMap = repository.allProgress
@@ -140,6 +146,26 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = emptySet()
       )
+
+    // Launch continuous background bidirectional sync with Web Admin server
+    startContinuousSyncLoop()
+  }
+
+  private fun startContinuousSyncLoop() {
+    viewModelScope.launch(Dispatchers.IO) {
+      // First immediate sync
+      syncWithServerInternal()
+      
+      // Polling loop every 3.5 seconds
+      while (true) {
+        delay(3500)
+        try {
+          syncWithServerInternal()
+        } catch (e: Exception) {
+          // Keep loop running silently
+        }
+      }
+    }
   }
 
   fun setTab(tab: AppTab) {
@@ -223,8 +249,10 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
           put("unit", profile.unit)
           put("phone", profile.phone)
           put("militaryId", profile.militaryId)
+          put("militaryCode", profile.militaryId)
         }
         sendJsonPost("/api/users/update-profile", payload)
+        syncWithServerInternal()
       } catch (e: Exception) {
         e.printStackTrace()
       }
@@ -240,6 +268,7 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
           put("newPassword", newPass)
         }
         sendJsonPost("/api/users/change-password", payload)
+        syncWithServerInternal()
       } catch (e: Exception) {
         e.printStackTrace()
       }
@@ -249,19 +278,7 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
   fun syncAllWithWebAdmin() {
     viewModelScope.launch(Dispatchers.IO) {
       val success = try {
-        val profile = _uiState.value.userProfile
-        if (profile.isLoggedIn) {
-          val payload = JSONObject().apply {
-            put("username", profile.username)
-            put("fullName", profile.name)
-            put("rank", profile.rank)
-            put("role", profile.role)
-            put("unit", profile.unit)
-            put("phone", profile.phone)
-            put("militaryId", profile.militaryId)
-          }
-          sendJsonPost("/api/users/update-profile", payload)
-        }
+        syncWithServerInternal()
         true
       } catch (e: Exception) {
         false
@@ -275,8 +292,34 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
     }
   }
 
-  private fun sendJsonPost(endpoint: String, json: JSONObject) {
-    val hostUrls = listOf("http://10.0.2.2:3000$endpoint", "http://127.0.0.1:3000$endpoint")
+  private fun performHttpGet(endpoint: String): String? {
+    val hostUrls = listOf("http://10.0.2.2:3000$endpoint", "http://127.0.0.1:3000$endpoint", "http://localhost:3000$endpoint")
+    for (urlStr in hostUrls) {
+      try {
+        val url = URL(urlStr)
+        val conn = (url.openConnection() as HttpURLConnection).apply {
+          requestMethod = "GET"
+          setRequestProperty("Accept", "application/json")
+          connectTimeout = 1500
+          readTimeout = 2000
+        }
+        if (conn.responseCode in 200..299) {
+          val reader = BufferedReader(InputStreamReader(conn.inputStream, Charsets.UTF_8))
+          val response = reader.readText()
+          reader.close()
+          conn.disconnect()
+          return response
+        }
+        conn.disconnect()
+      } catch (e: Exception) {
+        // Try next host candidate
+      }
+    }
+    return null
+  }
+
+  private fun sendJsonPost(endpoint: String, json: JSONObject): String? {
+    val hostUrls = listOf("http://10.0.2.2:3000$endpoint", "http://127.0.0.1:3000$endpoint", "http://localhost:3000$endpoint")
     for (urlStr in hostUrls) {
       try {
         val url = URL(urlStr)
@@ -285,20 +328,305 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
           setRequestProperty("Content-Type", "application/json; charset=utf-8")
           setRequestProperty("Accept", "application/json")
           doOutput = true
-          connectTimeout = 2000
+          connectTimeout = 1500
           readTimeout = 2000
         }
         conn.outputStream.use { os ->
           os.write(json.toString().toByteArray(Charsets.UTF_8))
         }
         val responseCode = conn.responseCode
-        conn.disconnect()
         if (responseCode in 200..299) {
-          break
+          val reader = BufferedReader(InputStreamReader(conn.inputStream, Charsets.UTF_8))
+          val response = reader.readText()
+          reader.close()
+          conn.disconnect()
+          return response
         }
+        conn.disconnect()
       } catch (e: Exception) {
         // try next host
       }
+    }
+    return null
+  }
+
+  private suspend fun syncWithServerInternal() {
+    val response = performHttpGet("/api/sync") ?: return
+    try {
+      val rootJson = JSONObject(response)
+      if (!rootJson.optBoolean("success", false)) return
+
+      // 1. Sync Users
+      val usersArray = rootJson.optJSONArray("users")
+      if (usersArray != null && usersArray.length() > 0) {
+        val parsedUsers = mutableListOf<UserAccount>()
+        for (i in 0 until usersArray.length()) {
+          val uJson = usersArray.getJSONObject(i)
+          parsedUsers.add(
+            UserAccount(
+              id = uJson.optString("id", "acc_$i"),
+              orderNumber = uJson.optInt("orderNumber", i + 1),
+              username = uJson.optString("username", "user_$i"),
+              password = uJson.optString("password", "12345@abc"),
+              militaryId = uJson.optString("militaryCode", uJson.optString("militaryId", "QN-16201")),
+              fullName = uJson.optString("fullName", "Quân nhân"),
+              rank = uJson.optString("rank", "Chiến sĩ"),
+              role = uJson.optString("position", uJson.optString("role", "Chiến sĩ")),
+              unit = uJson.optString("unit", "Vùng 4 Hải quân"),
+              completedLessonsCount = uJson.optInt("completedLessonsCount", uJson.optInt("progress", 0) / 25),
+              totalLessonsCount = uJson.optInt("totalLessonsCount", 6),
+              averageScore = uJson.optDouble("avgScore", uJson.optDouble("averageScore", 8.5)),
+              lastActive = uJson.optString("lastActive", "Vừa xong"),
+              status = uJson.optString("status", "Đang học"),
+              isInternalAccess = true,
+              phone = uJson.optString("phone", "0988.123.456")
+            )
+          )
+        }
+
+        withContext(Dispatchers.Main) {
+          val currentProfile = _uiState.value.userProfile
+          var updatedProfile = currentProfile
+
+          if (currentProfile.isLoggedIn) {
+            val currentAccount = parsedUsers.firstOrNull {
+              it.username.equals(currentProfile.username, ignoreCase = true) ||
+              it.militaryId.equals(currentProfile.militaryId, ignoreCase = true)
+            }
+            if (currentAccount != null) {
+              updatedProfile = currentProfile.copy(
+                name = currentAccount.fullName,
+                rank = currentAccount.rank,
+                role = currentAccount.role,
+                unit = currentAccount.unit,
+                militaryId = currentAccount.militaryId,
+                password = currentAccount.password
+              )
+            }
+          }
+
+          _uiState.value = _uiState.value.copy(
+            adminUserAccounts = parsedUsers,
+            userProfile = updatedProfile
+          )
+        }
+      }
+
+      // 2. Sync Lessons
+      val lessonsArray = rootJson.optJSONArray("lessons")
+      if (lessonsArray != null && lessonsArray.length() > 0) {
+        val parsedLessons = mutableListOf<Lesson>()
+        for (i in 0 until lessonsArray.length()) {
+          val lJson = lessonsArray.getJSONObject(i)
+          val lessonId = lJson.optString("id", "bai_${i + 1}")
+          val title = lJson.optString("title", "Chuyên đề Giáo dục Chính trị")
+          val category = lJson.optString("category", "Chuyên đề Sĩ quan & QNCN")
+          val summary = lJson.optString("summary", "Nội dung học tập chính trị trọng tâm")
+          val lecturer = lJson.optString("lecturer", "Phòng Chính trị Vùng 4")
+          val duration = lJson.optInt("durationMinutes", lJson.optInt("estimatedMinutes", 45))
+          val isInternal = lJson.optBoolean("isInternal", false)
+          val code = lJson.optString("code", "CĐ-${String.format("%02d", i + 1)}/2026")
+          val videoUrl = lJson.optString("videoUrl", "https://video.gdct.vung4.vn/$lessonId.mp4")
+          val videoDuration = lJson.optString("videoDuration", "18:00")
+          val audioUrl = lJson.optString("audioUrl", "https://audio.gdct.vung4.vn/$lessonId.mp3")
+          val audioDuration = lJson.optString("audioDuration", "18:00")
+          val audioSpeaker = lJson.optString("audioSpeaker", lecturer)
+
+          // Parse questions
+          val qArray = lJson.optJSONArray("questions")
+          val quizQuestions = mutableListOf<QuizQuestion>()
+          if (qArray != null && qArray.length() > 0) {
+            for (qIdx in 0 until qArray.length()) {
+              val qObj = qArray.getJSONObject(qIdx)
+              val optsJson = qObj.optJSONArray("options")
+              val options = mutableListOf<String>()
+              if (optsJson != null) {
+                for (o in 0 until optsJson.length()) {
+                  options.add(optsJson.optString(o))
+                }
+              }
+              if (options.isEmpty()) {
+                options.addAll(listOf("Phương án A", "Phương án B", "Phương án C", "Phương án D"))
+              }
+              quizQuestions.add(
+                QuizQuestion(
+                  id = qObj.optInt("id", qIdx + 1),
+                  question = qObj.optString("question", "Nội dung câu hỏi trắc nghiệm?"),
+                  options = options,
+                  correctOptionIndex = qObj.optInt("correctAnswer", qObj.optInt("correctOptionIndex", 0)),
+                  explanation = qObj.optString("explanation", "Theo tài liệu GDCT chính thức của Bộ Tư lệnh Vùng 4 Hải quân.")
+                )
+              )
+            }
+          } else {
+            quizQuestions.addAll(
+              listOf(
+                QuizQuestion(
+                  id = 1,
+                  question = "Mục tiêu trọng tâm của bài giảng '$title' là gì?",
+                  options = listOf(
+                    "Quán triệt sâu sắc các quan điểm của Đảng và Quân chủng Hải quân",
+                    "Đọc lướt qua tài liệu",
+                    "Không cần liên hệ thực tiễn",
+                    "Chỉ tập trung vào lý thuyết đơn thuần"
+                  ),
+                  correctOptionIndex = 0,
+                  explanation = "Mục tiêu nhằm nâng cao nhận thức, bản lĩnh và trách nhiệm người chiến sĩ Hải quân."
+                ),
+                QuizQuestion(
+                  id = 2,
+                  question = "Phương châm học tập GDCT hiệu quả nhất đối với cán bộ, chiến sĩ là gì?",
+                  options = listOf(
+                    "Học đi đôi với hành, gắn lý luận với thực tiễn chiến đấu",
+                    "Học chỉ để đối phó thi cử",
+                    "Thụ động ghi chép",
+                    "Học vẹt không cần hiểu"
+                  ),
+                  correctOptionIndex = 0,
+                  explanation = "Gắn lý luận với thực tiễn tàu, đảo, đài trạm và nhiệm vụ trực SSCĐ."
+                )
+              )
+            )
+          }
+
+          // Build sections & slides
+          val sections = listOf(
+            LessonSection(
+              sectionNumber = 1,
+              heading = "Phần I: Bối cảnh, mục đích và yêu cầu trọng tâm của chuyên đề",
+              content = summary,
+              keyTakeaway = "Nắm vững tình hình nhiệm vụ, xác định rõ trách nhiệm và quyết tâm cao."
+            ),
+            LessonSection(
+              sectionNumber = 2,
+              heading = "Phần II: Các nội dung cốt lõi và giải pháp thực hiện tại đơn vị",
+              content = "Thực hiện tốt phong trào thi đua quyết thắng, quản lý chặt chẽ vũ khí trang bị kỹ thuật, chấp hành nghiêm điều lệnh và kỷ luật quân đội.",
+              keyTakeaway = "Gương mẫu đi đầu, đoàn kết hiệp đồng, lập công tập thể."
+            ),
+            LessonSection(
+              sectionNumber = 3,
+              heading = "Phần III: Liên hệ thực tiễn bản thân và phương hướng phấn đấu",
+              content = "Mỗi cán bộ, chiến sĩ tự giác rèn luyện phẩm chất Bộ đội Cụ Hồ - Người chiến sĩ Hải quân, không ngại khó khăn sóng gió.",
+              keyTakeaway = "Sẵn sàng chiến đấu hy sinh bảo vệ vững chắc chủ quyền biển đảo."
+            )
+          )
+
+          val slides = listOf(
+            SlideItem(
+              slideNumber = 1,
+              title = "1. Tổng quan Chuyên đề",
+              bullets = listOf(title, "Giảng viên: $lecturer • Đơn vị: Vùng 4 Hải quân", "Khái quát toàn diện mục tiêu bài học"),
+              highlightQuote = "Nắm vững mục tiêu và lý luận gắn liền thực tiễn Hải quân.",
+              note = "Trọng tâm bài giảng"
+            ),
+            SlideItem(
+              slideNumber = 2,
+              title = "2. Ý nghĩa & Mục đích",
+              bullets = listOf("Nâng cao nhận thức chính trị tư tưởng", summary, "Cốt lõi nhận thức của người quân nhân"),
+              highlightQuote = "Bồi dưỡng lý tưởng cách mạng, bản lĩnh kiên định.",
+              note = "Nhận thức tư tưởng"
+            ),
+            SlideItem(
+              slideNumber = 3,
+              title = "3. Nhiệm vụ & Yêu cầu",
+              bullets = listOf("Nhiệm vụ trực sẵn sàng chiến đấu tại Vùng 4", "Luôn đề cao cảnh giác, sẵn sàng nhận và hoàn thành xuất sắc mọi nhiệm vụ được giao.", "Sẵn sàng chiến đấu cao"),
+              highlightQuote = "Đoàn kết hiệp đồng, lập công tập thể.",
+              note = "Nhiệm vụ trọng tâm"
+            ),
+            SlideItem(
+              slideNumber = 4,
+              title = "4. Tổng kết & Hành động",
+              bullets = listOf("Lời căn dặn và định hướng phấn đấu", "Phát huy truyền thống Chiến đấu anh dũng, mưu trí sáng tạo, làm chủ vùng biển.", "Quyết chiến quyết thắng"),
+              highlightQuote = "Bảo vệ vững chắc chủ quyền biển đảo Tổ quốc.",
+              note = "Định hướng phấn đấu"
+            )
+          )
+
+          val docAttachments = listOf(
+            DocAttachment("doc_1", lJson.optString("docxAttachment", "${lessonId}_Giao_an.docx"), "1.8 MB", "WORD", "https://docs.gdct.vung4.vn/${lessonId}.docx"),
+            DocAttachment("doc_2", lJson.optString("pdfAttachment", "${lessonId}_Tai_lieu.pdf"), "2.4 MB", "PDF", "https://docs.gdct.vung4.vn/${lessonId}.pdf")
+          )
+
+          parsedLessons.add(
+            Lesson(
+              id = lessonId,
+              code = code,
+              title = title,
+              category = category,
+              targetAudience = lJson.optString("targetAudience", "Cán bộ, chiến sĩ Vùng 4"),
+              durationMinutes = duration,
+              summary = summary,
+              lecturer = lecturer,
+              videoUrl = videoUrl,
+              videoDuration = videoDuration,
+              audioUrl = audioUrl,
+              audioDuration = audioDuration,
+              audioSpeaker = audioSpeaker,
+              docAttachments = docAttachments,
+              slides = slides,
+              sections = sections,
+              quizQuestions = quizQuestions,
+              status = "Đã phê duyệt",
+              updatedDate = "2026-03-01",
+              isInternal = isInternal,
+              securityLevel = if (isInternal) "Lưu hành nội bộ" else "Công khai"
+            )
+          )
+        }
+
+        withContext(Dispatchers.Main) {
+          _uiState.value = _uiState.value.copy(adminLessons = parsedLessons)
+        }
+      }
+
+      // 3. Sync Laws
+      val lawsArray = rootJson.optJSONArray("laws")
+      if (lawsArray != null && lawsArray.length() > 0) {
+        val parsedLaws = mutableListOf<LawDoc>()
+        for (i in 0 until lawsArray.length()) {
+          val lawObj = lawsArray.getJSONObject(i)
+          parsedLaws.add(
+            LawDoc(
+              id = lawObj.optString("id", "law_$i"),
+              title = lawObj.optString("title", "Văn bản Pháp luật"),
+              category = lawObj.optString("category", "Pháp luật & Kỷ luật"),
+              issuedBy = lawObj.optString("issuedBy", "Bộ Quốc phòng"),
+              summary = lawObj.optString("summary", "Nội dung quy định văn bản"),
+              keyArticles = listOf(
+                Pair("Điều 1", "Phạm vi điều chỉnh và đối tượng áp dụng"),
+                Pair("Điều 2", "Nguyên tắc chấp hành kỷ luật Quân đội và Pháp luật Nhà nước")
+              )
+            )
+          )
+        }
+        withContext(Dispatchers.Main) {
+          _uiState.value = _uiState.value.copy(adminLaws = parsedLaws)
+        }
+      }
+
+      // 4. Sync Submissions (Commander comments and approvals from Web Admin)
+      val subsArray = rootJson.optJSONArray("submissions")
+      if (subsArray != null && subsArray.length() > 0) {
+        for (i in 0 until subsArray.length()) {
+          val sObj = subsArray.getJSONObject(i)
+          val entity = QuizSubmissionEntity(
+            id = sObj.optLong("id", (i + 100).toLong()),
+            lessonId = sObj.optString("lessonId", "bai_1"),
+            lessonTitle = sObj.optString("lessonTitle", "Chuyên đề GDCT"),
+            score = sObj.optInt("score", 4),
+            totalQuestions = sObj.optInt("totalQuestions", 4),
+            percentage = sObj.optInt("percentage", 100),
+            passed = sObj.optBoolean("passed", true),
+            timestamp = sObj.optLong("timestamp", System.currentTimeMillis()),
+            syncedToAdmin = true,
+            commanderReviewStatus = sObj.optString("commanderReviewStatus", "Chính trị viên đã phê duyệt"),
+            commanderComment = sObj.optString("commanderComment", "Đồng chí nắm vững kiến thức chính trị.")
+          )
+          repository.insertOrUpdateQuizSubmission(entity)
+        }
+      }
+    } catch (e: Exception) {
+      e.printStackTrace()
     }
   }
 
@@ -336,6 +664,13 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
         adminUserAccounts = accounts,
         toastMessage = "Đã đặt lại mật khẩu về mặc định 12345@abc cho tài khoản ${updated.username}"
       )
+      viewModelScope.launch(Dispatchers.IO) {
+        val payload = JSONObject().apply {
+          put("userId", accountId)
+          put("username", updated.username)
+        }
+        sendJsonPost("/api/users/reset-password", payload)
+      }
     }
   }
 
@@ -343,18 +678,24 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
 
   fun triggerManualSync() {
     _uiState.value = _uiState.value.copy(toastMessage = "Đang đồng bộ dữ liệu thời gian thực với Cổng Web Quản trị...")
-    val current = _uiState.value.userProfile
-    if (current.isLoggedIn) {
-      updateProfileInfo(
-        current.name,
-        current.rank,
-        current.role,
-        current.unit,
-        current.phone,
-        current.militaryId
-      )
-    } else {
-      _uiState.value = _uiState.value.copy(toastMessage = "Dữ liệu Cổng Web Quản trị đã được làm mới!")
+    viewModelScope.launch(Dispatchers.IO) {
+      val current = _uiState.value.userProfile
+      if (current.isLoggedIn) {
+        val payload = JSONObject().apply {
+          put("username", current.username)
+          put("fullName", current.name)
+          put("rank", current.rank)
+          put("role", current.role)
+          put("unit", current.unit)
+          put("phone", current.phone)
+          put("militaryId", current.militaryId)
+        }
+        sendJsonPost("/api/users/update-profile", payload)
+      }
+      syncWithServerInternal()
+      withContext(Dispatchers.Main) {
+        _uiState.value = _uiState.value.copy(toastMessage = "Dữ liệu hai chiều giữa Ứng dụng và Cổng Web Quản trị đã đồng bộ thành công!")
+      }
     }
   }
 
@@ -533,6 +874,22 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
         isCompleted = isCompleted,
         lastMode = _uiState.value.studyMode.name
       )
+
+      val profile = _uiState.value.userProfile
+      if (profile.isLoggedIn) {
+        launch(Dispatchers.IO) {
+          try {
+            val progressPayload = JSONObject().apply {
+              put("username", profile.username)
+              put("progress", calculatedPercent)
+              put("lastActive", "Vừa học chuyên đề: ${lesson.title.take(30)}...")
+            }
+            sendJsonPost("/api/users/sync-progress", progressPayload)
+          } catch (e: Exception) {
+            // Ignore
+          }
+        }
+      }
     }
   }
 
@@ -583,18 +940,59 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
       val percentage = if (lesson.quizQuestions.isNotEmpty()) (correctCount * 100) / lesson.quizQuestions.size else 0
       val passed = percentage >= 60
 
-      _uiState.value = _uiState.value.copy(
-        quizSubmittedResult = QuizSubmissionEntity(
-          id = submissionId,
-          lessonId = lesson.id,
-          lessonTitle = lesson.title,
-          score = correctCount,
-          totalQuestions = lesson.quizQuestions.size,
-          percentage = percentage,
-          passed = passed,
-          timestamp = System.currentTimeMillis()
-        )
+      val submissionEntity = QuizSubmissionEntity(
+        id = submissionId,
+        lessonId = lesson.id,
+        lessonTitle = lesson.title,
+        score = correctCount,
+        totalQuestions = lesson.quizQuestions.size,
+        percentage = percentage,
+        passed = passed,
+        timestamp = System.currentTimeMillis(),
+        syncedToAdmin = true,
+        commanderReviewStatus = "Đã gửi lên Cổng Web Quản trị - Chờ Cán bộ ký duyệt",
+        commanderComment = "Kết quả thi: $correctCount/${lesson.quizQuestions.size} câu đúng ($percentage%)"
       )
+
+      _uiState.value = _uiState.value.copy(
+        quizSubmittedResult = submissionEntity
+      )
+
+      // Post submission immediately to Web Admin
+      val profile = _uiState.value.userProfile
+      launch(Dispatchers.IO) {
+        try {
+          val subPayload = JSONObject().apply {
+            put("id", submissionId)
+            put("username", if (profile.isLoggedIn) profile.username else "quan_nhan")
+            put("soldierName", if (profile.isLoggedIn) profile.name else "Chiến sĩ")
+            put("soldierRank", if (profile.isLoggedIn) profile.rank else "Binh nhất")
+            put("soldierUnit", if (profile.isLoggedIn) profile.unit else "Vùng 4 Hải quân")
+            put("lessonId", lesson.id)
+            put("lessonTitle", lesson.title)
+            put("score", correctCount)
+            put("totalQuestions", lesson.quizQuestions.size)
+            put("percentage", percentage)
+            put("passed", passed)
+            put("timestamp", System.currentTimeMillis())
+          }
+          sendJsonPost("/api/submissions", subPayload)
+
+          if (profile.isLoggedIn) {
+            val progressPayload = JSONObject().apply {
+              put("username", profile.username)
+              put("progress", 100)
+              put("avgScore", (percentage.toDouble() / 10.0))
+              put("lastActive", "Vừa hoàn thành trắc nghiệm ($correctCount/${lesson.quizQuestions.size}đ)")
+            }
+            sendJsonPost("/api/users/sync-progress", progressPayload)
+          }
+
+          syncWithServerInternal()
+        } catch (e: Exception) {
+          e.printStackTrace()
+        }
+      }
     }
   }
 
@@ -709,6 +1107,31 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
         toastMessage = "Đã thêm mới bài giảng GDCT: ${lesson.title}"
       )
     }
+
+    viewModelScope.launch(Dispatchers.IO) {
+      try {
+        val payload = JSONObject().apply {
+          put("id", lesson.id)
+          put("code", lesson.code)
+          put("title", lesson.title)
+          put("category", lesson.category)
+          put("targetAudience", lesson.targetAudience)
+          put("durationMinutes", lesson.durationMinutes)
+          put("summary", lesson.summary)
+          put("lecturer", lesson.lecturer)
+          put("videoUrl", lesson.videoUrl)
+          put("videoDuration", lesson.videoDuration)
+          put("audioUrl", lesson.audioUrl)
+          put("audioDuration", lesson.audioDuration)
+          put("audioSpeaker", lesson.audioSpeaker)
+          put("isInternal", lesson.isInternal)
+        }
+        sendJsonPost("/api/lessons", payload)
+        syncWithServerInternal()
+      } catch (e: Exception) {
+        e.printStackTrace()
+      }
+    }
   }
 
   fun deleteAdminLesson(lessonId: String) {
@@ -717,6 +1140,26 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
       adminLessons = currentLessons,
       toastMessage = "Đã xóa bài giảng khỏi danh mục hệ thống"
     )
+    viewModelScope.launch(Dispatchers.IO) {
+      try {
+        val hostUrls = listOf("http://10.0.2.2:3000/api/lessons/$lessonId", "http://127.0.0.1:3000/api/lessons/$lessonId")
+        for (urlStr in hostUrls) {
+          try {
+            val url = URL(urlStr)
+            val conn = (url.openConnection() as HttpURLConnection).apply {
+              requestMethod = "DELETE"
+              connectTimeout = 1500
+            }
+            conn.responseCode
+            conn.disconnect()
+            break
+          } catch (e: Exception) {}
+        }
+        syncWithServerInternal()
+      } catch (e: Exception) {
+        e.printStackTrace()
+      }
+    }
   }
 
   fun addAdminUserAccount(account: UserAccount) {
@@ -727,6 +1170,25 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
       showAddAccountDialog = false,
       toastMessage = "Đã thêm tài khoản quân nhân: ${account.fullName}"
     )
+
+    viewModelScope.launch(Dispatchers.IO) {
+      try {
+        val payload = JSONObject().apply {
+          put("id", account.id)
+          put("username", account.username)
+          put("password", account.password)
+          put("militaryCode", account.militaryId)
+          put("fullName", account.fullName)
+          put("rank", account.rank)
+          put("position", account.role)
+          put("unit", account.unit)
+        }
+        sendJsonPost("/api/users", payload)
+        syncWithServerInternal()
+      } catch (e: Exception) {
+        e.printStackTrace()
+      }
+    }
   }
 
   fun sendReminderToUser(account: UserAccount) {
