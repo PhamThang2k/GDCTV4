@@ -162,6 +162,7 @@ fun GdctApp(viewModel: GdctViewModel = viewModel()) {
             quizSubmissions = quizSubmissions,
             onOpenLesson = { viewModel.openLesson(it) },
             onOpenLoginDialog = { viewModel.setShowLoginDialog(true) },
+            onChangePassword = { oldPass, newPass -> viewModel.changePassword(oldPass, newPass) },
             onLogout = { viewModel.logout() }
           )
         }
@@ -173,7 +174,7 @@ fun GdctApp(viewModel: GdctViewModel = viewModel()) {
   if (uiState.showLoginDialog) {
     LoginDialog(
       userAccounts = uiState.adminUserAccounts.ifEmpty { viewModel.allLessons.let { emptyList() } },
-      onLoginWithCredentials = { militaryId, pin -> viewModel.loginWithCredentials(militaryId, pin) },
+      onLoginWithCredentials = { username, password -> viewModel.loginWithCredentials(username, password) },
       onQuickLogin = { viewModel.loginQuick(it) },
       onContinueAsGuest = { viewModel.setShowLoginDialog(false) },
       onDismiss = { viewModel.setShowLoginDialog(false) }

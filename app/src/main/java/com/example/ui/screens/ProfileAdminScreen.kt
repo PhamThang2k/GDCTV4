@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AdminPanelSettings
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.HelpOutline
 import androidx.compose.material.icons.filled.MilitaryTech
@@ -37,7 +38,9 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -47,6 +50,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -84,10 +88,17 @@ fun ProfileAdminScreen(
   quizSubmissions: List<QuizSubmissionEntity>,
   onOpenLesson: (Lesson) -> Unit,
   onOpenLoginDialog: () -> Unit,
+  onChangePassword: ((oldPass: String, newPass: String) -> Boolean)? = null,
   onLogout: () -> Unit,
   modifier: Modifier = Modifier
 ) {
   var selectedSubTab by remember { mutableIntStateOf(0) } // 0: Hồ sơ học tập, 1: Báo cáo Quản trị & Chỉ huy
+  var showChangePasswordDialog by remember { mutableStateOf(false) }
+  var oldPasswordInput by remember { mutableStateOf("") }
+  var newPasswordInput by remember { mutableStateOf("") }
+  var confirmPasswordInput by remember { mutableStateOf("") }
+  var changePasswordError by remember { mutableStateOf<String?>(null) }
+  var changePasswordSuccess by remember { mutableStateOf(false) }
 
   val totalLessons = lessons.size
   val completedLessons = progressMap.values.count { it.isCompleted || it.progressPercent >= 100 }
@@ -186,9 +197,10 @@ fun ProfileAdminScreen(
                 )
 
                 Text(
-                  text = if (userProfile.isLoggedIn) "Số hiệu QN: ${userProfile.militaryId} • ${userProfile.partyStatus}" else "Đăng nhập để mở khóa bài học nội bộ",
-                  color = Color.White.copy(alpha = 0.7f),
-                  fontSize = 10.5.sp
+                  text = if (userProfile.isLoggedIn) "Tài khoản: ${userProfile.username.ifEmpty { "phamtatthang_162" }} (STT: #${userProfile.orderNumber})" else "Đăng nhập để mở khóa bài học nội bộ",
+                  color = Color.White.copy(alpha = 0.85f),
+                  fontSize = 11.sp,
+                  fontWeight = FontWeight.SemiBold
                 )
               }
             }
@@ -202,23 +214,40 @@ fun ProfileAdminScreen(
             ) {
               if (userProfile.isLoggedIn) {
                 Button(
+                  onClick = {
+                    oldPasswordInput = ""
+                    newPasswordInput = ""
+                    confirmPasswordInput = ""
+                    changePasswordError = null
+                    changePasswordSuccess = false
+                    showChangePasswordDialog = true
+                  },
+                  colors = ButtonDefaults.buttonColors(containerColor = GoldYellow),
+                  shape = RoundedCornerShape(8.dp),
+                  contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
+                  modifier = Modifier.weight(1.1f)
+                ) {
+                  Text("Đổi mật khẩu", color = NavyDeep, fontSize = 11.sp, fontWeight = FontWeight.Black)
+                }
+
+                Button(
                   onClick = onOpenLoginDialog,
                   colors = ButtonDefaults.buttonColors(containerColor = Color.White.copy(alpha = 0.2f)),
                   shape = RoundedCornerShape(8.dp),
-                  contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                  contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
                   modifier = Modifier.weight(1f)
                 ) {
-                  Text("Đổi tài khoản", color = Color.White, fontSize = 11.5.sp, fontWeight = FontWeight.Bold)
+                  Text("Đổi TK", color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold)
                 }
 
                 Button(
                   onClick = onLogout,
                   colors = ButtonDefaults.buttonColors(containerColor = CrimsonRed.copy(alpha = 0.8f)),
                   shape = RoundedCornerShape(8.dp),
-                  contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                  contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
                   modifier = Modifier.weight(1f)
                 ) {
-                  Text("Đăng xuất", color = Color.White, fontSize = 11.5.sp, fontWeight = FontWeight.Bold)
+                  Text("Đăng xuất", color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold)
                 }
               } else {
                 Button(
@@ -502,6 +531,171 @@ fun ProfileAdminScreen(
                   Spacer(modifier = Modifier.height(2.dp))
                   Text(text = submission.commanderComment, color = Color(0xFF475569), fontSize = 11.5.sp, lineHeight = 16.sp)
                 }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  if (showChangePasswordDialog) {
+    androidx.compose.ui.window.Dialog(
+      onDismissRequest = { showChangePasswordDialog = false }
+    ) {
+      Card(
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(8.dp),
+        modifier = Modifier.fillMaxWidth()
+      ) {
+        Column {
+          Surface(color = NavyDeep, modifier = Modifier.fillMaxWidth()) {
+            Row(
+              modifier = Modifier.padding(16.dp),
+              horizontalArrangement = Arrangement.SpaceBetween,
+              verticalAlignment = Alignment.CenterVertically
+            ) {
+              Text(
+                text = "ĐỔI MẬT KHẨU TÀI KHOẢN",
+                color = Color.White,
+                fontWeight = FontWeight.Black,
+                fontSize = 14.5.sp
+              )
+              IconButton(onClick = { showChangePasswordDialog = false }, modifier = Modifier.size(28.dp)) {
+                Icon(Icons.Default.Close, contentDescription = "Đóng", tint = Color.White)
+              }
+            }
+          }
+
+          Column(
+            modifier = Modifier
+              .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+          ) {
+            Text(
+              text = "Tài khoản: ${userProfile.username.ifEmpty { "phamtatthang_162" }} (${userProfile.name})",
+              color = NavyPrimary,
+              fontWeight = FontWeight.Bold,
+              fontSize = 12.sp
+            )
+
+            OutlinedTextField(
+              value = oldPasswordInput,
+              onValueChange = {
+                oldPasswordInput = it
+                changePasswordError = null
+              },
+              label = { Text("Mật khẩu hiện tại (hoặc 12345@abc)") },
+              singleLine = true,
+              visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation(),
+              shape = RoundedCornerShape(10.dp),
+              modifier = Modifier.fillMaxWidth()
+            )
+
+            OutlinedTextField(
+              value = newPasswordInput,
+              onValueChange = {
+                newPasswordInput = it
+                changePasswordError = null
+              },
+              label = { Text("Mật khẩu mới") },
+              singleLine = true,
+              visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation(),
+              shape = RoundedCornerShape(10.dp),
+              modifier = Modifier.fillMaxWidth()
+            )
+
+            OutlinedTextField(
+              value = confirmPasswordInput,
+              onValueChange = {
+                confirmPasswordInput = it
+                changePasswordError = null
+              },
+              label = { Text("Xác nhận mật khẩu mới") },
+              singleLine = true,
+              visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation(),
+              shape = RoundedCornerShape(10.dp),
+              modifier = Modifier.fillMaxWidth()
+            )
+
+            if (changePasswordError != null) {
+              Surface(
+                shape = RoundedCornerShape(8.dp),
+                color = Color(0xFFFEF2F2),
+                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFFECACA)),
+                modifier = Modifier.fillMaxWidth()
+              ) {
+                Text(
+                  text = changePasswordError!!,
+                  color = CrimsonRed,
+                  fontSize = 11.sp,
+                  fontWeight = FontWeight.Bold,
+                  modifier = Modifier.padding(8.dp)
+                )
+              }
+            }
+
+            if (changePasswordSuccess) {
+              Surface(
+                shape = RoundedCornerShape(8.dp),
+                color = Color(0xFFF0FDF4),
+                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFBBF7D0)),
+                modifier = Modifier.fillMaxWidth()
+              ) {
+                Text(
+                  text = "Đã cập nhật mật khẩu mới thành công!",
+                  color = SuccessGreen,
+                  fontSize = 11.5.sp,
+                  fontWeight = FontWeight.Bold,
+                  modifier = Modifier.padding(8.dp)
+                )
+              }
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Row(
+              modifier = Modifier.fillMaxWidth(),
+              horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+              Button(
+                onClick = { showChangePasswordDialog = false },
+                colors = ButtonDefaults.outlinedButtonColors(),
+                shape = RoundedCornerShape(10.dp),
+                modifier = Modifier.weight(1f)
+              ) {
+                Text("Hủy", color = Color(0xFF64748B), fontSize = 12.sp)
+              }
+
+              Button(
+                onClick = {
+                  if (oldPasswordInput.isBlank()) {
+                    changePasswordError = "Vui lòng nhập Mật khẩu hiện tại"
+                    return@Button
+                  }
+                  if (newPasswordInput.length < 6) {
+                    changePasswordError = "Mật khẩu mới phải có ít nhất 6 ký tự"
+                    return@Button
+                  }
+                  if (newPasswordInput != confirmPasswordInput) {
+                    changePasswordError = "Xác nhận mật khẩu mới không khớp"
+                    return@Button
+                  }
+                  val success = onChangePassword?.invoke(oldPasswordInput, newPasswordInput) ?: true
+                  if (success) {
+                    changePasswordSuccess = true
+                    changePasswordError = null
+                    showChangePasswordDialog = false
+                  } else {
+                    changePasswordError = "Mật khẩu hiện tại không đúng!"
+                  }
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = NavyPrimary),
+                shape = RoundedCornerShape(10.dp),
+                modifier = Modifier.weight(1.5f)
+              ) {
+                Text("LƯU MẬT KHẨU", fontWeight = FontWeight.Bold, fontSize = 12.sp)
               }
             }
           }

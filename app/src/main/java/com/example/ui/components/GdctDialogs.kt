@@ -28,6 +28,8 @@ import androidx.compose.material.icons.filled.Gavel
 import androidx.compose.material.icons.filled.LibraryBooks
 import androidx.compose.material.icons.filled.MilitaryTech
 import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -51,6 +53,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -325,15 +329,15 @@ fun AddNoteDialog(
 @Composable
 fun LoginDialog(
   userAccounts: List<com.example.data.model.UserAccount>,
-  onLoginWithCredentials: (militaryId: String, pin: String) -> Boolean,
+  onLoginWithCredentials: (username: String, password: String) -> Boolean,
   onQuickLogin: (com.example.data.model.UserAccount) -> Unit,
   onContinueAsGuest: () -> Unit,
   onDismiss: () -> Unit
 ) {
-  var militaryIdInput by remember { mutableStateOf("") }
-  var pinInput by remember { mutableStateOf("") }
+  var usernameInput by remember { mutableStateOf("") }
+  var passwordInput by remember { mutableStateOf("") }
+  var isPasswordVisible by remember { mutableStateOf(false) }
   var errorMessage by remember { mutableStateOf<String?>(null) }
-  var isQuickSelectOpen by remember { mutableStateOf(true) }
 
   Dialog(
     onDismissRequest = onDismiss,
@@ -378,7 +382,7 @@ fun LoginDialog(
               Spacer(modifier = Modifier.width(10.dp))
               Column {
                 Text(
-                  text = "ĐĂNG NHẬP QUÂN NHÂN",
+                  text = "ĐĂNG NHẬP HỆ THỐNG GDCT",
                   color = Color.White,
                   fontSize = 14.5.sp,
                   fontWeight = FontWeight.Black,
@@ -424,7 +428,7 @@ fun LoginDialog(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                  text = "Không cần đăng nhập vẫn xem được toàn bộ bài giảng GDCT công khai. Đăng nhập để mở khóa chuyên đề LƯU HÀNH NỘI BỘ.",
+                  text = "Không cần đăng nhập vẫn xem được toàn bộ bài giảng GDCT công khai. Đăng nhập tài khoản quân nhân để mở khóa các chuyên đề LƯU HÀNH NỘI BỘ.",
                   color = Color(0xFF1E3A8A),
                   fontSize = 11.5.sp,
                   lineHeight = 15.sp
@@ -433,161 +437,109 @@ fun LoginDialog(
             }
           }
 
-          // Manual Login Inputs
+          // Username Input
           item {
             OutlinedTextField(
-              value = militaryIdInput,
+              value = usernameInput,
               onValueChange = {
-                militaryIdInput = it
+                usernameInput = it
                 errorMessage = null
               },
-              label = { Text("Số hiệu QN / Mã cán bộ") },
-              placeholder = { Text("VD: HQ-V4-2026") },
+              label = { Text("Tên tài khoản (Username)") },
+              placeholder = { Text("VD: phamtatthang_162 hoặc Mã QN") },
               singleLine = true,
               shape = RoundedCornerShape(10.dp),
               modifier = Modifier
                 .fillMaxWidth()
-                .testTag("input_login_military_id")
+                .testTag("input_login_username")
+            )
+            Text(
+              text = "Tên tài khoản theo định dạng: ten_donvi (Ví dụ: phamtatthang_162)",
+              color = Color(0xFF64748B),
+              fontSize = 10.5.sp,
+              modifier = Modifier.padding(start = 4.dp, top = 2.dp)
             )
           }
 
+          // Password Input
           item {
             OutlinedTextField(
-              value = pinInput,
+              value = passwordInput,
               onValueChange = {
-                pinInput = it
+                passwordInput = it
                 errorMessage = null
               },
-              label = { Text("Mã PIN bảo mật") },
-              placeholder = { Text("Mặc định: 123456") },
+              label = { Text("Mật khẩu") },
+              placeholder = { Text("Mật khẩu mặc định: 12345@abc") },
               singleLine = true,
+              visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+              trailingIcon = {
+                IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
+                  Icon(
+                    imageVector = if (isPasswordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                    contentDescription = if (isPasswordVisible) "Ẩn mật khẩu" else "Hiện mật khẩu",
+                    tint = Color(0xFF64748B)
+                  )
+                }
+              },
               shape = RoundedCornerShape(10.dp),
               modifier = Modifier
                 .fillMaxWidth()
-                .testTag("input_login_pin")
+                .testTag("input_login_password")
+            )
+            Text(
+              text = "Mật khẩu mặc định ban đầu do Quản trị cấp: 12345@abc",
+              color = Color(0xFF166534),
+              fontSize = 10.5.sp,
+              fontWeight = FontWeight.Medium,
+              modifier = Modifier.padding(start = 4.dp, top = 2.dp)
             )
           }
 
           if (errorMessage != null) {
             item {
-              Text(
-                text = errorMessage!!,
-                color = CrimsonRed,
-                fontSize = 11.5.sp,
-                fontWeight = FontWeight.Bold
-              )
-            }
-          }
-
-          item {
-            Button(
-              onClick = {
-                if (militaryIdInput.isBlank()) {
-                  errorMessage = "Vui lòng nhập Số hiệu quân nhân"
-                  return@Button
-                }
-                val success = onLoginWithCredentials(militaryIdInput, pinInput)
-                if (!success) {
-                  errorMessage = "Số hiệu QN hoặc Mã PIN không đúng. Bạn có thể chọn nhanh tài khoản mẫu bên dưới."
-                }
-              },
-              colors = ButtonDefaults.buttonColors(containerColor = NavyPrimary),
-              shape = RoundedCornerShape(10.dp),
-              modifier = Modifier
-                .fillMaxWidth()
-                .height(46.dp)
-                .testTag("btn_confirm_login")
-            ) {
-              Text("XÁC THỰC & ĐĂNG NHẬP", fontWeight = FontWeight.Bold, fontSize = 13.sp)
-            }
-          }
-
-          // Quick 1-click login section
-          item {
-            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp), color = Color(0xFFE2E8F0))
-            Row(
-              modifier = Modifier
-                .fillMaxWidth()
-                .clickable { isQuickSelectOpen = !isQuickSelectOpen },
-              horizontalArrangement = Arrangement.SpaceBetween,
-              verticalAlignment = Alignment.CenterVertically
-            ) {
-              Text(
-                text = "⚡ Đăng nhập nhanh tài khoản mẫu được cấp:",
-                color = Color(0xFF475569),
-                fontSize = 11.5.sp,
-                fontWeight = FontWeight.Bold
-              )
-              Text(
-                text = if (isQuickSelectOpen) "Thu gọn" else "Mở rộng",
-                color = NavyPrimary,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.SemiBold
-              )
-            }
-          }
-
-          if (isQuickSelectOpen) {
-            items(userAccounts) { acc ->
               Surface(
-                shape = RoundedCornerShape(10.dp),
-                color = Color(0xFFF8FAFC),
-                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFE2E8F0)),
-                modifier = Modifier
-                  .fillMaxWidth()
-                  .clickable { onQuickLogin(acc) }
-                  .testTag("quick_login_${acc.id}")
+                shape = RoundedCornerShape(8.dp),
+                color = Color(0xFFFEF2F2),
+                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFFECACA)),
+                modifier = Modifier.fillMaxWidth()
               ) {
-                Row(
-                  modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                  horizontalArrangement = Arrangement.SpaceBetween,
-                  verticalAlignment = Alignment.CenterVertically
-                ) {
-                  Column(modifier = Modifier.weight(1f)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                      Text(
-                        text = acc.fullName,
-                        color = NavyDeep,
-                        fontSize = 12.5.sp,
-                        fontWeight = FontWeight.Bold
-                      )
-                      Spacer(modifier = Modifier.width(6.dp))
-                      Surface(
-                        shape = RoundedCornerShape(4.dp),
-                        color = Color(0xFFDCFCE7)
-                      ) {
-                        Text(
-                          text = "Nội bộ",
-                          color = SuccessGreen,
-                          fontSize = 9.sp,
-                          fontWeight = FontWeight.Bold,
-                          modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
-                        )
-                      }
-                    }
-                    Text(
-                      text = "${acc.rank} • ${acc.role} (${acc.unit})",
-                      color = Color(0xFF64748B),
-                      fontSize = 10.5.sp
-                    )
-                  }
-
-                  Button(
-                    onClick = { onQuickLogin(acc) },
-                    shape = RoundedCornerShape(8.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E3A8A)),
-                    contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
-                    modifier = Modifier.height(30.dp)
-                  ) {
-                    Text("Chọn", fontSize = 11.sp)
-                  }
-                }
+                Text(
+                  text = errorMessage!!,
+                  color = CrimsonRed,
+                  fontSize = 11.5.sp,
+                  fontWeight = FontWeight.Bold,
+                  modifier = Modifier.padding(8.dp)
+                )
               }
             }
           }
 
           item {
             Spacer(modifier = Modifier.height(4.dp))
+            Button(
+              onClick = {
+                if (usernameInput.isBlank()) {
+                  errorMessage = "Vui lòng nhập Tên tài khoản được cấp (VD: phamtatthang_162)"
+                  return@Button
+                }
+                val success = onLoginWithCredentials(usernameInput, passwordInput)
+                if (!success) {
+                  errorMessage = "Tên tài khoản hoặc Mật khẩu không chính xác. Mật khẩu mặc định là 12345@abc."
+                }
+              },
+              colors = ButtonDefaults.buttonColors(containerColor = NavyPrimary),
+              shape = RoundedCornerShape(10.dp),
+              modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp)
+                .testTag("btn_confirm_login")
+            ) {
+              Text("XÁC THỰC & ĐĂNG NHẬP", fontWeight = FontWeight.Bold, fontSize = 13.5.sp)
+            }
+          }
+
+          item {
             Button(
               onClick = onContinueAsGuest,
               colors = ButtonDefaults.outlinedButtonColors(),

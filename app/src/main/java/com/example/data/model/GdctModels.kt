@@ -60,6 +60,9 @@ data class Lesson(
 
 data class UserAccount(
   val id: String,
+  val orderNumber: Int = 1,
+  val username: String = "",
+  val password: String = "12345@abc",
   val militaryId: String,
   val fullName: String,
   val rank: String,
@@ -70,7 +73,6 @@ data class UserAccount(
   val averageScore: Double,
   val lastActive: String,
   val status: String, // "Hoàn thành tốt", "Đang học", "Cần đôn đốc"
-  val pinCode: String = "123456",
   val isInternalAccess: Boolean = true,
   val phone: String = "0988.123.456"
 )
@@ -92,10 +94,13 @@ data class UserProfile(
   val isLoggedIn: Boolean = false,
   val isInternalAccess: Boolean = false,
   val name: String = "Khách (Chưa đăng nhập)",
+  val username: String = "",
+  val password: String = "12345@abc",
   val rank: String = "Chiến sĩ",
   val role: String = "Tự do tham khảo GDCT",
   val unit: String = "Vùng 4 Hải quân",
   val militaryId: String = "GUEST-V4",
+  val orderNumber: Int = 0,
   val joinDate: String = "08/2026",
   val partyStatus: String = "Chưa xác thực tài khoản",
   val phone: String = ""

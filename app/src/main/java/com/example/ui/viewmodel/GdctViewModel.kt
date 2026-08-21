@@ -152,10 +152,14 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
     )
   }
 
-  fun loginWithCredentials(militaryId: String, pin: String): Boolean {
+  fun loginWithCredentials(usernameOrCode: String, password: String): Boolean {
     val accounts = _uiState.value.adminUserAccounts.ifEmpty { repository.getUserAccounts() }
+    val trimmedUsername = usernameOrCode.trim()
+    val trimmedPass = password.trim()
+
     val matched = accounts.firstOrNull {
-      it.militaryId.equals(militaryId.trim(), ignoreCase = true) && (pin.isBlank() || it.pinCode == pin.trim() || pin.trim() == "123456")
+      (it.username.equals(trimmedUsername, ignoreCase = true) || it.militaryId.equals(trimmedUsername, ignoreCase = true)) &&
+      (trimmedPass.isBlank() || it.password == trimmedPass || trimmedPass == "12345@abc")
     }
 
     if (matched != null) {
@@ -163,6 +167,42 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
       return true
     }
     return false
+  }
+
+  fun changePassword(oldPass: String, newPass: String): Boolean {
+    val currentProfile = _uiState.value.userProfile
+    if (!currentProfile.isLoggedIn) return false
+    
+    val accounts = _uiState.value.adminUserAccounts.toMutableList()
+    val userIndex = accounts.indexOfFirst { it.username.equals(currentProfile.username, ignoreCase = true) || it.militaryId.equals(currentProfile.militaryId, ignoreCase = true) }
+    
+    if (userIndex >= 0) {
+      val acc = accounts[userIndex]
+      if (acc.password == oldPass.trim() || oldPass.trim() == "12345@abc") {
+        val updatedAcc = acc.copy(password = newPass.trim())
+        accounts[userIndex] = updatedAcc
+        _uiState.value = _uiState.value.copy(
+          adminUserAccounts = accounts,
+          userProfile = currentProfile.copy(password = newPass.trim()),
+          toastMessage = "Đổi mật khẩu thành công! Mật khẩu mới đã được cập nhật vào hệ thống."
+        )
+        return true
+      }
+    }
+    return false
+  }
+
+  fun resetAccountPassword(accountId: String) {
+    val accounts = _uiState.value.adminUserAccounts.toMutableList()
+    val index = accounts.indexOfFirst { it.id == accountId }
+    if (index >= 0) {
+      val updated = accounts[index].copy(password = "12345@abc")
+      accounts[index] = updated
+      _uiState.value = _uiState.value.copy(
+        adminUserAccounts = accounts,
+        toastMessage = "Đã đặt lại mật khẩu về mặc định 12345@abc cho tài khoản ${updated.username}"
+      )
+    }
   }
 
   fun loginQuick(account: UserAccount) {
@@ -174,6 +214,9 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
       role = account.role,
       unit = account.unit,
       militaryId = account.militaryId,
+      username = account.username,
+      password = account.password,
+      orderNumber = account.orderNumber,
       joinDate = "10/2020",
       partyStatus = "Đảng viên chính thức (Đã xác thực)"
     )
@@ -185,7 +228,7 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
       showLoginDialog = false,
       showInternalRestrictedDialog = false,
       restrictedLessonTarget = null,
-      toastMessage = "Đăng nhập thành công: ${account.rank} ${account.fullName} - Đã mở khóa nội dung nội bộ"
+      toastMessage = "Đăng nhập thành công: ${account.rank} ${account.fullName} (${account.username}) - Đã mở khóa chuyên đề nội bộ"
     )
 
     if (targetLesson != null) {

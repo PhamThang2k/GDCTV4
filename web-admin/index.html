@@ -354,14 +354,14 @@
               <table class="data-table">
                 <thead>
                   <tr>
-                    <th>Mã QN</th>
-                    <th>Họ và tên</th>
-                    <th>Cấp bậc</th>
-                    <th>Chức vụ</th>
-                    <th>Đơn vị</th>
+                    <th style="width: 50px;">STT</th>
+                    <th>Tên tài khoản (Username)</th>
+                    <th>Họ và tên quân nhân</th>
+                    <th>Cấp bậc / Chức vụ</th>
+                    <th>Đơn vị & Quyền</th>
+                    <th>Mật khẩu</th>
                     <th>Tiến độ GDCT</th>
-                    <th>Điểm thi TB</th>
-                    <th>Lần học cuối</th>
+                    <th>Điểm TB</th>
                     <th>Thao tác</th>
                   </tr>
                 </thead>
@@ -515,9 +515,15 @@
             </div>
           </div>
 
-          <div class="form-group">
-            <label class="form-label">Tên bài giảng đầy đủ *</label>
-            <input type="text" class="form-control" id="lesson-title" placeholder="VD: Nâng cao bản lĩnh chính trị của sĩ quan trẻ..." required>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Tên bài giảng đầy đủ *</label>
+              <input type="text" class="form-control" id="lesson-title" placeholder="VD: Nâng cao bản lĩnh chính trị của sĩ quan trẻ..." required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Giảng viên / Báo cáo viên</label>
+              <input type="text" class="form-control" id="lesson-lecturer" placeholder="VD: Đại tá Bùi Xuân Thắng">
+            </div>
           </div>
 
           <div class="form-row">
@@ -540,34 +546,66 @@
 
           <div class="form-group">
             <label class="form-label">Tóm tắt nội dung trọng tâm</label>
-            <textarea class="form-control" id="lesson-summary" placeholder="Tóm tắt mục đích, yêu cầu và nội dung cốt lõi của bài giảng..."></textarea>
+            <textarea class="form-control" id="lesson-summary" rows="3" placeholder="Tóm tắt mục đích, yêu cầu và nội dung cốt lõi của bài giảng..."></textarea>
           </div>
 
-          <!-- Tabs inside Modal for Multimedia -->
+          <!-- Tabs inside Modal for Local File Uploads & Multimedia -->
           <div style="margin-top: 14px; border: 1px solid var(--slate-200); border-radius: 8px; padding: 14px; background: var(--slate-50);">
             <div style="font-size: 13px; font-weight: 700; color: var(--navy-primary); margin-bottom: 10px;">
-              <i class="fa-solid fa-photo-film"></i> Cấu hình Đa phương tiện (Slide, DOCX/PDF, Video, Audio)
+              <i class="fa-solid fa-cloud-arrow-up"></i> Tải Tệp từ Máy tính & Cấu hình Đa phương tiện
             </div>
             
+            <!-- DOCX & PDF File Picker -->
             <div class="form-row">
               <div class="form-group">
-                <label class="form-label"><i class="fa-solid fa-file-word" style="color: #2563EB;"></i> Tên tệp DOCX đính kèm</label>
-                <input type="text" class="form-control" id="lesson-docx-name" placeholder="VD: Bai_Giang_Chuyen_De.docx">
+                <label class="form-label"><i class="fa-solid fa-file-word" style="color: #2563EB;"></i> Tệp Word (DOCX/DOC) từ máy tính</label>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                  <input type="file" id="file-lesson-docx" accept=".docx,.doc" style="display: none;">
+                  <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('file-lesson-docx').click()">
+                    <i class="fa-solid fa-folder-open"></i> Chọn tệp DOCX...
+                  </button>
+                  <input type="text" class="form-control" id="lesson-docx-name" placeholder="Hoặc nhập tên tệp / URL" style="flex: 1;">
+                </div>
+                <div id="docx-file-status" style="font-size: 11px; color: #166534; margin-top: 3px;"></div>
               </div>
+
               <div class="form-group">
-                <label class="form-label"><i class="fa-solid fa-file-pdf" style="color: #DC2626;"></i> Tên tệp PDF đính kèm</label>
-                <input type="text" class="form-control" id="lesson-pdf-name" placeholder="VD: Tai_Lieu_Nghien_Cuu.pdf">
+                <label class="form-label"><i class="fa-solid fa-file-pdf" style="color: #DC2626;"></i> Tệp PDF Nghiên cứu từ máy tính</label>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                  <input type="file" id="file-lesson-pdf" accept=".pdf" style="display: none;">
+                  <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('file-lesson-pdf').click()">
+                    <i class="fa-solid fa-folder-open"></i> Chọn tệp PDF...
+                  </button>
+                  <input type="text" class="form-control" id="lesson-pdf-name" placeholder="Hoặc nhập tên tệp / URL" style="flex: 1;">
+                </div>
+                <div id="pdf-file-status" style="font-size: 11px; color: #166534; margin-top: 3px;"></div>
               </div>
             </div>
 
+            <!-- Video & Audio File Picker -->
             <div class="form-row">
               <div class="form-group">
-                <label class="form-label"><i class="fa-solid fa-video" style="color: #059669;"></i> Link Video bài giảng (MP4/HLS)</label>
-                <input type="text" class="form-control" id="lesson-video-url" placeholder="VD: https://video.gdct.vung4.vn/lesson.mp4">
+                <label class="form-label"><i class="fa-solid fa-video" style="color: #059669;"></i> Video bài giảng (MP4 / WebM từ máy)</label>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                  <input type="file" id="file-lesson-video" accept="video/mp4,video/webm,video/*" style="display: none;">
+                  <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('file-lesson-video').click()">
+                    <i class="fa-solid fa-file-video"></i> Chọn video...
+                  </button>
+                  <input type="text" class="form-control" id="lesson-video-url" placeholder="Hoặc dán URL video (MP4/HLS)" style="flex: 1;">
+                </div>
+                <div id="video-file-status" style="font-size: 11px; color: #059669; margin-top: 3px;"></div>
               </div>
+
               <div class="form-group">
-                <label class="form-label"><i class="fa-solid fa-headphones" style="color: #D97706;"></i> Link Audio phát thanh (MP3)</label>
-                <input type="text" class="form-control" id="lesson-audio-url" placeholder="VD: https://audio.gdct.vung4.vn/lesson.mp3">
+                <label class="form-label"><i class="fa-solid fa-headphones" style="color: #D97706;"></i> Audio phát thanh (MP3 / M4A từ máy)</label>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                  <input type="file" id="file-lesson-audio" accept="audio/mp3,audio/wav,audio/m4a,audio/*" style="display: none;">
+                  <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('file-lesson-audio').click()">
+                    <i class="fa-solid fa-file-audio"></i> Chọn audio...
+                  </button>
+                  <input type="text" class="form-control" id="lesson-audio-url" placeholder="Hoặc dán URL âm thanh (MP3)" style="flex: 1;">
+                </div>
+                <div id="audio-file-status" style="font-size: 11px; color: #D97706; margin-top: 3px;"></div>
               </div>
             </div>
           </div>
@@ -585,9 +623,9 @@
 
   <!-- 2. USER MODAL (CREATE / EDIT) -->
   <div class="modal-backdrop" id="modal-user">
-    <div class="modal-dialog" style="max-width: 600px;">
+    <div class="modal-dialog" style="max-width: 620px;">
       <div class="modal-header">
-        <div class="modal-title" id="modal-user-title">Thêm Tài khoản Quân nhân</div>
+        <div class="modal-title" id="modal-user-title">Thêm / Cấp Tài khoản Quân nhân</div>
         <button class="btn-close" onclick="closeModal('modal-user')">&times;</button>
       </div>
       <div class="modal-body">
@@ -595,13 +633,63 @@
           <input type="hidden" id="user-id">
           
           <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Mã số quân nhân / Tên đăng nhập *</label>
-              <input type="text" class="form-control" id="user-code" placeholder="VD: QN-0128, HQ-V4-2026" required>
+            <div class="form-group" style="flex: 0.5;">
+              <label class="form-label">STT Quản trị</label>
+              <input type="number" class="form-control" id="user-order-number" min="1" value="1" required>
             </div>
+            <div class="form-group" style="flex: 1.5;">
+              <label class="form-label">Họ và tên quân nhân *</label>
+              <input type="text" class="form-control" id="user-fullname" placeholder="VD: Phạm Tất Thắng" required>
+            </div>
+          </div>
+
+          <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Mã PIN xác thực (6 số) *</label>
-              <input type="text" class="form-control" id="user-pincode" value="123456" placeholder="Mặc định: 123456" required>
+              <label class="form-label">Đơn vị trực thuộc *</label>
+              <select class="form-control" id="user-unit" required>
+                <option value="Lữ đoàn 162">Lữ đoàn 162 (Tàu mặt nước chiến đấu)</option>
+                <option value="Lữ đoàn 146">Lữ đoàn 146 (Đoàn Trường Sa)</option>
+                <option value="Lữ đoàn 955">Lữ đoàn 955 (Tàu Vận tải - Đổ bộ)</option>
+                <option value="Lữ đoàn 101">Lữ đoàn 101 (Hải quân Đánh bộ)</option>
+                <option value="Lữ đoàn 685">Lữ đoàn 685 (Tên lửa bờ)</option>
+                <option value="Trung tâm BĐKT">Trung tâm BĐKT</option>
+                <option value="Phòng Chính trị Vùng 4">Phòng Chính trị Vùng 4</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Mã số quân nhân</label>
+              <input type="text" class="form-control" id="user-code" placeholder="VD: QN-16201" required>
+            </div>
+          </div>
+
+          <!-- Auto-generated Username & Password Section -->
+          <div style="background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 8px; padding: 12px; margin-bottom: 14px;">
+            <div style="font-size: 12px; font-weight: 700; color: var(--navy-primary); margin-bottom: 8px;">
+              <i class="fa-solid fa-id-badge"></i> Thông tin Đăng nhập Hệ thống (Tên tài khoản & Mật khẩu)
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <label class="form-label" style="margin-bottom: 2px;">Tên tài khoản (Username) *</label>
+                  <button type="button" class="btn btn-outline btn-sm" id="btn-auto-username" style="padding: 2px 6px; font-size: 10px;" title="Tự động tạo theo Họ tên_Đơn vị">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Tạo tự động
+                  </button>
+                </div>
+                <input type="text" class="form-control" id="user-username" placeholder="VD: phamtatthang_162" required>
+                <div style="font-size: 10.5px; color: var(--slate-500); margin-top: 2px;">Định dạng: <code>tenquannhan_donvi</code> (VD: <code>phamtatthang_162</code>)</div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Mật khẩu *</label>
+                <div style="display: flex; gap: 4px;">
+                  <input type="text" class="form-control" id="user-password" value="12345@abc" placeholder="Mặc định: 12345@abc" required>
+                  <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('user-password').value='12345@abc'" title="Đặt về mật khẩu mặc định 12345@abc">
+                    <i class="fa-solid fa-rotate-left"></i>
+                  </button>
+                </div>
+                <div style="font-size: 10.5px; color: #166534; margin-top: 2px;">Mật khẩu ban đầu: <b>12345@abc</b></div>
+              </div>
             </div>
           </div>
 
@@ -614,6 +702,9 @@
                 <option value="Hạ sĩ">Hạ sĩ</option>
                 <option value="Trung sĩ">Trung sĩ</option>
                 <option value="Thượng sĩ">Thượng sĩ</option>
+                <option value="Thiếu úy QNCN">Thiếu úy QNCN</option>
+                <option value="Trung úy QNCN">Trung úy QNCN</option>
+                <option value="Thượng úy QNCN">Thượng úy QNCN</option>
                 <option value="Thiếu úy">Thiếu úy</option>
                 <option value="Trung úy">Trung úy</option>
                 <option value="Thượng úy">Thượng úy</option>
@@ -624,37 +715,20 @@
                 <option value="Đại tá">Đại tá</option>
               </select>
             </div>
-            <div class="form-group">
-              <label class="form-label">Họ và tên quân nhân *</label>
-              <input type="text" class="form-control" id="user-fullname" placeholder="VD: Nguyễn Văn Nam" required>
-            </div>
-          </div>
 
-          <div class="form-row">
             <div class="form-group">
               <label class="form-label">Chức vụ *</label>
-              <input type="text" class="form-control" id="user-position" placeholder="VD: Thuyền phó, Khẩu đội trưởng" required>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Đơn vị trực thuộc *</label>
-              <select class="form-control" id="user-unit" required>
-                <option value="Lữ đoàn 162">Lữ đoàn 162</option>
-                <option value="Lữ đoàn 146">Lữ đoàn 146 (Trường Sa)</option>
-                <option value="Lữ đoàn 955">Lữ đoàn 955</option>
-                <option value="Lữ đoàn 101">Lữ đoàn 101</option>
-                <option value="Lữ đoàn 685">Lữ đoàn 685</option>
-                <option value="Trung tâm BĐKT">Trung tâm BĐKT</option>
-              </select>
+              <input type="text" class="form-control" id="user-position" placeholder="VD: Thuyền phó, Chính trị viên Tàu" required>
             </div>
           </div>
 
           <div class="form-row">
             <div class="form-group">
               <label class="form-label">Số điện thoại liên hệ</label>
-              <input type="text" class="form-control" id="user-phone" placeholder="VD: 0988.123.456">
+              <input type="text" class="form-control" id="user-phone" placeholder="VD: 0988.112.233">
             </div>
             <div class="form-group">
-              <label class="form-label">Tiến độ khởi tạo (%)</label>
+              <label class="form-label">Tiến độ GDCT (%)</label>
               <input type="number" class="form-control" id="user-progress" min="0" max="100" value="0">
             </div>
           </div>
@@ -662,7 +736,7 @@
           <div class="form-group" style="background: #F0FDF4; border: 1px solid #86EFAC; padding: 10px 14px; border-radius: 8px;">
             <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 700; color: #166534; margin-bottom: 0;">
               <input type="checkbox" id="user-internal-access" checked style="width: 18px; height: 18px;">
-              <span><i class="fa-solid fa-key" style="color: #16A34A;"></i> Cấp quyền truy cập Tài liệu & Chuyên đề LƯU HÀNH NỘI BỘ trên App</span>
+              <span><i class="fa-solid fa-key" style="color: #16A34A;"></i> Cấp quyền truy cập Bài giảng & Tài liệu LƯU HÀNH NỘI BỘ</span>
             </label>
           </div>
         </form>
@@ -671,7 +745,7 @@
         <button class="btn btn-outline" onclick="closeModal('modal-user')">Hủy</button>
         <button class="btn btn-primary" id="btn-save-user">
           <i class="fa-solid fa-check"></i>
-          <span>Lưu thông tin</span>
+          <span>Lưu tài khoản</span>
         </button>
       </div>
     </div>
