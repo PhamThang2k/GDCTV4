@@ -59,7 +59,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.material.icons.filled.Badge
+import androidx.compose.material.icons.filled.Business
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Save
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.ui.text.TextStyle
 import com.example.data.model.LawDoc
+import com.example.data.model.UserProfile
 import com.example.ui.theme.CrimsonRed
 import com.example.ui.theme.GoldYellow
 import com.example.ui.theme.NavyDeep
@@ -445,9 +453,25 @@ fun LoginDialog(
                 usernameInput = it
                 errorMessage = null
               },
-              label = { Text("Tên tài khoản (Username)") },
-              placeholder = { Text("VD: phamtatthang_162 hoặc Mã QN") },
+              label = { Text("Tên tài khoản (Username)", color = NavyPrimary, fontWeight = FontWeight.Bold) },
+              placeholder = { Text("VD: phamtatthang_162 hoặc Mã QN", color = Color(0xFF64748B)) },
               singleLine = true,
+              textStyle = TextStyle(
+                color = Color(0xFF000000),
+                fontSize = 15.sp,
+                fontWeight = FontWeight.SemiBold
+              ),
+              colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = Color(0xFF000000),
+                unfocusedTextColor = Color(0xFF000000),
+                focusedContainerColor = Color(0xFFFFFFFF),
+                unfocusedContainerColor = Color(0xFFF8FAFC),
+                focusedBorderColor = NavyPrimary,
+                unfocusedBorderColor = Color(0xFF94A3B8),
+                focusedLabelColor = NavyPrimary,
+                unfocusedLabelColor = Color(0xFF334155),
+                cursorColor = Color(0xFF000000)
+              ),
               shape = RoundedCornerShape(10.dp),
               modifier = Modifier
                 .fillMaxWidth()
@@ -455,8 +479,9 @@ fun LoginDialog(
             )
             Text(
               text = "Tên tài khoản theo định dạng: ten_donvi (Ví dụ: phamtatthang_162)",
-              color = Color(0xFF64748B),
-              fontSize = 10.5.sp,
+              color = Color(0xFF475569),
+              fontSize = 11.sp,
+              fontWeight = FontWeight.Medium,
               modifier = Modifier.padding(start = 4.dp, top = 2.dp)
             )
           }
@@ -469,16 +494,32 @@ fun LoginDialog(
                 passwordInput = it
                 errorMessage = null
               },
-              label = { Text("Mật khẩu") },
-              placeholder = { Text("Mật khẩu mặc định: 12345@abc") },
+              label = { Text("Mật khẩu", color = NavyPrimary, fontWeight = FontWeight.Bold) },
+              placeholder = { Text("Mật khẩu mặc định: 12345@abc", color = Color(0xFF64748B)) },
               singleLine = true,
+              textStyle = TextStyle(
+                color = Color(0xFF000000),
+                fontSize = 15.sp,
+                fontWeight = FontWeight.SemiBold
+              ),
+              colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = Color(0xFF000000),
+                unfocusedTextColor = Color(0xFF000000),
+                focusedContainerColor = Color(0xFFFFFFFF),
+                unfocusedContainerColor = Color(0xFFF8FAFC),
+                focusedBorderColor = NavyPrimary,
+                unfocusedBorderColor = Color(0xFF94A3B8),
+                focusedLabelColor = NavyPrimary,
+                unfocusedLabelColor = Color(0xFF334155),
+                cursorColor = Color(0xFF000000)
+              ),
               visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
               trailingIcon = {
                 IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
                   Icon(
                     imageVector = if (isPasswordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
                     contentDescription = if (isPasswordVisible) "Ẩn mật khẩu" else "Hiện mật khẩu",
-                    tint = Color(0xFF64748B)
+                    tint = Color(0xFF0F172A)
                   )
                 }
               },
@@ -490,8 +531,8 @@ fun LoginDialog(
             Text(
               text = "Mật khẩu mặc định ban đầu do Quản trị cấp: 12345@abc",
               color = Color(0xFF166534),
-              fontSize = 10.5.sp,
-              fontWeight = FontWeight.Medium,
+              fontSize = 11.sp,
+              fontWeight = FontWeight.Bold,
               modifier = Modifier.padding(start = 4.dp, top = 2.dp)
             )
           }
@@ -550,6 +591,313 @@ fun LoginDialog(
                 .testTag("btn_guest_mode")
             ) {
               Text("Tiếp tục xem ở Chế độ Khách (Không cần tài khoản)", color = Color(0xFF64748B), fontSize = 11.5.sp)
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@Composable
+fun EditProfileDialog(
+  userProfile: UserProfile,
+  onSave: (fullName: String, rank: String, role: String, unit: String, phone: String, militaryId: String) -> Unit,
+  onDismiss: () -> Unit
+) {
+  var fullNameInput by remember { mutableStateOf(userProfile.name) }
+  var rankInput by remember { mutableStateOf(userProfile.rank) }
+  var roleInput by remember { mutableStateOf(userProfile.role) }
+  var unitInput by remember { mutableStateOf(userProfile.unit) }
+  var phoneInput by remember { mutableStateOf(userProfile.phone) }
+  var militaryIdInput by remember { mutableStateOf(userProfile.militaryId) }
+  var errorText by remember { mutableStateOf<String?>(null) }
+
+  Dialog(
+    onDismissRequest = onDismiss,
+    properties = DialogProperties(usePlatformDefaultWidth = false)
+  ) {
+    Card(
+      shape = RoundedCornerShape(20.dp),
+      colors = CardDefaults.cardColors(containerColor = Color.White),
+      elevation = CardDefaults.cardElevation(10.dp),
+      modifier = Modifier
+        .fillMaxWidth(0.94f)
+        .fillMaxHeight(0.85f)
+    ) {
+      Column(modifier = Modifier.fillMaxSize()) {
+        // Header
+        Surface(color = NavyDeep, modifier = Modifier.fillMaxWidth()) {
+          Row(
+            modifier = Modifier.padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+          ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+              Icon(Icons.Default.Person, contentDescription = null, tint = GoldYellow, modifier = Modifier.size(24.dp))
+              Spacer(modifier = Modifier.width(8.dp))
+              Column {
+                Text("CHỈNH SỬA THÔNG TIN QUÂN NHÂN", color = Color.White, fontWeight = FontWeight.Black, fontSize = 13.5.sp)
+                Text("Đồng bộ trực tiếp về Cổng Web Quản trị", color = GoldYellow, fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+              }
+            }
+            IconButton(onClick = onDismiss, modifier = Modifier.size(28.dp)) {
+              Icon(Icons.Default.Close, contentDescription = "Đóng", tint = Color.White)
+            }
+          }
+        }
+
+        LazyColumn(
+          modifier = Modifier
+            .weight(1f)
+            .padding(16.dp),
+          verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+          // Info banner
+          item {
+            Surface(
+              shape = RoundedCornerShape(10.dp),
+              color = Color(0xFFEFF6FF),
+              border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFBFDBFE)),
+              modifier = Modifier.fillMaxWidth()
+            ) {
+              Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.Badge, contentDescription = null, tint = NavyPrimary, modifier = Modifier.size(20.dp))
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                  text = "Tài khoản: ${userProfile.username.ifEmpty { "phamtatthang_162" }} (STT: #${userProfile.orderNumber})",
+                  color = NavyDeep,
+                  fontSize = 12.sp,
+                  fontWeight = FontWeight.Bold
+                )
+              }
+            }
+          }
+
+          // Full Name
+          item {
+            OutlinedTextField(
+              value = fullNameInput,
+              onValueChange = { fullNameInput = it; errorText = null },
+              label = { Text("Họ và tên quân nhân *", color = NavyPrimary, fontWeight = FontWeight.Bold) },
+              singleLine = true,
+              textStyle = TextStyle(color = Color(0xFF000000), fontSize = 14.5.sp, fontWeight = FontWeight.SemiBold),
+              colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = Color(0xFF000000),
+                unfocusedTextColor = Color(0xFF000000),
+                focusedContainerColor = Color(0xFFFFFFFF),
+                unfocusedContainerColor = Color(0xFFF8FAFC),
+                focusedBorderColor = NavyPrimary,
+                unfocusedBorderColor = Color(0xFF94A3B8),
+                focusedLabelColor = NavyPrimary,
+                unfocusedLabelColor = Color(0xFF334155),
+                cursorColor = Color(0xFF000000)
+              ),
+              shape = RoundedCornerShape(10.dp),
+              modifier = Modifier.fillMaxWidth().testTag("input_edit_fullname")
+            )
+          }
+
+          // Rank
+          item {
+            OutlinedTextField(
+              value = rankInput,
+              onValueChange = { rankInput = it; errorText = null },
+              label = { Text("Cấp bậc (VD: Đại úy, Thượng úy, Thiếu tá, Hạ sĩ...) *", color = NavyPrimary, fontWeight = FontWeight.Bold) },
+              singleLine = true,
+              textStyle = TextStyle(color = Color(0xFF000000), fontSize = 14.5.sp, fontWeight = FontWeight.SemiBold),
+              colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = Color(0xFF000000),
+                unfocusedTextColor = Color(0xFF000000),
+                focusedContainerColor = Color(0xFFFFFFFF),
+                unfocusedContainerColor = Color(0xFFF8FAFC),
+                focusedBorderColor = NavyPrimary,
+                unfocusedBorderColor = Color(0xFF94A3B8),
+                focusedLabelColor = NavyPrimary,
+                unfocusedLabelColor = Color(0xFF334155),
+                cursorColor = Color(0xFF000000)
+              ),
+              shape = RoundedCornerShape(10.dp),
+              modifier = Modifier.fillMaxWidth().testTag("input_edit_rank")
+            )
+          }
+
+          // Role / Position
+          item {
+            OutlinedTextField(
+              value = roleInput,
+              onValueChange = { roleInput = it; errorText = null },
+              label = { Text("Chức vụ / Nhiệm vụ *", color = NavyPrimary, fontWeight = FontWeight.Bold) },
+              placeholder = { Text("VD: Thuyền phó Tàu 015, Chính trị viên...", color = Color(0xFF64748B)) },
+              singleLine = true,
+              textStyle = TextStyle(color = Color(0xFF000000), fontSize = 14.5.sp, fontWeight = FontWeight.SemiBold),
+              colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = Color(0xFF000000),
+                unfocusedTextColor = Color(0xFF000000),
+                focusedContainerColor = Color(0xFFFFFFFF),
+                unfocusedContainerColor = Color(0xFFF8FAFC),
+                focusedBorderColor = NavyPrimary,
+                unfocusedBorderColor = Color(0xFF94A3B8),
+                focusedLabelColor = NavyPrimary,
+                unfocusedLabelColor = Color(0xFF334155),
+                cursorColor = Color(0xFF000000)
+              ),
+              shape = RoundedCornerShape(10.dp),
+              modifier = Modifier.fillMaxWidth().testTag("input_edit_role")
+            )
+          }
+
+          // Unit
+          item {
+            OutlinedTextField(
+              value = unitInput,
+              onValueChange = { unitInput = it; errorText = null },
+              label = { Text("Đơn vị trực thuộc *", color = NavyPrimary, fontWeight = FontWeight.Bold) },
+              placeholder = { Text("VD: Lữ đoàn 162, Lữ đoàn 146, Lữ đoàn 955...", color = Color(0xFF64748B)) },
+              singleLine = true,
+              textStyle = TextStyle(color = Color(0xFF000000), fontSize = 14.5.sp, fontWeight = FontWeight.SemiBold),
+              colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = Color(0xFF000000),
+                unfocusedTextColor = Color(0xFF000000),
+                focusedContainerColor = Color(0xFFFFFFFF),
+                unfocusedContainerColor = Color(0xFFF8FAFC),
+                focusedBorderColor = NavyPrimary,
+                unfocusedBorderColor = Color(0xFF94A3B8),
+                focusedLabelColor = NavyPrimary,
+                unfocusedLabelColor = Color(0xFF334155),
+                cursorColor = Color(0xFF000000)
+              ),
+              shape = RoundedCornerShape(10.dp),
+              modifier = Modifier.fillMaxWidth().testTag("input_edit_unit")
+            )
+          }
+
+          // Phone
+          item {
+            OutlinedTextField(
+              value = phoneInput,
+              onValueChange = { phoneInput = it; errorText = null },
+              label = { Text("Số điện thoại liên hệ", color = NavyPrimary, fontWeight = FontWeight.Bold) },
+              placeholder = { Text("VD: 0988.112.233", color = Color(0xFF64748B)) },
+              singleLine = true,
+              textStyle = TextStyle(color = Color(0xFF000000), fontSize = 14.5.sp, fontWeight = FontWeight.SemiBold),
+              colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = Color(0xFF000000),
+                unfocusedTextColor = Color(0xFF000000),
+                focusedContainerColor = Color(0xFFFFFFFF),
+                unfocusedContainerColor = Color(0xFFF8FAFC),
+                focusedBorderColor = NavyPrimary,
+                unfocusedBorderColor = Color(0xFF94A3B8),
+                focusedLabelColor = NavyPrimary,
+                unfocusedLabelColor = Color(0xFF334155),
+                cursorColor = Color(0xFF000000)
+              ),
+              shape = RoundedCornerShape(10.dp),
+              modifier = Modifier.fillMaxWidth().testTag("input_edit_phone")
+            )
+          }
+
+          // Military ID
+          item {
+            OutlinedTextField(
+              value = militaryIdInput,
+              onValueChange = { militaryIdInput = it; errorText = null },
+              label = { Text("Mã Quân nhân", color = NavyPrimary, fontWeight = FontWeight.Bold) },
+              placeholder = { Text("VD: QN-16201", color = Color(0xFF64748B)) },
+              singleLine = true,
+              textStyle = TextStyle(color = Color(0xFF000000), fontSize = 14.5.sp, fontWeight = FontWeight.SemiBold),
+              colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = Color(0xFF000000),
+                unfocusedTextColor = Color(0xFF000000),
+                focusedContainerColor = Color(0xFFFFFFFF),
+                unfocusedContainerColor = Color(0xFFF8FAFC),
+                focusedBorderColor = NavyPrimary,
+                unfocusedBorderColor = Color(0xFF94A3B8),
+                focusedLabelColor = NavyPrimary,
+                unfocusedLabelColor = Color(0xFF334155),
+                cursorColor = Color(0xFF000000)
+              ),
+              shape = RoundedCornerShape(10.dp),
+              modifier = Modifier.fillMaxWidth().testTag("input_edit_military_id")
+            )
+          }
+
+          if (errorText != null) {
+            item {
+              Surface(
+                shape = RoundedCornerShape(8.dp),
+                color = Color(0xFFFEF2F2),
+                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFFECACA)),
+                modifier = Modifier.fillMaxWidth()
+              ) {
+                Text(
+                  text = errorText!!,
+                  color = CrimsonRed,
+                  fontSize = 11.5.sp,
+                  fontWeight = FontWeight.Bold,
+                  modifier = Modifier.padding(8.dp)
+                )
+              }
+            }
+          }
+        }
+
+        // Action Buttons
+        Surface(
+          color = Color(0xFFF8FAFC),
+          border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFE2E8F0)),
+          modifier = Modifier.fillMaxWidth()
+        ) {
+          Row(
+            modifier = Modifier
+              .fillMaxWidth()
+              .padding(14.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+          ) {
+            Button(
+              onClick = onDismiss,
+              colors = ButtonDefaults.outlinedButtonColors(),
+              shape = RoundedCornerShape(10.dp),
+              modifier = Modifier.weight(1f)
+            ) {
+              Text("Hủy bỏ", color = Color(0xFF64748B), fontSize = 12.5.sp)
+            }
+
+            Button(
+              onClick = {
+                if (fullNameInput.isBlank()) {
+                  errorText = "Vui lòng nhập Họ và tên quân nhân"
+                  return@Button
+                }
+                if (rankInput.isBlank()) {
+                  errorText = "Vui lòng nhập Cấp bậc quân hàm"
+                  return@Button
+                }
+                if (roleInput.isBlank()) {
+                  errorText = "Vui lòng nhập Chức vụ / Nhiệm vụ"
+                  return@Button
+                }
+                if (unitInput.isBlank()) {
+                  errorText = "Vui lòng nhập Đơn vị trực thuộc"
+                  return@Button
+                }
+                onSave(
+                  fullNameInput.trim(),
+                  rankInput.trim(),
+                  roleInput.trim(),
+                  unitInput.trim(),
+                  phoneInput.trim(),
+                  militaryIdInput.trim()
+                )
+                onDismiss()
+              },
+              colors = ButtonDefaults.buttonColors(containerColor = NavyPrimary),
+              shape = RoundedCornerShape(10.dp),
+              modifier = Modifier.weight(1.5f).testTag("btn_save_profile")
+            ) {
+              Icon(Icons.Default.Save, contentDescription = null, tint = Color.White, modifier = Modifier.size(16.dp))
+              Spacer(modifier = Modifier.width(6.dp))
+              Text("LƯU & GỬI VỀ WEB", fontWeight = FontWeight.Bold, fontSize = 12.5.sp)
             }
           }
         }

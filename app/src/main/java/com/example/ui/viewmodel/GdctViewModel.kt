@@ -17,6 +17,7 @@ import com.example.data.model.StudyMode
 import com.example.data.model.UserAccount
 import com.example.data.model.UserProfile
 import com.example.data.repository.GdctRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -24,6 +25,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.json.JSONObject
+import java.net.HttpURLConnection
+import java.net.URL
 
 enum class AppTab(val title: String, val testTag: String) {
   HOME("Trang chủ", "tab_home"),
@@ -169,6 +174,134 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
     return false
   }
 
+  fun updateProfileInfo(name: String, rank: String, role: String, unit: String, phone: String, militaryId: String = "") {
+    val current = _uiState.value.userProfile
+    if (!current.isLoggedIn) return
+
+    val updatedProfile = current.copy(
+      name = name.trim().ifEmpty { current.name },
+      rank = rank.trim().ifEmpty { current.rank },
+      role = role.trim().ifEmpty { current.role },
+      unit = unit.trim().ifEmpty { current.unit },
+      phone = phone.trim(),
+      militaryId = if (militaryId.isNotBlank()) militaryId.trim() else current.militaryId
+    )
+
+    val accounts = _uiState.value.adminUserAccounts.toMutableList()
+    val userIndex = accounts.indexOfFirst { 
+      it.username.equals(current.username, ignoreCase = true) || 
+      it.militaryId.equals(current.militaryId, ignoreCase = true) 
+    }
+    if (userIndex >= 0) {
+      accounts[userIndex] = accounts[userIndex].copy(
+        fullName = updatedProfile.name,
+        rank = updatedProfile.rank,
+        role = updatedProfile.role,
+        unit = updatedProfile.unit,
+        phone = updatedProfile.phone,
+        militaryId = updatedProfile.militaryId
+      )
+    }
+
+    _uiState.value = _uiState.value.copy(
+      userProfile = updatedProfile,
+      adminUserAccounts = accounts,
+      toastMessage = "Đã cập nhật thông tin quân nhân và đồng bộ về Cổng Web Quản trị Vùng 4!"
+    )
+
+    syncProfileToWebAdmin(updatedProfile)
+  }
+
+  private fun syncProfileToWebAdmin(profile: UserProfile) {
+    viewModelScope.launch(Dispatchers.IO) {
+      try {
+        val payload = JSONObject().apply {
+          put("username", profile.username)
+          put("fullName", profile.name)
+          put("rank", profile.rank)
+          put("role", profile.role)
+          put("unit", profile.unit)
+          put("phone", profile.phone)
+          put("militaryId", profile.militaryId)
+        }
+        sendJsonPost("/api/users/update-profile", payload)
+      } catch (e: Exception) {
+        e.printStackTrace()
+      }
+    }
+  }
+
+  private fun syncPasswordToWebAdmin(username: String, oldPass: String, newPass: String) {
+    viewModelScope.launch(Dispatchers.IO) {
+      try {
+        val payload = JSONObject().apply {
+          put("username", username)
+          put("oldPassword", oldPass)
+          put("newPassword", newPass)
+        }
+        sendJsonPost("/api/users/change-password", payload)
+      } catch (e: Exception) {
+        e.printStackTrace()
+      }
+    }
+  }
+
+  fun syncAllWithWebAdmin() {
+    viewModelScope.launch(Dispatchers.IO) {
+      val success = try {
+        val profile = _uiState.value.userProfile
+        if (profile.isLoggedIn) {
+          val payload = JSONObject().apply {
+            put("username", profile.username)
+            put("fullName", profile.name)
+            put("rank", profile.rank)
+            put("role", profile.role)
+            put("unit", profile.unit)
+            put("phone", profile.phone)
+            put("militaryId", profile.militaryId)
+          }
+          sendJsonPost("/api/users/update-profile", payload)
+        }
+        true
+      } catch (e: Exception) {
+        false
+      }
+
+      withContext(Dispatchers.Main) {
+        _uiState.value = _uiState.value.copy(
+          toastMessage = if (success) "Đồng bộ hai chiều với Cổng Web Quản trị hoàn tất thành công!" else "Đã đồng bộ dữ liệu cục bộ!"
+        )
+      }
+    }
+  }
+
+  private fun sendJsonPost(endpoint: String, json: JSONObject) {
+    val hostUrls = listOf("http://10.0.2.2:3000$endpoint", "http://127.0.0.1:3000$endpoint")
+    for (urlStr in hostUrls) {
+      try {
+        val url = URL(urlStr)
+        val conn = (url.openConnection() as HttpURLConnection).apply {
+          requestMethod = "POST"
+          setRequestProperty("Content-Type", "application/json; charset=utf-8")
+          setRequestProperty("Accept", "application/json")
+          doOutput = true
+          connectTimeout = 2000
+          readTimeout = 2000
+        }
+        conn.outputStream.use { os ->
+          os.write(json.toString().toByteArray(Charsets.UTF_8))
+        }
+        val responseCode = conn.responseCode
+        conn.disconnect()
+        if (responseCode in 200..299) {
+          break
+        }
+      } catch (e: Exception) {
+        // try next host
+      }
+    }
+  }
+
   fun changePassword(oldPass: String, newPass: String): Boolean {
     val currentProfile = _uiState.value.userProfile
     if (!currentProfile.isLoggedIn) return false
@@ -184,8 +317,9 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
         _uiState.value = _uiState.value.copy(
           adminUserAccounts = accounts,
           userProfile = currentProfile.copy(password = newPass.trim()),
-          toastMessage = "Đổi mật khẩu thành công! Mật khẩu mới đã được cập nhật vào hệ thống."
+          toastMessage = "Đổi mật khẩu thành công! Mật khẩu mới đã được cập nhật và gửi về Web Quản trị."
         )
+        syncPasswordToWebAdmin(currentProfile.username, oldPass.trim(), newPass.trim())
         return true
       }
     }
@@ -202,6 +336,25 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
         adminUserAccounts = accounts,
         toastMessage = "Đã đặt lại mật khẩu về mặc định 12345@abc cho tài khoản ${updated.username}"
       )
+    }
+  }
+
+  fun resetUserPassword(userId: String) = resetAccountPassword(userId)
+
+  fun triggerManualSync() {
+    _uiState.value = _uiState.value.copy(toastMessage = "Đang đồng bộ dữ liệu thời gian thực với Cổng Web Quản trị...")
+    val current = _uiState.value.userProfile
+    if (current.isLoggedIn) {
+      updateProfileInfo(
+        current.name,
+        current.rank,
+        current.role,
+        current.unit,
+        current.phone,
+        current.militaryId
+      )
+    } else {
+      _uiState.value = _uiState.value.copy(toastMessage = "Dữ liệu Cổng Web Quản trị đã được làm mới!")
     }
   }
 

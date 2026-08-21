@@ -348,7 +348,7 @@ function generateUniqueUsername(fullName, unit, currentUserId = null) {
   return `${nameCode}${counter}_${unitCode}`;
 }
 
-// App State Management with LocalStorage
+// App State Management with LocalStorage and Server Sync
 class AdminDataStore {
   constructor() {
     this.lessons = this.load("gdct_admin_lessons", DEFAULT_LESSONS);
@@ -361,6 +361,30 @@ class AdminDataStore {
       username: u.username || generateUniqueUsername(u.fullName, u.unit, u.id),
       password: u.password || "12345@abc"
     }));
+
+    // Initial server fetch & polling
+    this.fetchFromServer();
+    setInterval(() => this.fetchFromServer(true), 5000);
+  }
+
+  async fetchFromServer(silent = false) {
+    try {
+      const res = await fetch('/api/users');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && Array.isArray(data.users) && data.users.length > 0) {
+          const currentCount = this.users.length;
+          this.users = data.users;
+          this.save("gdct_admin_users", this.users);
+          if (!silent || currentCount !== this.users.length) {
+            if (typeof renderUsersTable === 'function') renderUsersTable();
+            if (typeof renderStats === 'function') renderStats();
+          }
+        }
+      }
+    } catch (e) {
+      // offline / local fallback
+    }
   }
 
   load(key, defaultValue) {
@@ -384,6 +408,13 @@ class AdminDataStore {
     this.save("gdct_admin_lessons", this.lessons);
     this.save("gdct_admin_users", this.users);
     this.save("gdct_admin_laws", this.laws);
+
+    // Sync to backend
+    fetch('/api/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ users: this.users, lessons: this.lessons })
+    }).catch(err => console.log('Sync to server note:', err));
   }
 }
 

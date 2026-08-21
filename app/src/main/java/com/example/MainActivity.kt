@@ -163,6 +163,12 @@ fun GdctApp(viewModel: GdctViewModel = viewModel()) {
             onOpenLesson = { viewModel.openLesson(it) },
             onOpenLoginDialog = { viewModel.setShowLoginDialog(true) },
             onChangePassword = { oldPass, newPass -> viewModel.changePassword(oldPass, newPass) },
+            onUpdateProfile = { fullName, rank, role, unit, phone, militaryId ->
+              viewModel.updateProfileInfo(fullName, rank, role, unit, phone, militaryId)
+            },
+            onSyncWithServer = { viewModel.triggerManualSync() },
+            adminUserAccounts = uiState.adminUserAccounts,
+            onResetAccountPassword = { userId -> viewModel.resetUserPassword(userId) },
             onLogout = { viewModel.logout() }
           )
         }
