@@ -770,6 +770,226 @@
   <!-- TOAST NOTIFICATION CONTAINER -->
   <div class="toast-container" id="toast-container"></div>
 
+  <!-- ================= 4. QUESTION MODAL ================= -->
+  <div class="modal-backdrop" id="modal-question">
+    <div class="modal-dialog" style="max-width: 650px;">
+      <div class="modal-header">
+        <div class="modal-title" id="modal-question-title">Soạn Câu hỏi Trắc nghiệm mới</div>
+        <button class="btn-close" onclick="closeModal('modal-question')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="form-question">
+          <input type="hidden" id="question-id">
+          <div class="form-group">
+            <label class="form-label">Thuộc Chuyên đề Bài giảng *</label>
+            <select class="form-control" id="question-lesson-id" required>
+              <!-- Populated by JS -->
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nội dung câu hỏi trắc nghiệm *</label>
+            <textarea class="form-control" id="question-text" rows="3" placeholder="Nhập nội dung câu hỏi..." required></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Đáp án A *</label>
+              <input type="text" class="form-control" id="question-opt-a" placeholder="Phương án A" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Đáp án B *</label>
+              <input type="text" class="form-control" id="question-opt-b" placeholder="Phương án B" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Đáp án C *</label>
+              <input type="text" class="form-control" id="question-opt-c" placeholder="Phương án C" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Đáp án D *</label>
+              <input type="text" class="form-control" id="question-opt-d" placeholder="Phương án D" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Đáp án Đúng chính xác *</label>
+              <select class="form-control" id="question-correct" required>
+                <option value="0">Phương án A</option>
+                <option value="1">Phương án B</option>
+                <option value="2">Phương án C</option>
+                <option value="3">Phương án D</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Giải thích đáp án</label>
+              <input type="text" class="form-control" id="question-explanation" placeholder="Căn cứ theo Nghị quyết, Tài liệu GDCT...">
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modal-question')">Hủy bỏ</button>
+        <button class="btn btn-primary" id="btn-save-question">
+          <i class="fa-solid fa-check"></i>
+          <span>Lưu Câu hỏi</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 5. LAW MODAL ================= -->
+  <div class="modal-backdrop" id="modal-law">
+    <div class="modal-dialog" style="max-width: 650px;">
+      <div class="modal-header">
+        <div class="modal-title" id="modal-law-title">Thêm Văn bản Pháp luật & Kỷ luật</div>
+        <button class="btn-close" onclick="closeModal('modal-law')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="form-law">
+          <input type="hidden" id="law-id">
+          <div class="form-group">
+            <label class="form-label">Tên văn bản / Nghị quyết / Thông tư *</label>
+            <input type="text" class="form-control" id="law-title" placeholder="VD: Thông tư 143/2023/TT-BQP" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Cơ quan ban hành *</label>
+              <input type="text" class="form-control" id="law-issued-by" placeholder="VD: Bộ Quốc phòng, Quốc hội" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Thể loại *</label>
+              <select class="form-control" id="law-category" required>
+                <option value="Kỷ luật Quân đội">Kỷ luật Quân đội</option>
+                <option value="Pháp luật Nhà nước">Pháp luật Nhà nước</option>
+                <option value="Chế độ chính sách">Chế độ chính sách</option>
+                <option value="Điều lệnh Quản lý bộ đội">Điều lệnh Quản lý bộ đội</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Trích yếu / Tóm tắt nội dung *</label>
+            <textarea class="form-control" id="law-summary" rows="3" placeholder="Tóm tắt quy định trọng tâm..." required></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modal-law')">Hủy bỏ</button>
+        <button class="btn btn-primary" id="btn-save-law">
+          <i class="fa-solid fa-check"></i>
+          <span>Lưu Văn bản</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 6. IMPORT USERS MODAL ================= -->
+  <div class="modal-backdrop" id="modal-import-users">
+    <div class="modal-dialog" style="max-width: 600px;">
+      <div class="modal-header">
+        <div class="modal-title">Nhập Danh sách Quân nhân (Excel / CSV / JSON)</div>
+        <button class="btn-close" onclick="closeModal('modal-import-users')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 12.5px; color: var(--slate-600); margin-bottom: 12px;">
+          Chọn tệp tin CSV/JSON từ máy tính hoặc dán dữ liệu danh sách quân nhân các Lữ đoàn để tự động cấp phát tài khoản:
+        </p>
+        <div style="border: 2px dashed var(--slate-300); border-radius: 8px; padding: 20px; text-align: center; margin-bottom: 14px; background: var(--slate-50);">
+          <i class="fa-solid fa-file-csv" style="font-size: 32px; color: #16A34A; margin-bottom: 8px;"></i>
+          <div style="font-weight: 700; font-size: 13px; color: var(--navy-primary);">Chọn tệp CSV / JSON từ máy tính</div>
+          <input type="file" id="input-import-users-file" accept=".csv,.json,.txt" style="display: none;">
+          <button type="button" class="btn btn-outline btn-sm" style="margin-top: 8px;" onclick="document.getElementById('input-import-users-file').click()">
+            <i class="fa-solid fa-folder-open"></i> Tải tệp lên...
+          </button>
+          <div id="import-users-file-status" style="font-size: 11px; color: #16A34A; margin-top: 6px;"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Hoặc Dán nội dung JSON / CSV:</label>
+          <textarea class="form-control" id="textarea-import-users" rows="5" placeholder='[{"fullName": "Vũ Văn Nam", "rank": "Thiếu tá", "unit": "Lữ đoàn 162", "position": "Chính trị viên"}]'></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modal-import-users')">Hủy bỏ</button>
+        <button class="btn btn-primary" id="btn-execute-import-users">
+          <i class="fa-solid fa-cloud-arrow-down"></i>
+          <span>Xử lý & Cấp tài khoản</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 7. ADMIN LOGIN OVERLAY ================= -->
+  <div id="admin-login-overlay" style="position: fixed; inset: 0; background: linear-gradient(135deg, #07152B 0%, #0F2744 50%, #162F56 100%); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px;">
+    <div style="background: white; width: 100%; max-width: 460px; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); overflow: hidden; border: 1px solid rgba(255,255,255,0.2);">
+      
+      <!-- Top banner header -->
+      <div style="background: linear-gradient(135deg, #0A192F 0%, #0F2744 100%); color: white; padding: 24px; text-align: center; position: relative;">
+        <div style="width: 56px; height: 56px; background: #B91C1C; border: 2.5px solid #D4AF37; border-radius: 14px; display: inline-flex; align-items: center; justify-content: center; font-size: 26px; color: #D4AF37; box-shadow: 0 6px 14px rgba(0,0,0,0.35); margin-bottom: 12px;">
+          <i class="fa-solid fa-anchor"></i>
+        </div>
+        <h2 style="font-size: 16px; font-weight: 900; letter-spacing: 0.5px; color: #D4AF37; text-transform: uppercase; margin-bottom: 4px;">
+          BỘ TƯ LỆNH VÙNG 4 HẢI QUÂN
+        </h2>
+        <div style="font-size: 12px; color: #E2E8F0; font-weight: 600;">
+          CỔNG QUẢN TRỊ NỘI DUNG GIÁO DỤC CHÍNH TRỊ
+        </div>
+        <div style="display: inline-block; margin-top: 10px; background: rgba(185, 28, 28, 0.85); color: #FEF2F2; font-size: 10px; font-weight: 800; padding: 3px 10px; border-radius: 20px; border: 1px solid rgba(254, 243, 199, 0.3); text-transform: uppercase; letter-spacing: 0.5px;">
+          <i class="fa-solid fa-shield-halved"></i> Lưu hành Nội bộ - Cấp độ Quản trị
+        </div>
+      </div>
+
+      <!-- Login Form Body -->
+      <div style="padding: 26px 24px;">
+        <div id="admin-login-error" style="display: none; background: #FEE2E2; border: 1px solid #F87171; color: #991B1B; font-size: 12px; font-weight: 600; padding: 10px 14px; border-radius: 8px; margin-bottom: 16px; align-items: center; gap: 8px;">
+          <i class="fa-solid fa-circle-exclamation"></i>
+          <span id="admin-login-error-text">Tên đăng nhập hoặc mật khẩu không chính xác!</span>
+        </div>
+
+        <form id="form-admin-login" onsubmit="event.preventDefault(); window.handleAdminLogin();">
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 12px; font-weight: 700; color: #1E293B; margin-bottom: 6px;">
+              <i class="fa-solid fa-user-shield" style="color: #0F2744;"></i> Tên tài khoản Quản trị *
+            </label>
+            <div style="position: relative;">
+              <input type="text" id="admin-username-input" class="form-control" value="gdct_vung4" placeholder="Nhập tài khoản quản trị (gdct_vung4)" style="width: 100%; padding: 10px 12px 10px 36px; border: 1.5px solid #CBD5E1; border-radius: 8px; font-size: 13px; font-weight: 600;" required>
+              <i class="fa-solid fa-user" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94A3B8; font-size: 13px;"></i>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 18px;">
+            <label style="display: block; font-size: 12px; font-weight: 700; color: #1E293B; margin-bottom: 6px;">
+              <i class="fa-solid fa-lock" style="color: #0F2744;"></i> Mật khẩu bảo mật *
+            </label>
+            <div style="position: relative;">
+              <input type="password" id="admin-password-input" class="form-control" value="12345@abc" placeholder="Nhập mật khẩu quản trị" style="width: 100%; padding: 10px 40px 10px 36px; border: 1.5px solid #CBD5E1; border-radius: 8px; font-size: 13px; font-weight: 600;" required>
+              <i class="fa-solid fa-key" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94A3B8; font-size: 13px;"></i>
+              <button type="button" id="btn-toggle-admin-pass" onclick="window.toggleAdminPasswordVisibility()" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #64748B; cursor: pointer; padding: 4px;">
+                <i class="fa-solid fa-eye" id="icon-admin-pass-eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Quick Test Credentials Box -->
+          <div style="background: #F8FAFC; border: 1px dashed #CBD5E1; border-radius: 8px; padding: 10px 12px; margin-bottom: 20px; font-size: 11.5px; color: #475569;">
+            <div style="font-weight: 700; color: #0F2744; margin-bottom: 4px;">
+              <i class="fa-solid fa-circle-info" style="color: #3B82F6;"></i> Thông tin tài khoản quản trị hệ thống:
+            </div>
+            <div>• Tên tài khoản: <code style="background: #EEF2FF; color: #1E3A8A; font-weight: 700; padding: 1px 5px; border-radius: 4px;">gdct_vung4</code></div>
+            <div style="margin-top: 2px;">• Mật khẩu: <code style="background: #EEF2FF; color: #1E3A8A; font-weight: 700; padding: 1px 5px; border-radius: 4px;">12345@abc</code></div>
+          </div>
+
+          <button type="submit" id="btn-admin-login" style="width: 100%; background: linear-gradient(135deg, #0F2744 0%, #1B3B6F 100%); color: white; border: none; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 12px rgba(15, 39, 68, 0.35); transition: all 0.2s ease;">
+            <i class="fa-solid fa-right-to-bracket" style="color: #D4AF37;"></i>
+            <span>ĐĂNG NHẬP CỔNG QUẢN TRỊ</span>
+          </button>
+        </form>
+
+        <div style="text-align: center; margin-top: 16px; font-size: 11px; color: #94A3B8;">
+          Bảo mật bởi Phòng Chính trị - Bộ Tư lệnh Vùng 4 Hải quân
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- SCRIPT ENGINE -->
   <script src="admin.js"></script>
 </body>

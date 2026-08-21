@@ -1,0 +1,11 @@
+{
+  "name": "gdct-vung4-admin",
+  "version": "1.0.0",
+  "description": "Cổng Quản trị Giáo dục Chính trị - Bộ Tư lệnh Vùng 4 Hải quân",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "Phòng Chính trị Vùng 4 Hải quân",
+  "license": "UNLICENSED"
+}

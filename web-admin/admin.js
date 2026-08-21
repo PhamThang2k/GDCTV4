@@ -1,6 +1,6 @@
 /**
  * BỘ TƯ LỆNH VÙNG 4 HẢI QUÂN - HỆ THỐNG QUẢN TRỊ NỘI DUNG & TÀI KHOẢN GDCT
- * Standalone CMS Web Engine
+ * Standalone CMS Web Engine & Full Admin Control Suite
  */
 
 // Initial Seed Data (matching GDCT Mobile App Schema)
@@ -20,7 +20,21 @@ const DEFAULT_LESSONS = [
     videoUrl: "https://video.gdct.vung4.vn/cd-01-hd.mp4",
     audioUrl: "https://audio.gdct.vung4.vn/cd-01-phat-thanh.mp3",
     quizCount: 4,
-    isInternal: false
+    isInternal: false,
+    questions: [
+      {
+        question: "Phương châm chỉ đạo xuyên suốt của Đảng ta trong giải quyết tranh chấp trên biển là gì?",
+        options: ["Bị động đối phó", "Kiên quyết, kiên trì, bình tĩnh, khôn khéo", "Đơn phương giải quyết quân sự", "Chờ đợi đối tác phản hồi"],
+        correctAnswer: 1,
+        explanation: "Phương châm: Kiên quyết, kiên trì đấu tranh bảo vệ vững chắc độc lập, chủ quyền, thống nhất, toàn vẹn lãnh thổ của Tổ quốc."
+      },
+      {
+        question: "Bộ Tư lệnh Vùng 4 Hải quân có nhiệm vụ nòng cốt bảo vệ vùng biển nào?",
+        options: ["Vịnh Bắc Bộ", "Quần đảo Hoàng Sa", "Quần đảo Trường Sa và vùng biển Nam Trung Bộ", "Vịnh Thái Lan"],
+        correctAnswer: 2,
+        explanation: "Vùng 4 Hải quân quản lý vùng biển chiến lược Nam Trung Bộ và quần đảo Trường Sa."
+      }
+    ]
   },
   {
     id: "cd-02",
@@ -37,7 +51,15 @@ const DEFAULT_LESSONS = [
     videoUrl: "https://video.gdct.vung4.vn/cd-02-hd.mp4",
     audioUrl: "https://audio.gdct.vung4.vn/cd-02-phat-thanh.mp3",
     quizCount: 4,
-    isInternal: true
+    isInternal: true,
+    questions: [
+      {
+        question: "Yếu tố quyết định thắng lợi trong tác chiến hiện đại trên biển của Bộ đội Hải quân là gì?",
+        options: ["Vũ khí tối tân hoàn toàn", "Con người với bản lĩnh chính trị kiên định và làm chủ VKTB", "Thời tiết thuận lợi", "Số lượng tàu thuyền"],
+        correctAnswer: 1,
+        explanation: "Con người là nhân tố quyết định, bản lĩnh chính trị kiên định vững vàng là nền tảng."
+      }
+    ]
   },
   {
     id: "cd-03",
@@ -54,7 +76,20 @@ const DEFAULT_LESSONS = [
     videoUrl: "https://video.gdct.vung4.vn/cd-03-hd.mp4",
     audioUrl: "https://audio.gdct.vung4.vn/cd-03-phat-thanh.mp3",
     quizCount: 4,
-    isInternal: false
+    isInternal: false,
+    questions: [
+      {
+        question: "Truyền thống vẻ vang 16 chữ vàng của Quân chủng Hải quân là gì?",
+        options: [
+          "Đoàn kết, kỷ luật, tự lực, tự cường",
+          "Chiến đấu anh dũng; mưu trí, sáng tạo; làm chủ vùng biển; quyết chiến, quyết thắng",
+          "Trung dũng, kiên cường, toàn dân đánh giặc",
+          "Thần tốc, táo bạo, bất ngờ, chắc thắng"
+        ],
+        correctAnswer: 1,
+        explanation: "Truyền thống 16 chữ vàng do Đảng và Nhà nước trao tặng Quân chủng Hải quân."
+      }
+    ]
   },
   {
     id: "cd-04",
@@ -71,7 +106,15 @@ const DEFAULT_LESSONS = [
     videoUrl: "https://video.gdct.vung4.vn/cd-04-hd.mp4",
     audioUrl: "https://audio.gdct.vung4.vn/cd-04-phat-thanh.mp3",
     quizCount: 4,
-    isInternal: false
+    isInternal: false,
+    questions: [
+      {
+        question: "Thông tư 143/2023/TT-BQP quy định xử lý nghiêm nhất hành vi vi phạm nào?",
+        options: ["Đi muộn giờ", "Vi phạm nồng độ cồn khi tham gia giao thông và vay mượn tài chính bất hợp pháp", "Không mặc đúng quân phục dạo mát", "Đọc sách ngoài giờ"],
+        correctAnswer: 1,
+        explanation: "Thông tư 143/2023/TT-BQP xử lý nghiêm khắc vi phạm nồng độ cồn, tệ nạn, vay nợ bất hợp pháp."
+      }
+    ]
   },
   {
     id: "cd-05",
@@ -88,7 +131,20 @@ const DEFAULT_LESSONS = [
     videoUrl: "https://video.gdct.vung4.vn/cd-05-hd.mp4",
     audioUrl: "https://audio.gdct.vung4.vn/cd-05-phat-thanh.mp3",
     quizCount: 4,
-    isInternal: false
+    isInternal: false,
+    questions: [
+      {
+        question: "Lời Bác Hồ căn dặn Bộ đội Hải quân khi về thăm Vạn Hoa (Hải Phòng) năm 1961 là gì?",
+        options: [
+          "Không có gì quý hơn độc lập tự do",
+          "Ngày trước ta chỉ có đêm và rừng. Ngày nay ta có ngày, có trời, có biển. Bờ biển ta dài, tươi đẹp, ta phải biết giữ gìn lấy nó",
+          "Quyết tử để Tổ quốc quyết sinh",
+          "Vì lợi ích mười năm trồng cây, vì lợi ích trăm năm trồng người"
+        ],
+        correctAnswer: 1,
+        explanation: "Lời dạy bất hủ của Chủ tịch Hồ Chí Minh tại đảo Vạn Hoa năm 1961."
+      }
+    ]
   }
 ];
 
@@ -237,7 +293,7 @@ const DEFAULT_LAWS = [
   { id: "law-03", title: "Luật Sĩ quan Quân đội nhân dân Việt Nam", issuedBy: "Quốc hội Nước CHXHCN Việt Nam", category: "Chế độ chính sách", summary: "Quy định chức vụ, cấp bậc quân hàm, quyền lợi, trách nhiệm và nghĩa vụ vẻ vang của Sĩ quan QĐND Việt Nam." }
 ];
 
-// Helper: Remove Vietnamese tones for username generation
+// Helpers
 function removeVietnameseTones(str) {
   if (!str) return "";
   str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, "a");
@@ -257,7 +313,6 @@ function removeVietnameseTones(str) {
   return str.toLowerCase().replace(/[^a-z0-9]/g, "");
 }
 
-// Helper: Extract Unit Code
 function getUnitCode(unitStr) {
   if (!unitStr) return "v4";
   const str = unitStr.toLowerCase();
@@ -273,15 +328,12 @@ function getUnitCode(unitStr) {
   return "v4";
 }
 
-// Helper: Generate unique username like phamtatthang_162 or phamtatthang2_162
 function generateUniqueUsername(fullName, unit, currentUserId = null) {
   const nameCode = removeVietnameseTones(fullName);
   const unitCode = getUnitCode(unit);
   if (!nameCode) return `user_${unitCode}`;
 
   const baseUsername = `${nameCode}_${unitCode}`;
-  
-  // Check against existing users in store
   const existingUsers = store.users.filter(u => u.id !== currentUserId);
   const existingUsernames = new Set(existingUsers.map(u => (u.username || "").toLowerCase()));
 
@@ -289,7 +341,6 @@ function generateUniqueUsername(fullName, unit, currentUserId = null) {
     return baseUsername;
   }
 
-  // Handle collision: phamtatthang2_162, phamtatthang3_162, etc.
   let counter = 2;
   while (existingUsernames.has(`${nameCode}${counter}_${unitCode}`)) {
     counter++;
@@ -304,7 +355,6 @@ class AdminDataStore {
     this.users = this.load("gdct_admin_users", DEFAULT_USERS);
     this.laws = this.load("gdct_admin_laws", DEFAULT_LAWS);
     
-    // Ensure all users have orderNumber, username, and password
     this.users = this.users.map((u, idx) => ({
       ...u,
       orderNumber: u.orderNumber || idx + 1,
@@ -323,7 +373,11 @@ class AdminDataStore {
   }
 
   save(key, data) {
-    localStorage.setItem(key, JSON.stringify(data));
+    try {
+      localStorage.setItem(key, JSON.stringify(data));
+    } catch (e) {
+      console.warn("Storage save error", e);
+    }
   }
 
   saveAll() {
@@ -335,8 +389,57 @@ class AdminDataStore {
 
 const store = new AdminDataStore();
 
-// DOM READY & EVENT LISTENERS
+// ADMIN AUTHENTICATION
+const ADMIN_CREDENTIALS = {
+  username: "gdct_vung4",
+  password: "12345@abc"
+};
+
+function checkAdminAuth() {
+  const isAuth = sessionStorage.getItem("gdct_admin_authenticated") === "true";
+  const overlay = document.getElementById("admin-login-overlay");
+  if (overlay) {
+    overlay.style.display = isAuth ? "none" : "flex";
+  }
+}
+
+window.handleAdminLogin = function() {
+  const usernameInput = document.getElementById("admin-username-input").value.trim();
+  const passwordInput = document.getElementById("admin-password-input").value;
+  const errorBox = document.getElementById("admin-login-error");
+  const errorText = document.getElementById("admin-login-error-text");
+
+  if (usernameInput === ADMIN_CREDENTIALS.username && passwordInput === ADMIN_CREDENTIALS.password) {
+    sessionStorage.setItem("gdct_admin_authenticated", "true");
+    if (errorBox) errorBox.style.display = "none";
+    const overlay = document.getElementById("admin-login-overlay");
+    if (overlay) overlay.style.display = "none";
+    showToast("Đăng nhập Cổng Quản trị GDCT Vùng 4 thành công!");
+  } else {
+    if (errorBox) {
+      errorBox.style.display = "flex";
+      errorText.textContent = "Tài khoản hoặc Mật khẩu không chính xác! (Yêu cầu: gdct_vung4 / 12345@abc)";
+    }
+  }
+};
+
+window.toggleAdminPasswordVisibility = function() {
+  const input = document.getElementById("admin-password-input");
+  const eye = document.getElementById("icon-admin-pass-eye");
+  if (input) {
+    if (input.type === "password") {
+      input.type = "text";
+      if (eye) eye.className = "fa-solid fa-eye-slash";
+    } else {
+      input.type = "password";
+      if (eye) eye.className = "fa-solid fa-eye";
+    }
+  }
+};
+
+// DOM READY
 document.addEventListener("DOMContentLoaded", () => {
+  checkAdminAuth();
   initNavigation();
   renderOverview();
   renderLessonsTable();
@@ -350,6 +453,8 @@ document.addEventListener("DOMContentLoaded", () => {
 // Toast notification helper
 function showToast(message, type = "info") {
   const container = document.getElementById("toast-container");
+  if (!container) return;
+
   const toast = document.createElement("div");
   toast.className = "toast";
   
@@ -390,7 +495,7 @@ function initNavigation() {
       tabPanes.forEach(p => p.classList.remove("active"));
 
       item.classList.add("active");
-      const targetPane = document.getElementById(`tab-tab-${tabId}`) || document.getElementById(`tab-${tabId}`);
+      const targetPane = document.getElementById(`tab-${tabId}`);
       if (targetPane) targetPane.classList.add("active");
 
       if (titles[tabId] && pageTitle) {
@@ -402,37 +507,39 @@ function initNavigation() {
 
 // 1. RENDER OVERVIEW
 function renderOverview() {
-  document.getElementById("stat-total-lessons").textContent = store.lessons.length;
-  document.getElementById("stat-total-users").textContent = store.users.length;
+  const totalLessonsEl = document.getElementById("stat-total-lessons");
+  const totalUsersEl = document.getElementById("stat-total-users");
+  if (totalLessonsEl) totalLessonsEl.textContent = store.lessons.length;
+  if (totalUsersEl) totalUsersEl.textContent = store.users.length;
 
   const unitTbody = document.getElementById("unit-progress-tbody");
-  if (!unitTbody) return;
-
-  unitTbody.innerHTML = DEFAULT_UNITS_DATA.map(u => `
-    <tr>
-      <td><b>${u.name}</b></td>
-      <td>${u.count} đồng chí</td>
-      <td style="min-width: 140px;">
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <div class="progress-bar-container" style="flex: 1;">
-            <div class="progress-bar-fill" style="width: ${u.progress}%;"></div>
+  if (unitTbody) {
+    unitTbody.innerHTML = DEFAULT_UNITS_DATA.map(u => `
+      <tr>
+        <td><b>${u.name}</b></td>
+        <td>${u.count} đồng chí</td>
+        <td style="min-width: 140px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="progress-bar-container" style="flex: 1;">
+              <div class="progress-bar-fill" style="width: ${u.progress}%;"></div>
+            </div>
+            <b>${u.progress}%</b>
           </div>
-          <b>${u.progress}%</b>
-        </div>
-      </td>
-      <td><b>${u.avgScore}đ</b></td>
-      <td>
-        <span class="badge ${u.status === 'Xuất sắc' || u.status === 'Tốt' ? 'badge-green' : u.status === 'Cần đôn đốc' ? 'badge-orange' : 'badge-navy'}">
-          ${u.status}
-        </span>
-      </td>
-      <td>
-        <button class="btn btn-outline btn-sm" onclick="urgeUnit('${u.name}')" title="Đôn đốc đơn vị">
-          <i class="fa-solid fa-bell" style="color: var(--crimson-red);"></i> Đôn đốc
-        </button>
-      </td>
-    </tr>
-  `).join("");
+        </td>
+        <td><b>${u.avgScore}đ</b></td>
+        <td>
+          <span class="badge ${u.status === 'Xuất sắc' || u.status === 'Tốt' ? 'badge-green' : u.status === 'Cần đôn đốc' ? 'badge-orange' : 'badge-navy'}">
+            ${u.status}
+          </span>
+        </td>
+        <td>
+          <button class="btn btn-outline btn-sm" onclick="urgeUnit('${u.name}')" title="Đôn đốc đơn vị">
+            <i class="fa-solid fa-bell" style="color: var(--crimson-red);"></i> Đôn đốc
+          </button>
+        </td>
+      </tr>
+    `).join("");
+  }
 
   const activityList = document.getElementById("recent-activity-list");
   if (activityList) {
@@ -450,11 +557,15 @@ function renderLessonsTable() {
   const tbody = document.getElementById("lessons-tbody");
   const search = document.getElementById("lesson-search")?.value.toLowerCase() || "";
   const catFilter = document.getElementById("lesson-filter-category")?.value || "ALL";
+  const audFilter = document.getElementById("lesson-filter-audience")?.value || "ALL";
 
   const filtered = store.lessons.filter(l => {
-    const matchSearch = l.title.toLowerCase().includes(search) || l.id.toLowerCase().includes(search) || (l.lecturer && l.lecturer.toLowerCase().includes(search));
+    const matchSearch = l.title.toLowerCase().includes(search) || 
+      l.id.toLowerCase().includes(search) || 
+      (l.lecturer && l.lecturer.toLowerCase().includes(search));
     const matchCat = catFilter === "ALL" || l.category === catFilter;
-    return matchSearch && matchCat;
+    const matchAud = audFilter === "ALL" || (l.targetAudience && l.targetAudience.includes(audFilter));
+    return matchSearch && matchCat && matchAud;
   });
 
   if (!tbody) return;
@@ -483,7 +594,7 @@ function renderLessonsTable() {
           <span title="Audio: ${l.audioUrl || 'Có audio'}" style="color: #F59E0B;"><i class="fa-solid fa-headphones"></i></span>
         </div>
       </td>
-      <td><span class="badge badge-green">${l.quizCount || 4} câu</span></td>
+      <td><span class="badge badge-green">${l.questions ? l.questions.length : (l.quizCount || 4)} câu</span></td>
       <td>
         <div style="display: flex; gap: 4px;">
           <button class="btn btn-outline btn-sm" onclick="previewLesson('${l.id}')" title="Xem trước / Tải file"><i class="fa-solid fa-eye"></i></button>
@@ -502,7 +613,6 @@ function renderUsersTable() {
   const unitFilter = document.getElementById("user-filter-unit")?.value || "ALL";
   const statusFilter = document.getElementById("user-filter-status")?.value || "ALL";
 
-  // Sort by orderNumber
   const sorted = [...store.users].sort((a, b) => (a.orderNumber || 0) - (b.orderNumber || 0));
 
   const filtered = sorted.filter(u => {
@@ -531,7 +641,7 @@ function renderUsersTable() {
           <code style="font-size: 12.5px; font-weight: 700; color: #1E3A8A; background: #EEF2FF; padding: 2px 6px; border-radius: 4px;">
             ${u.username || 'phamtatthang_162'}
           </code>
-          <button class="btn-outline btn-sm" onclick="copyToClipboard('${u.username}')" title="Sao chép tên tài khoản" style="padding: 2px 5px; border: none;">
+          <button class="btn-outline btn-sm" onclick="copyToClipboard('${u.username}')" title="Sao chép tên tài khoản" style="padding: 2px 5px; border: none; background: transparent; cursor: pointer;">
             <i class="fa-solid fa-copy" style="color: #64748B;"></i>
           </button>
         </div>
@@ -586,28 +696,74 @@ function renderUsersTable() {
 // 4. RENDER QUIZ BANK
 function renderQuizBank() {
   const container = document.getElementById("quiz-questions-list");
+  const filterLesson = document.getElementById("quiz-filter-lesson");
+  const search = document.getElementById("quiz-search")?.value.toLowerCase() || "";
+  const selectedLessonId = filterLesson?.value || "ALL";
+
+  if (filterLesson && filterLesson.options.length <= 1) {
+    filterLesson.innerHTML = '<option value="ALL">Tất cả chuyên đề bài giảng</option>' + 
+      store.lessons.map(l => `<option value="${l.id}">[${l.id.toUpperCase()}] ${l.title.slice(0, 45)}...</option>`).join("");
+  }
+
+  // Populate select in question modal as well
+  const modalLessonSelect = document.getElementById("question-lesson-id");
+  if (modalLessonSelect) {
+    modalLessonSelect.innerHTML = store.lessons.map(l => `<option value="${l.id}">[${l.id.toUpperCase()}] ${l.title}</option>`).join("");
+  }
+
   if (!container) return;
 
-  container.innerHTML = store.lessons.map((l) => `
-    <div style="border: 1px solid var(--slate-200); border-radius: 10px; padding: 16px; background: white;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-        <div style="font-weight: 700; color: var(--navy-primary); font-size: 14px;">
-          <span class="badge badge-navy">${l.id.toUpperCase()}</span> ${l.title}
-        </div>
-        <span class="badge badge-green">4 Câu trắc nghiệm</span>
-      </div>
+  const matchedLessons = store.lessons.filter(l => selectedLessonId === "ALL" || l.id === selectedLessonId);
 
-      <div style="font-size: 12.5px; color: var(--slate-700); background: var(--slate-50); padding: 10px; border-radius: 6px; margin-bottom: 8px;">
-        <b>Câu 1:</b> Phương châm chỉ đạo xuyên suốt của Đảng ta trong bảo vệ chủ quyền biển đảo là gì?
-        <div style="margin-top: 6px; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 11.5px;">
-          <div>A. Bị động đối phó</div>
-          <div style="color: var(--green-600); font-weight: bold;">B. Kiên quyết, kiên trì, bình tĩnh, khôn khéo (Đúng)</div>
-          <div>C. Đơn phương giải quyết</div>
-          <div>D. Đợi chỉ thị cấp trên</div>
+  container.innerHTML = matchedLessons.map((l) => {
+    const questions = l.questions || [
+      {
+        question: "Phương châm chỉ đạo xuyên suốt trong giáo dục chính trị tại đơn vị là gì?",
+        options: ["Thụ động tiếp thu", "Gắn lý luận với thực tiễn chiến đấu", "Chỉ học lý thuyết", "Tự phát cá nhân"],
+        correctAnswer: 1,
+        explanation: "Phương châm cơ bản trong GDCT quân đội."
+      }
+    ];
+
+    const filteredQs = questions.filter(q => q.question.toLowerCase().includes(search) || l.title.toLowerCase().includes(search));
+
+    return `
+      <div style="border: 1px solid var(--slate-200); border-radius: 10px; padding: 16px; background: white; margin-bottom: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--slate-100); padding-bottom: 8px;">
+          <div style="font-weight: 700; color: var(--navy-primary); font-size: 14px;">
+            <span class="badge badge-navy">${l.id.toUpperCase()}</span> ${l.title}
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <span class="badge badge-green">${questions.length} Câu trắc nghiệm</span>
+            <button class="btn btn-outline btn-sm" onclick="openAddQuestionModalForLesson('${l.id}')">
+              <i class="fa-solid fa-plus"></i> Thêm câu hỏi
+            </button>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          ${filteredQs.map((q, idx) => `
+            <div style="font-size: 12.5px; color: var(--slate-700); background: var(--slate-50); padding: 12px; border-radius: 6px; border: 1px solid var(--slate-200);">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <b>Câu ${idx + 1}: ${q.question}</b>
+                <button class="btn-outline btn-sm" onclick="deleteQuestion('${l.id}', ${idx})" title="Xóa câu hỏi" style="color: var(--crimson-red); border: none; background: transparent; cursor: pointer; padding: 2px 6px;">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+              <div style="margin-top: 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 12px;">
+                ${q.options.map((opt, oIdx) => `
+                  <div style="padding: 4px 8px; border-radius: 4px; ${oIdx === q.correctAnswer ? 'background: #DCFCE7; color: #166534; font-weight: bold; border: 1px solid #86EFAC;' : 'background: white; border: 1px solid #E2E8F0;'}">
+                    <b>${String.fromCharCode(65 + oIdx)}.</b> ${opt} ${oIdx === q.correctAnswer ? '(Đúng)' : ''}
+                  </div>
+                `).join("")}
+              </div>
+              ${q.explanation ? `<div style="margin-top: 6px; font-size: 11px; color: var(--slate-500); font-style: italic;"><i class="fa-solid fa-lightbulb" style="color: #EAB308;"></i> ${q.explanation}</div>` : ''}
+            </div>
+          `).join("")}
         </div>
       </div>
-    </div>
-  `).join("");
+    `;
+  }).join("");
 }
 
 // 5. RENDER LAWS
@@ -625,8 +781,9 @@ function renderLaws() {
         <h4 style="font-size: 14px; color: var(--navy-primary); margin-bottom: 6px;">${law.title}</h4>
         <p style="font-size: 12px; color: var(--slate-600); line-height: 1.5;">${law.summary}</p>
       </div>
-      <div style="margin-top: 14px; display: flex; justify-content: flex-end; gap: 6px;">
-        <button class="btn btn-outline btn-sm" onclick="showToast('Đã mở toàn văn ${law.title}')"><i class="fa-solid fa-book-open"></i> Đọc toàn văn</button>
+      <div style="margin-top: 14px; display: flex; justify-content: space-between; align-items: center;">
+        <button class="btn btn-outline btn-sm" onclick="deleteLaw('${law.id}')" style="color: var(--crimson-red);"><i class="fa-solid fa-trash"></i> Xóa</button>
+        <button class="btn btn-outline btn-sm" onclick="showToast('Đã mở toàn văn: ${law.title}')"><i class="fa-solid fa-book-open"></i> Đọc toàn văn</button>
       </div>
     </div>
   `).join("");
@@ -634,7 +791,6 @@ function renderLaws() {
 
 // FILE UPLOAD HANDLERS
 function initFileUploadHandlers() {
-  // 1. DOCX File Picker
   document.getElementById("file-lesson-docx")?.addEventListener("change", (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -645,7 +801,6 @@ function initFileUploadHandlers() {
     }
   });
 
-  // 2. PDF File Picker
   document.getElementById("file-lesson-pdf")?.addEventListener("change", (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -656,7 +811,6 @@ function initFileUploadHandlers() {
     }
   });
 
-  // 3. Video File Picker
   document.getElementById("file-lesson-video")?.addEventListener("change", (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -667,7 +821,6 @@ function initFileUploadHandlers() {
     }
   });
 
-  // 4. Audio File Picker
   document.getElementById("file-lesson-audio")?.addEventListener("change", (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -678,7 +831,6 @@ function initFileUploadHandlers() {
     }
   });
 
-  // Auto-generate username button in User Modal
   document.getElementById("btn-auto-username")?.addEventListener("click", () => {
     const name = document.getElementById("user-fullname").value.trim();
     const unit = document.getElementById("user-unit").value;
@@ -692,7 +844,6 @@ function initFileUploadHandlers() {
     showToast(`Đã tạo tên tài khoản: ${generated}`);
   });
 
-  // Auto-suggest username when user types Full Name (if username is currently empty or untouched)
   document.getElementById("user-fullname")?.addEventListener("input", (e) => {
     const usernameInput = document.getElementById("user-username");
     if (usernameInput && (!usernameInput.value || usernameInput.dataset.manual !== "true")) {
@@ -708,19 +859,34 @@ function initFileUploadHandlers() {
   document.getElementById("user-username")?.addEventListener("input", () => {
     document.getElementById("user-username").dataset.manual = "true";
   });
+
+  // User import file
+  document.getElementById("input-import-users-file")?.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        document.getElementById("textarea-import-users").value = evt.target.result;
+        document.getElementById("import-users-file-status").innerHTML = `<i class="fa-solid fa-check"></i> Đã nạp: <b>${file.name}</b>`;
+        showToast(`Đã nạp file danh sách: ${file.name}`);
+      };
+      reader.readAsText(file);
+    }
+  });
 }
 
-// ACTION HANDLERS & MODAL MANAGEMENT
-function openModal(id) {
-  document.getElementById(id)?.classList.add("show");
-}
+// MODAL CONTROLS
+window.openModal = function(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.add("show");
+};
 
-function closeModal(id) {
-  document.getElementById(id)?.classList.remove("show");
-}
+window.closeModal = function(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.remove("show");
+};
 
 function initActionButtons() {
-  // Global buttons
   document.getElementById("btn-urge-all")?.addEventListener("click", () => {
     showToast("Đã phát lệnh đôn đốc học tập đến toàn thể quân nhân Vùng 4 qua SMS và thông báo App!", "warning");
   });
@@ -731,6 +897,8 @@ function initActionButtons() {
 
   document.getElementById("btn-logout")?.addEventListener("click", () => {
     if (confirm("Đồng chí có chắc chắn muốn đăng xuất khỏi Cổng Quản trị GDCT?")) {
+      sessionStorage.removeItem("gdct_admin_authenticated");
+      checkAdminAuth();
       showToast("Đã kết thúc phiên làm việc an toàn.");
     }
   });
@@ -738,9 +906,12 @@ function initActionButtons() {
   // Filter Listeners
   document.getElementById("lesson-search")?.addEventListener("input", renderLessonsTable);
   document.getElementById("lesson-filter-category")?.addEventListener("change", renderLessonsTable);
+  document.getElementById("lesson-filter-audience")?.addEventListener("change", renderLessonsTable);
   document.getElementById("user-search")?.addEventListener("input", renderUsersTable);
   document.getElementById("user-filter-unit")?.addEventListener("change", renderUsersTable);
   document.getElementById("user-filter-status")?.addEventListener("change", renderUsersTable);
+  document.getElementById("quiz-search")?.addEventListener("input", renderQuizBank);
+  document.getElementById("quiz-filter-lesson")?.addEventListener("change", renderQuizBank);
 
   // Lesson Modal
   document.getElementById("btn-add-lesson")?.addEventListener("click", () => {
@@ -771,6 +942,8 @@ function initActionButtons() {
     }
 
     const existingIdx = store.lessons.findIndex(l => l.id === id);
+    const existingLesson = existingIdx >= 0 ? store.lessons[existingIdx] : null;
+
     const newLesson = {
       id,
       title,
@@ -785,8 +958,9 @@ function initActionButtons() {
       pdfAttachment: document.getElementById("lesson-pdf-name").value || `${code}_Tai_Lieu.pdf`,
       videoUrl: document.getElementById("lesson-video-url").value || `https://video.gdct.vung4.vn/${code}.mp4`,
       audioUrl: document.getElementById("lesson-audio-url").value || `https://audio.gdct.vung4.vn/${code}.mp3`,
-      quizCount: 4,
-      isInternal
+      quizCount: existingLesson?.questions ? existingLesson.questions.length : 4,
+      isInternal,
+      questions: existingLesson?.questions || []
     };
 
     if (existingIdx >= 0) {
@@ -869,6 +1043,167 @@ function initActionButtons() {
     renderUsersTable();
   });
 
+  // Import / Export Users
+  document.getElementById("btn-import-users")?.addEventListener("click", () => {
+    openModal("modal-import-users");
+  });
+
+  document.getElementById("btn-export-users")?.addEventListener("click", () => {
+    exportToCSV();
+  });
+
+  document.getElementById("btn-execute-import-users")?.addEventListener("click", () => {
+    const raw = document.getElementById("textarea-import-users").value.trim();
+    if (!raw) {
+      alert("Vui lòng dán dữ liệu hoặc tải tệp lên!");
+      return;
+    }
+
+    try {
+      if (raw.startsWith("[") || raw.startsWith("{")) {
+        const parsed = JSON.parse(raw);
+        const list = Array.isArray(parsed) ? parsed : [parsed];
+        list.forEach(item => {
+          const id = `acc_${Date.now()}_${Math.floor(Math.random()*1000)}`;
+          const unit = item.unit || "Lữ đoàn 162";
+          const username = item.username || generateUniqueUsername(item.fullName || "Quân nhân", unit);
+          store.users.push({
+            id,
+            orderNumber: store.users.length + 1,
+            username,
+            password: item.password || "12345@abc",
+            militaryCode: item.militaryCode || `QN-${getUnitCode(unit)}01`,
+            fullName: item.fullName || "Quân nhân Vùng 4",
+            rank: item.rank || "Chiến sĩ",
+            position: item.position || "Chiến sĩ",
+            unit: unit,
+            phone: item.phone || "0988.112.233",
+            progress: item.progress || 0,
+            avgScore: item.avgScore || 0,
+            lastActive: "Mới tạo",
+            isInternalAccess: item.isInternalAccess !== false
+          });
+        });
+      } else {
+        // Parse CSV line by line
+        const lines = raw.split("\n").filter(l => l.trim().length > 0);
+        lines.forEach((line, idx) => {
+          if (idx === 0 && line.toLowerCase().includes("họ và tên")) return; // Skip header
+          const parts = line.split(",").map(p => p.trim().replace(/^"|"$/g, ''));
+          if (parts.length >= 2) {
+            const name = parts[0] || parts[1] || "Quân nhân";
+            const unit = parts[2] || "Lữ đoàn 162";
+            const rank = parts[3] || "Hạ sĩ";
+            const position = parts[4] || "Chiến sĩ";
+            const username = generateUniqueUsername(name, unit);
+            store.users.push({
+              id: `acc_${Date.now()}_${idx}`,
+              orderNumber: store.users.length + 1,
+              username,
+              password: "12345@abc",
+              militaryCode: `QN-${getUnitCode(unit)}0${idx+1}`,
+              fullName: name,
+              rank,
+              position,
+              unit,
+              phone: "0988.112.233",
+              progress: 0,
+              avgScore: 0,
+              lastActive: "Mới tạo",
+              isInternalAccess: true
+            });
+          }
+        });
+      }
+
+      store.saveAll();
+      closeModal("modal-import-users");
+      renderUsersTable();
+      renderOverview();
+      showToast("Đã nhập danh sách quân nhân và cấp phát tài khoản thành công!");
+    } catch (e) {
+      alert("Lỗi khi xử lý dữ liệu nhập! Vui lòng kiểm tra lại định dạng JSON/CSV.");
+    }
+  });
+
+  // Question Modal
+  document.getElementById("btn-add-question")?.addEventListener("click", () => {
+    document.getElementById("form-question").reset();
+    document.getElementById("question-id").value = "";
+    openModal("modal-question");
+  });
+
+  document.getElementById("btn-save-question")?.addEventListener("click", () => {
+    const lessonId = document.getElementById("question-lesson-id").value;
+    const text = document.getElementById("question-text").value.trim();
+    const optA = document.getElementById("question-opt-a").value.trim();
+    const optB = document.getElementById("question-opt-b").value.trim();
+    const optC = document.getElementById("question-opt-c").value.trim();
+    const optD = document.getElementById("question-opt-d").value.trim();
+    const correct = parseInt(document.getElementById("question-correct").value) || 0;
+    const explanation = document.getElementById("question-explanation").value.trim();
+
+    if (!text || !optA || !optB) {
+      alert("Vui lòng nhập nội dung câu hỏi và ít nhất 2 đáp án A, B!");
+      return;
+    }
+
+    const lesson = store.lessons.find(l => l.id === lessonId);
+    if (!lesson) {
+      alert("Không tìm thấy bài giảng được chọn!");
+      return;
+    }
+
+    if (!lesson.questions) lesson.questions = [];
+    lesson.questions.push({
+      question: text,
+      options: [optA, optB, optC || "Phương án C", optD || "Phương án D"],
+      correctAnswer: correct,
+      explanation
+    });
+
+    lesson.quizCount = lesson.questions.length;
+    store.saveAll();
+    closeModal("modal-question");
+    renderQuizBank();
+    renderLessonsTable();
+    showToast("Đã lưu câu hỏi trắc nghiệm mới vào ngân hàng đề thi!");
+  });
+
+  // Law Modal
+  document.getElementById("btn-add-law")?.addEventListener("click", () => {
+    document.getElementById("form-law").reset();
+    document.getElementById("law-id").value = "";
+    openModal("modal-law");
+  });
+
+  document.getElementById("btn-save-law")?.addEventListener("click", () => {
+    const title = document.getElementById("law-title").value.trim();
+    const issuedBy = document.getElementById("law-issued-by").value.trim();
+    const category = document.getElementById("law-category").value;
+    const summary = document.getElementById("law-summary").value.trim();
+    const id = document.getElementById("law-id").value || `law_${Date.now()}`;
+
+    if (!title || !summary) {
+      alert("Vui lòng nhập Tên văn bản và Tóm tắt nội dung!");
+      return;
+    }
+
+    const newLaw = { id, title, issuedBy: issuedBy || "Bộ Quốc phòng", category, summary };
+    const existingIdx = store.laws.findIndex(l => l.id === id);
+    if (existingIdx >= 0) {
+      store.laws[existingIdx] = newLaw;
+      showToast(`Đã cập nhật: ${title}`);
+    } else {
+      store.laws.push(newLaw);
+      showToast(`Đã thêm văn bản: ${title}`);
+    }
+
+    store.saveAll();
+    closeModal("modal-law");
+    renderLaws();
+  });
+
   // Export / Import Database
   document.getElementById("btn-export-database")?.addEventListener("click", () => {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(store, null, 2));
@@ -898,6 +1233,8 @@ function initActionButtons() {
         renderOverview();
         renderLessonsTable();
         renderUsersTable();
+        renderQuizBank();
+        renderLaws();
         showToast("Đã phục hồi cơ sở dữ liệu thành công!");
       } catch (err) {
         alert("Tệp JSON không hợp lệ!");
@@ -909,9 +1246,13 @@ function initActionButtons() {
 
 // Global actions exposed to HTML inline onclick
 window.copyToClipboard = function(text) {
-  navigator.clipboard.writeText(text).then(() => {
-    showToast(`Đã sao chép: ${text}`);
-  });
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => {
+      showToast(`Đã sao chép: ${text}`);
+    });
+  } else {
+    showToast(`Tài khoản: ${text}`);
+  }
 };
 
 window.togglePasswordView = function(id) {
@@ -1049,6 +1390,35 @@ window.deleteUser = function(id) {
     store.saveAll();
     renderUsersTable();
     showToast("Đã xóa tài khoản quân nhân.");
+  }
+};
+
+window.openAddQuestionModalForLesson = function(lessonId) {
+  document.getElementById("form-question").reset();
+  document.getElementById("question-id").value = "";
+  document.getElementById("question-lesson-id").value = lessonId;
+  openModal("modal-question");
+};
+
+window.deleteQuestion = function(lessonId, qIdx) {
+  const lesson = store.lessons.find(l => l.id === lessonId);
+  if (!lesson || !lesson.questions) return;
+  if (confirm("Xác nhận xóa câu hỏi trắc nghiệm này?")) {
+    lesson.questions.splice(qIdx, 1);
+    lesson.quizCount = lesson.questions.length;
+    store.saveAll();
+    renderQuizBank();
+    renderLessonsTable();
+    showToast("Đã xóa câu hỏi.");
+  }
+};
+
+window.deleteLaw = function(lawId) {
+  if (confirm("Xác nhận xóa văn bản pháp luật này?")) {
+    store.laws = store.laws.filter(l => l.id !== lawId);
+    store.saveAll();
+    renderLaws();
+    showToast("Đã xóa văn bản.");
   }
 };
 
