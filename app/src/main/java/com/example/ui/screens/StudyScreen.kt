@@ -197,7 +197,7 @@ fun StudyScreen(
       contentPadding = PaddingValues(14.dp),
       verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-      items(filteredLessons) { lesson ->
+      items(filteredLessons, key = { it.id }) { lesson ->
         val progress = progressMap[lesson.id]
         val progressPercent = progress?.progressPercent ?: 0
         val isCompleted = progress?.isCompleted == true || progressPercent >= 100
@@ -213,7 +213,7 @@ fun StudyScreen(
             .testTag("card_study_lesson_${lesson.id}")
         ) {
           Column(modifier = Modifier.padding(16.dp)) {
-            // Header Row (Code & Category)
+            // Header Row (Code & Category & Internal Badge)
             Row(
               modifier = Modifier.fillMaxWidth(),
               horizontalArrangement = Arrangement.SpaceBetween,
@@ -222,17 +222,35 @@ fun StudyScreen(
               Row(verticalAlignment = Alignment.CenterVertically) {
                 Surface(
                   shape = RoundedCornerShape(6.dp),
-                  color = NavyContainer
+                  color = if (lesson.isInternal) Color(0xFFFEF2F2) else NavyContainer
                 ) {
                   Text(
                     text = lesson.code,
-                    color = NavyPrimary,
+                    color = if (lesson.isInternal) CrimsonRed else NavyPrimary,
                     fontSize = 10.5.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                   )
                 }
+
                 Spacer(modifier = Modifier.width(6.dp))
+
+                if (lesson.isInternal) {
+                  Surface(
+                    shape = RoundedCornerShape(6.dp),
+                    color = CrimsonRed
+                  ) {
+                    Text(
+                      text = "NỘI BỘ",
+                      color = Color.White,
+                      fontSize = 9.5.sp,
+                      fontWeight = FontWeight.Black,
+                      modifier = Modifier.padding(horizontal = 5.dp, vertical = 2.dp)
+                    )
+                  }
+                  Spacer(modifier = Modifier.width(6.dp))
+                }
+
                 Text(
                   text = lesson.category,
                   color = Color(0xFF64748B),

@@ -531,6 +531,13 @@
             </div>
           </div>
 
+          <div class="form-group" style="background: #FFFBEB; border: 1px solid #FCD34D; padding: 10px 14px; border-radius: 8px;">
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 700; color: #92400E; margin-bottom: 0;">
+              <input type="checkbox" id="lesson-is-internal" style="width: 18px; height: 18px;">
+              <span><i class="fa-solid fa-shield-halved" style="color: #DC2626;"></i> Phân loại: LƯU HÀNH NỘI BỘ (Yêu cầu đăng nhập tài khoản quân nhân mới được xem)</span>
+            </label>
+          </div>
+
           <div class="form-group">
             <label class="form-label">Tóm tắt nội dung trọng tâm</label>
             <textarea class="form-control" id="lesson-summary" placeholder="Tóm tắt mục đích, yêu cầu và nội dung cốt lõi của bài giảng..."></textarea>
@@ -589,9 +596,16 @@
           
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Mã số quân nhân *</label>
-              <input type="text" class="form-control" id="user-code" placeholder="VD: QN-0128" required>
+              <label class="form-label">Mã số quân nhân / Tên đăng nhập *</label>
+              <input type="text" class="form-control" id="user-code" placeholder="VD: QN-0128, HQ-V4-2026" required>
             </div>
+            <div class="form-group">
+              <label class="form-label">Mã PIN xác thực (6 số) *</label>
+              <input type="text" class="form-control" id="user-pincode" value="123456" placeholder="Mặc định: 123456" required>
+            </div>
+          </div>
+
+          <div class="form-row">
             <div class="form-group">
               <label class="form-label">Cấp bậc quân hàm *</label>
               <select class="form-control" id="user-rank" required>
@@ -610,11 +624,10 @@
                 <option value="Đại tá">Đại tá</option>
               </select>
             </div>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Họ và tên quân nhân *</label>
-            <input type="text" class="form-control" id="user-fullname" placeholder="VD: Nguyễn Văn Nam" required>
+            <div class="form-group">
+              <label class="form-label">Họ và tên quân nhân *</label>
+              <input type="text" class="form-control" id="user-fullname" placeholder="VD: Nguyễn Văn Nam" required>
+            </div>
           </div>
 
           <div class="form-row">
@@ -644,6 +657,13 @@
               <label class="form-label">Tiến độ khởi tạo (%)</label>
               <input type="number" class="form-control" id="user-progress" min="0" max="100" value="0">
             </div>
+          </div>
+
+          <div class="form-group" style="background: #F0FDF4; border: 1px solid #86EFAC; padding: 10px 14px; border-radius: 8px;">
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 700; color: #166534; margin-bottom: 0;">
+              <input type="checkbox" id="user-internal-access" checked style="width: 18px; height: 18px;">
+              <span><i class="fa-solid fa-key" style="color: #16A34A;"></i> Cấp quyền truy cập Tài liệu & Chuyên đề LƯU HÀNH NỘI BỘ trên App</span>
+            </label>
           </div>
         </form>
       </div>

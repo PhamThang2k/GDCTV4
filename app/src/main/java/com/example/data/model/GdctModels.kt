@@ -7,7 +7,8 @@ data class DocAttachment(
   val fileSize: String, // e.g. "2.4 MB"
   val downloadUrl: String,
   val pageCount: Int = 12,
-  val isDownloaded: Boolean = false
+  val isDownloaded: Boolean = false,
+  val isInternal: Boolean = false
 )
 
 data class SlideItem(
@@ -52,7 +53,9 @@ data class Lesson(
   val sections: List<LessonSection>,
   val quizQuestions: List<QuizQuestion>,
   val status: String = "Đã xuất bản",
-  val updatedDate: String = "16/08/2026"
+  val updatedDate: String = "20/08/2026",
+  val isInternal: Boolean = false, // true: Tài liệu Lưu hành nội bộ yêu cầu đăng nhập tài khoản cấp phát
+  val securityLevel: String = "Công khai" // "Công khai" hoặc "Lưu hành nội bộ"
 )
 
 data class UserAccount(
@@ -66,7 +69,10 @@ data class UserAccount(
   val totalLessonsCount: Int,
   val averageScore: Double,
   val lastActive: String,
-  val status: String // "Hoàn thành tốt", "Đang học", "Cần đôn đốc"
+  val status: String, // "Hoàn thành tốt", "Đang học", "Cần đôn đốc"
+  val pinCode: String = "123456",
+  val isInternalAccess: Boolean = true,
+  val phone: String = "0988.123.456"
 )
 
 data class LawDoc(
@@ -78,17 +84,21 @@ data class LawDoc(
   val keyArticles: List<Pair<String, String>>,
   val docxDownloadUrl: String = "https://docs.vung4.vn/law_vanban.docx",
   val pdfDownloadUrl: String = "https://docs.vung4.vn/law_vanban.pdf",
-  val fileSize: String = "1.5 MB"
+  val fileSize: String = "1.5 MB",
+  val isInternal: Boolean = false
 )
 
 data class UserProfile(
-  val name: String = "Nguyễn Văn Thắng",
-  val rank: String = "Trung úy",
-  val role: String = "Trợ lý Chính trị",
-  val unit: String = "Lữ đoàn 162 - Vùng 4 Hải quân",
-  val militaryId: String = "HQ-V4-2026",
-  val joinDate: String = "08/2020",
-  val partyStatus: String = "Đảng viên chính thức"
+  val isLoggedIn: Boolean = false,
+  val isInternalAccess: Boolean = false,
+  val name: String = "Khách (Chưa đăng nhập)",
+  val rank: String = "Chiến sĩ",
+  val role: String = "Tự do tham khảo GDCT",
+  val unit: String = "Vùng 4 Hải quân",
+  val militaryId: String = "GUEST-V4",
+  val joinDate: String = "08/2026",
+  val partyStatus: String = "Chưa xác thực tài khoản",
+  val phone: String = ""
 )
 
 enum class StudyMode {

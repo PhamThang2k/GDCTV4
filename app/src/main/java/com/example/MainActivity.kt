@@ -20,8 +20,10 @@ import com.example.ui.components.AddNoteDialog
 import com.example.ui.components.DailyQuoteDialog
 import com.example.ui.components.GdctBottomNavigation
 import com.example.ui.components.GdctTopBar
+import com.example.ui.components.InternalRestrictedDialog
 import com.example.ui.components.LawDetailDialog
 import com.example.ui.components.LessonDetailView
+import com.example.ui.components.LoginDialog
 import com.example.ui.components.QuizEngineDialog
 import com.example.ui.screens.HomeScreen
 import com.example.ui.screens.ProfileAdminScreen
@@ -101,7 +103,8 @@ fun GdctApp(viewModel: GdctViewModel = viewModel()) {
         GdctTopBar(
           userProfile = uiState.userProfile,
           onOpenQuoteDialog = { viewModel.setDailyQuoteDialog(true) },
-          onOpenCommanderReport = { viewModel.setTab(AppTab.PROFILE) }
+          onOpenCommanderReport = { viewModel.setTab(AppTab.PROFILE) },
+          onOpenLoginDialog = { viewModel.setShowLoginDialog(true) }
         )
       },
       bottomBar = {
@@ -157,7 +160,9 @@ fun GdctApp(viewModel: GdctViewModel = viewModel()) {
             lessons = viewModel.allLessons,
             progressMap = progressMap,
             quizSubmissions = quizSubmissions,
-            onOpenLesson = { viewModel.openLesson(it) }
+            onOpenLesson = { viewModel.openLesson(it) },
+            onOpenLoginDialog = { viewModel.setShowLoginDialog(true) },
+            onLogout = { viewModel.logout() }
           )
         }
       }
@@ -165,6 +170,27 @@ fun GdctApp(viewModel: GdctViewModel = viewModel()) {
   }
 
   // Modals & Dialogs
+  if (uiState.showLoginDialog) {
+    LoginDialog(
+      userAccounts = uiState.adminUserAccounts.ifEmpty { viewModel.allLessons.let { emptyList() } },
+      onLoginWithCredentials = { militaryId, pin -> viewModel.loginWithCredentials(militaryId, pin) },
+      onQuickLogin = { viewModel.loginQuick(it) },
+      onContinueAsGuest = { viewModel.setShowLoginDialog(false) },
+      onDismiss = { viewModel.setShowLoginDialog(false) }
+    )
+  }
+
+  if (uiState.showInternalRestrictedDialog) {
+    InternalRestrictedDialog(
+      lessonTitle = uiState.restrictedLessonTarget?.title ?: "Chuyên đề GDCT Nội bộ",
+      onLoginClick = {
+        viewModel.setShowInternalRestrictedDialog(false)
+        viewModel.setShowLoginDialog(true)
+      },
+      onDismiss = { viewModel.setShowInternalRestrictedDialog(false) }
+    )
+  }
+
   if (uiState.activeQuizLesson != null) {
     QuizEngineDialog(
       lesson = uiState.activeQuizLesson!!,

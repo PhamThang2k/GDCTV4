@@ -19,7 +19,8 @@ const DEFAULT_LESSONS = [
     pdfAttachment: "Chuyen_de_01_Chu_quyen_bien_dao.pdf",
     videoUrl: "https://video.gdct.vung4.vn/cd-01-hd.mp4",
     audioUrl: "https://audio.gdct.vung4.vn/cd-01-phat-thanh.mp3",
-    quizCount: 4
+    quizCount: 4,
+    isInternal: false
   },
   {
     id: "cd-02",
@@ -35,7 +36,8 @@ const DEFAULT_LESSONS = [
     pdfAttachment: "Chuyen_de_02_Ban_linh_chinh_tri_thuy_thu.pdf",
     videoUrl: "https://video.gdct.vung4.vn/cd-02-hd.mp4",
     audioUrl: "https://audio.gdct.vung4.vn/cd-02-phat-thanh.mp3",
-    quizCount: 4
+    quizCount: 4,
+    isInternal: true
   },
   {
     id: "cd-03",
@@ -51,7 +53,8 @@ const DEFAULT_LESSONS = [
     pdfAttachment: "Chuyen_de_03_Truyen_thong_Vung4.pdf",
     videoUrl: "https://video.gdct.vung4.vn/cd-03-hd.mp4",
     audioUrl: "https://audio.gdct.vung4.vn/cd-03-phat-thanh.mp3",
-    quizCount: 4
+    quizCount: 4,
+    isInternal: false
   },
   {
     id: "cd-04",
@@ -67,7 +70,8 @@ const DEFAULT_LESSONS = [
     pdfAttachment: "Chuyen_de_04_Ky_luat_an_toan.pdf",
     videoUrl: "https://video.gdct.vung4.vn/cd-04-hd.mp4",
     audioUrl: "https://audio.gdct.vung4.vn/cd-04-phat-thanh.mp3",
-    quizCount: 4
+    quizCount: 4,
+    isInternal: false
   },
   {
     id: "cd-05",
@@ -83,19 +87,20 @@ const DEFAULT_LESSONS = [
     pdfAttachment: "Chuyen_de_05_Tu_tuong_Bac_Ho.pdf",
     videoUrl: "https://video.gdct.vung4.vn/cd-05-hd.mp4",
     audioUrl: "https://audio.gdct.vung4.vn/cd-05-phat-thanh.mp3",
-    quizCount: 4
+    quizCount: 4,
+    isInternal: false
   }
 ];
 
 const DEFAULT_USERS = [
-  { id: "usr-01", militaryCode: "QN-16201", fullName: "Trần Văn Bình", rank: "Đại úy", position: "Thuyền trưởng Tàu 015 Trần Hưng Đạo", unit: "Lữ đoàn 162", phone: "0988.112.233", progress: 100, avgScore: 10.0, lastActive: "Hôm nay, 08:30" },
-  { id: "usr-02", militaryCode: "QN-16202", fullName: "Lê Hoàng Nam", rank: "Thượng úy", position: "Chính trị viên Tàu 016 Quang Trung", unit: "Lữ đoàn 162", phone: "0977.445.566", progress: 100, avgScore: 9.5, lastActive: "Hôm nay, 09:15" },
-  { id: "usr-03", militaryCode: "QN-14601", fullName: "Nguyễn Văn Tuấn", rank: "Thiếu tá", position: "Chỉ huy trưởng Đảo Sinh Tồn", unit: "Lữ đoàn 146", phone: "0912.334.455", progress: 100, avgScore: 9.8, lastActive: "Hôm qua, 16:45" },
-  { id: "usr-04", militaryCode: "QN-14602", fullName: "Phạm Hải Đăng", rank: "Trung úy", position: "Chính trị viên Đảo Cô Lin", unit: "Lữ đoàn 146", phone: "0903.667.788", progress: 80, avgScore: 8.5, lastActive: "2 ngày trước" },
-  { id: "usr-05", militaryCode: "QN-95501", fullName: "Hoàng Minh Đức", rank: "Thiếu úy", position: "Trưởng ngành Cơ điện Tàu 561", unit: "Lữ đoàn 955", phone: "0982.554.433", progress: 40, avgScore: 7.0, lastActive: "5 ngày trước" },
-  { id: "usr-06", militaryCode: "QN-10101", fullName: "Đặng Quốc Cường", rank: "Thượng sĩ", position: "Tiểu đội trưởng Hải quân Đánh bộ", unit: "Lữ đoàn 101", phone: "0966.778.899", progress: 60, avgScore: 8.0, lastActive: "Hôm qua, 14:20" },
-  { id: "usr-07", militaryCode: "QN-68501", fullName: "Vũ Đình Trọng", rank: "Trung sĩ", position: "Trắc thủ Tên lửa bờ", unit: "Lữ đoàn 685", phone: "0934.112.299", progress: 20, avgScore: 6.5, lastActive: "1 tuần trước" },
-  { id: "usr-08", militaryCode: "QN-KT01", fullName: "Lâm Quang Huy", rank: "Thượng úy QNCN", position: "Tổ trưởng Kỹ thuật Vũ khí", unit: "Trung tâm BĐKT", phone: "0971.889.900", progress: 100, avgScore: 9.0, lastActive: "Hôm nay, 07:50" }
+  { id: "usr-01", militaryCode: "QN-0128", pinCode: "123456", fullName: "Nguyễn Văn Nam", rank: "Thượng úy", position: "Chính trị viên phó", unit: "Lữ đoàn 162", phone: "0988.112.233", progress: 100, avgScore: 10.0, lastActive: "Hôm nay, 08:30", isInternalAccess: true },
+  { id: "usr-02", militaryCode: "QN-0492", pinCode: "654321", fullName: "Trần Quốc Toản", rank: "Đại úy", position: "Thuyền trưởng Tàu HQ-015", unit: "Lữ đoàn 162", phone: "0977.445.566", progress: 100, avgScore: 9.5, lastActive: "Hôm nay, 09:15", isInternalAccess: true },
+  { id: "usr-03", militaryCode: "QN-0888", pinCode: "888888", fullName: "Lê Hoàng Hải", rank: "Thiếu tá", position: "Chỉ huy trưởng Đảo Trường Sa", unit: "Lữ đoàn 146", phone: "0912.334.455", progress: 85, avgScore: 9.8, lastActive: "Hôm qua, 16:45", isInternalAccess: true },
+  { id: "usr-04", militaryCode: "QN-0001", pinCode: "999999", fullName: "Bùi Xuân Thắng", rank: "Đại tá", position: "Chủ nhiệm Chính trị Vùng", unit: "Phòng Chính trị Vùng 4", phone: "0903.667.788", progress: 100, avgScore: 10.0, lastActive: "Vừa xong", isInternalAccess: true },
+  { id: "usr-05", militaryCode: "QN-95501", pinCode: "123456", fullName: "Hoàng Minh Đức", rank: "Thiếu úy", position: "Trưởng ngành Cơ điện Tàu 561", unit: "Lữ đoàn 955", phone: "0982.554.433", progress: 40, avgScore: 7.0, lastActive: "5 ngày trước", isInternalAccess: true },
+  { id: "usr-06", militaryCode: "QN-10101", pinCode: "123456", fullName: "Đặng Quốc Cường", rank: "Thượng sĩ", position: "Tiểu đội trưởng Hải quân Đánh bộ", unit: "Lữ đoàn 101", phone: "0966.778.899", progress: 60, avgScore: 8.0, lastActive: "Hôm qua, 14:20", isInternalAccess: true },
+  { id: "usr-07", militaryCode: "QN-68501", pinCode: "123456", fullName: "Vũ Đình Trọng", rank: "Trung sĩ", position: "Trắc thủ Tên lửa bờ", unit: "Lữ đoàn 685", phone: "0934.112.299", progress: 20, avgScore: 6.5, lastActive: "1 tuần trước", isInternalAccess: true },
+  { id: "usr-08", militaryCode: "QN-KT01", pinCode: "123456", fullName: "Lâm Quang Huy", rank: "Thượng úy QNCN", position: "Tổ trưởng Kỹ thuật Vũ khí", unit: "Trung tâm BĐKT", phone: "0971.889.900", progress: 100, avgScore: 9.0, lastActive: "Hôm nay, 07:50", isInternalAccess: true }
 ];
 
 const DEFAULT_UNITS_DATA = [
@@ -258,7 +263,7 @@ function renderLessonsTable() {
   const catFilter = document.getElementById("lesson-filter-category")?.value || "ALL";
 
   const filtered = store.lessons.filter(l => {
-    const matchSearch = l.title.toLowerCase().includes(search) || l.id.toLowerCase().includes(search) || l.lecturer.toLowerCase().includes(search);
+    const matchSearch = l.title.toLowerCase().includes(search) || l.id.toLowerCase().includes(search) || (l.lecturer && l.lecturer.toLowerCase().includes(search));
     const matchCat = catFilter === "ALL" || l.category === catFilter;
     return matchSearch && matchCat;
   });
@@ -267,20 +272,25 @@ function renderLessonsTable() {
 
   tbody.innerHTML = filtered.map(l => `
     <tr>
-      <td><span class="badge badge-navy"><b>${l.id.toUpperCase()}</b></span></td>
+      <td>
+        <div style="display: flex; flex-direction: column; gap: 3px;">
+          <span class="badge badge-navy"><b>${l.id.toUpperCase()}</b></span>
+          ${l.isInternal ? '<span class="badge" style="background:#FEE2E2; color:#DC2626; font-size:9.5px;"><i class="fa-solid fa-lock"></i> Nội bộ</span>' : '<span class="badge" style="background:#F1F5F9; color:#475569; font-size:9.5px;">Công khai</span>'}
+        </div>
+      </td>
       <td style="max-width: 300px;">
         <div style="font-weight: 700; color: var(--navy-primary); margin-bottom: 2px;">${l.title}</div>
-        <div style="font-size: 11px; color: var(--slate-500);">${l.lecturer} • ${l.unit}</div>
+        <div style="font-size: 11px; color: var(--slate-500);">${l.lecturer || 'Ban Tuyên huấn Vùng 4'} • ${l.unit || 'Phòng Chính trị'}</div>
       </td>
       <td><span class="badge badge-blue">${l.category}</span></td>
       <td style="font-size: 12px;">${l.targetAudience}</td>
       <td><b>${l.estimatedMinutes} phút</b></td>
       <td>
-        <div style="display: flex; gap: 4px; font-size: 13px;">
-          <span title="Slide: ${l.slidesCount} trang" style="color: #3B82F6;"><i class="fa-solid fa-chalkboard-user"></i> ${l.slidesCount}</span>
-          <span title="Tài liệu DOCX/PDF" style="color: #EF4444;"><i class="fa-solid fa-file-pdf"></i></span>
-          <span title="Video HD" style="color: #10B981;"><i class="fa-solid fa-video"></i></span>
-          <span title="Audio phát thanh" style="color: #F59E0B;"><i class="fa-solid fa-headphones"></i></span>
+        <div style="display: flex; gap: 6px; font-size: 13px;">
+          <span title="Slide: ${l.slidesCount || 8} trang" style="color: #3B82F6;"><i class="fa-solid fa-chalkboard-user"></i> ${l.slidesCount || 8}</span>
+          <span title="Tài liệu DOCX/PDF: ${l.docxAttachment || 'Co_ban.docx'}" style="color: #EF4444;"><i class="fa-solid fa-file-pdf"></i></span>
+          <span title="Video HD: ${l.videoUrl || 'Có video'}" style="color: #10B981;"><i class="fa-solid fa-video"></i></span>
+          <span title="Audio phát thanh: ${l.audioUrl || 'Có audio'}" style="color: #F59E0B;"><i class="fa-solid fa-headphones"></i></span>
         </div>
       </td>
       <td><span class="badge badge-green">${l.quizCount || 4} câu</span></td>
@@ -317,14 +327,20 @@ function renderUsersTable() {
 
   tbody.innerHTML = filtered.map(u => `
     <tr>
-      <td><b>${u.militaryCode}</b></td>
+      <td>
+        <b>${u.militaryCode}</b>
+        <div style="font-size: 10.5px; color: #64748B;">PIN: <b>${u.pinCode || '123456'}</b></div>
+      </td>
       <td>
         <div style="font-weight: 700; color: var(--navy-primary);">${u.fullName}</div>
         <div style="font-size: 11px; color: var(--slate-500);"><i class="fa-solid fa-phone"></i> ${u.phone}</div>
       </td>
       <td><span class="badge badge-navy">${u.rank}</span></td>
       <td style="font-size: 12px;">${u.position}</td>
-      <td><b>${u.unit}</b></td>
+      <td>
+        <b>${u.unit}</b>
+        <div>${u.isInternalAccess !== false ? '<span class="badge" style="background:#DCFCE7; color:#166534; font-size:9px;">Quyền nội bộ</span>' : '<span class="badge" style="background:#F1F5F9; color:#64748B; font-size:9px;">Công khai</span>'}</div>
+      </td>
       <td style="min-width: 120px;">
         <div style="display: flex; align-items: center; gap: 6px;">
           <div class="progress-bar-container" style="flex: 1;">
@@ -448,6 +464,7 @@ function initActionButtons() {
     const audience = document.getElementById("lesson-audience").value.trim();
     const duration = parseInt(document.getElementById("lesson-duration").value) || 45;
     const summary = document.getElementById("lesson-summary").value.trim();
+    const isInternal = document.getElementById("lesson-is-internal")?.checked || false;
     const id = document.getElementById("lesson-id").value || code.toLowerCase();
 
     if (!code || !title) {
@@ -470,7 +487,8 @@ function initActionButtons() {
       pdfAttachment: document.getElementById("lesson-pdf-name").value || `${code}_Tai_Lieu.pdf`,
       videoUrl: document.getElementById("lesson-video-url").value || `https://video.gdct.vung4.vn/${code}.mp4`,
       audioUrl: document.getElementById("lesson-audio-url").value || `https://audio.gdct.vung4.vn/${code}.mp3`,
-      quizCount: 4
+      quizCount: 4,
+      isInternal
     };
 
     if (existingIdx >= 0) {
@@ -492,6 +510,8 @@ function initActionButtons() {
     document.getElementById("modal-user-title").textContent = "Thêm Quân nhân mới";
     document.getElementById("form-user").reset();
     document.getElementById("user-id").value = "";
+    document.getElementById("user-pincode").value = "123456";
+    document.getElementById("user-internal-access").checked = true;
     openModal("modal-user");
   });
 
@@ -502,6 +522,8 @@ function initActionButtons() {
     const position = document.getElementById("user-position").value.trim();
     const unit = document.getElementById("user-unit").value;
     const phone = document.getElementById("user-phone").value.trim() || "0988.xxx.xxx";
+    const pinCode = document.getElementById("user-pincode")?.value.trim() || "123456";
+    const isInternalAccess = document.getElementById("user-internal-access")?.checked !== false;
     const progress = parseInt(document.getElementById("user-progress").value) || 0;
     const id = document.getElementById("user-id").value || `usr-${Date.now()}`;
 
@@ -514,6 +536,7 @@ function initActionButtons() {
     const userObj = {
       id,
       militaryCode: code,
+      pinCode,
       fullName: name,
       rank,
       position: position || "Chiến sĩ",
@@ -521,7 +544,8 @@ function initActionButtons() {
       phone,
       progress,
       avgScore: progress === 100 ? 9.5 : (progress / 10).toFixed(1),
-      lastActive: "Vừa cập nhật"
+      lastActive: "Vừa cập nhật",
+      isInternalAccess
     };
 
     if (existingIdx >= 0) {
@@ -596,6 +620,7 @@ window.editLesson = function(id) {
   document.getElementById("lesson-audience").value = lesson.targetAudience;
   document.getElementById("lesson-duration").value = lesson.estimatedMinutes;
   document.getElementById("lesson-summary").value = lesson.summary;
+  document.getElementById("lesson-is-internal").checked = !!lesson.isInternal;
   document.getElementById("lesson-docx-name").value = lesson.docxAttachment || "";
   document.getElementById("lesson-pdf-name").value = lesson.pdfAttachment || "";
   document.getElementById("lesson-video-url").value = lesson.videoUrl || "";
@@ -622,27 +647,41 @@ window.previewLesson = function(id) {
   const body = document.getElementById("preview-modal-body");
   body.innerHTML = `
     <div style="background: var(--slate-50); border: 1px solid var(--slate-200); border-radius: 8px; padding: 14px; margin-bottom: 12px;">
-      <span class="badge badge-navy">${lesson.category}</span>
-      <h3 style="color: var(--navy-primary); font-size: 15px; margin: 8px 0;">${lesson.title}</h3>
+      <div style="display: flex; gap: 6px; align-items: center; margin-bottom: 6px;">
+        <span class="badge badge-navy">${lesson.category}</span>
+        ${lesson.isInternal ? '<span class="badge" style="background:#FEE2E2; color:#DC2626;"><i class="fa-solid fa-lock"></i> Lưu hành Nội bộ</span>' : '<span class="badge" style="background:#DCFCE7; color:#166534;">Công khai</span>'}
+      </div>
+      <h3 style="color: var(--navy-primary); font-size: 15px; margin: 4px 0 8px 0;">${lesson.title}</h3>
       <p style="font-size: 12.5px; color: var(--slate-600); line-height: 1.5;">${lesson.summary}</p>
     </div>
 
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 12px;">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 12px; margin-bottom: 14px;">
       <div style="background: white; border: 1px solid var(--slate-200); padding: 10px; border-radius: 6px;">
-        <i class="fa-solid fa-chalkboard-user" style="color: #3B82F6;"></i> <b>Trình chiếu Slide:</b> ${lesson.slidesCount} trang slide chuẩn
+        <i class="fa-solid fa-chalkboard-user" style="color: #3B82F6;"></i> <b>Trình chiếu Slide:</b> ${lesson.slidesCount || 8} trang slide HD
       </div>
       <div style="background: white; border: 1px solid var(--slate-200); padding: 10px; border-radius: 6px;">
-        <i class="fa-solid fa-file-word" style="color: #2563EB;"></i> <b>Tài liệu tải về:</b> ${lesson.docxAttachment || 'Co_ban.docx'}
+        <i class="fa-solid fa-file-word" style="color: #2563EB;"></i> <b>Tệp đính kèm:</b> ${lesson.docxAttachment || 'Tai_Lieu.docx'}
+        <br><button class="btn btn-outline btn-sm" style="margin-top: 5px;" onclick="downloadSampleFile('${lesson.docxAttachment || 'Tai_Lieu.docx'}')"><i class="fa-solid fa-download"></i> Tải về</button>
       </div>
       <div style="background: white; border: 1px solid var(--slate-200); padding: 10px; border-radius: 6px;">
-        <i class="fa-solid fa-video" style="color: #059669;"></i> <b>Video bài giảng:</b> Chuẩn HD 1080p
+        <i class="fa-solid fa-video" style="color: #059669;"></i> <b>Video bài giảng:</b> Độ phân giải Full HD 1080p
       </div>
       <div style="background: white; border: 1px solid var(--slate-200); padding: 10px; border-radius: 6px;">
-        <i class="fa-solid fa-headphones" style="color: #D97706;"></i> <b>Audio phát thanh:</b> Giọng đọc Tuyên huấn
+        <i class="fa-solid fa-headphones" style="color: #D97706;"></i> <b>Audio phát thanh:</b> Giọng đọc chuẩn Tuyên huấn
       </div>
     </div>
   `;
   openModal("modal-preview");
+};
+
+window.downloadSampleFile = function(fileName) {
+  const blob = new Blob([`TÀI LIỆU HỌC TẬP GIÁO DỤC CHÍNH TRỊ - VÙNG 4 HẢI QUÂN\nTệp tin: ${fileName}\nNgày xuất: ${new Date().toLocaleDateString('vi-VN')}`], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = fileName;
+  a.click();
+  showToast(`Đang tải tệp: ${fileName}`);
 };
 
 window.editUser = function(id) {
@@ -652,12 +691,14 @@ window.editUser = function(id) {
   document.getElementById("modal-user-title").textContent = `Chỉnh sửa: ${user.fullName}`;
   document.getElementById("user-id").value = user.id;
   document.getElementById("user-code").value = user.militaryCode;
+  document.getElementById("user-pincode").value = user.pinCode || "123456";
   document.getElementById("user-fullname").value = user.fullName;
   document.getElementById("user-rank").value = user.rank;
   document.getElementById("user-position").value = user.position;
   document.getElementById("user-unit").value = user.unit;
   document.getElementById("user-phone").value = user.phone;
   document.getElementById("user-progress").value = user.progress;
+  document.getElementById("user-internal-access").checked = user.isInternalAccess !== false;
 
   openModal("modal-user");
 };
@@ -672,16 +713,16 @@ window.deleteUser = function(id) {
 };
 
 function exportToCSV() {
-  let csv = "Mã QN,Họ và Tên,Cấp bậc,Chức vụ,Đơn vị,Tiến độ (%),Điểm TB,Lần học cuối\n";
+  let csv = "Mã QN,Mã PIN,Họ và Tên,Cấp bậc,Chức vụ,Đơn vị,Tiến độ (%),Điểm TB,Quyền nội bộ,Lần học cuối\n";
   store.users.forEach(u => {
-    csv += `"${u.militaryCode}","${u.fullName}","${u.rank}","${u.position}","${u.unit}",${u.progress},${u.avgScore},"${u.lastActive}"\n`;
+    csv += `"${u.militaryCode}","${u.pinCode || '123456'}","${u.fullName}","${u.rank}","${u.position}","${u.unit}",${u.progress},${u.avgScore},"${u.isInternalAccess !== false ? 'CÓ' : 'KHÔNG'}","${u.lastActive}"\n`;
   });
 
   const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.setAttribute("href", url);
-  link.setAttribute("download", `danh_sach_tien_do_gdct_${new Date().toISOString().slice(0,10)}.csv`);
+  link.setAttribute("download", `danh_sach_quan_nhan_gdct_${new Date().toISOString().slice(0,10)}.csv`);
   link.click();
-  showToast("Đã xuất danh sách tiến độ học tập ra file CSV!");
+  showToast("Đã xuất danh sách tài khoản & tiến độ học tập ra file CSV!");
 }

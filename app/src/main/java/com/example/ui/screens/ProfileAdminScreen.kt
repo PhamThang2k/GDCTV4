@@ -83,6 +83,8 @@ fun ProfileAdminScreen(
   progressMap: Map<String, StudyProgressEntity>,
   quizSubmissions: List<QuizSubmissionEntity>,
   onOpenLesson: (Lesson) -> Unit,
+  onOpenLoginDialog: () -> Unit,
+  onLogout: () -> Unit,
   modifier: Modifier = Modifier
 ) {
   var selectedSubTab by remember { mutableIntStateOf(0) } // 0: Hồ sơ học tập, 1: Báo cáo Quản trị & Chỉ huy
@@ -157,39 +159,85 @@ fun ProfileAdminScreen(
               Column(modifier = Modifier.weight(1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                   Text(
-                    text = userProfile.name,
+                    text = if (userProfile.isLoggedIn) userProfile.name else "Quân nhân / Khách vãng lai",
                     color = Color.White,
-                    fontSize = 17.sp,
+                    fontSize = 16.5.sp,
                     fontWeight = FontWeight.Black
                   )
                   Spacer(modifier = Modifier.width(6.dp))
-                  Icon(Icons.Default.VerifiedUser, contentDescription = null, tint = GoldYellow, modifier = Modifier.size(16.dp))
+                  if (userProfile.isLoggedIn) {
+                    Icon(Icons.Default.VerifiedUser, contentDescription = null, tint = GoldYellow, modifier = Modifier.size(16.dp))
+                  }
                 }
 
                 Spacer(modifier = Modifier.height(2.dp))
 
                 Text(
-                  text = "Cấp bậc: ${userProfile.rank} • Chức vụ: ${userProfile.role}",
+                  text = if (userProfile.isLoggedIn) "Cấp bậc: ${userProfile.rank} • ${userProfile.role}" else "Chưa đăng nhập tài khoản quân nhân",
                   color = GoldYellow,
                   fontSize = 12.sp,
                   fontWeight = FontWeight.Bold
                 )
 
                 Text(
-                  text = "Đơn vị: ${userProfile.unit}",
+                  text = if (userProfile.isLoggedIn) "Đơn vị: ${userProfile.unit}" else "Xem bài giảng GDCT công khai tự do",
                   color = Color.White.copy(alpha = 0.85f),
                   fontSize = 11.5.sp
                 )
 
                 Text(
-                  text = "Số hiệu QN: ${userProfile.militaryId} • ${userProfile.partyStatus}",
+                  text = if (userProfile.isLoggedIn) "Số hiệu QN: ${userProfile.militaryId} • ${userProfile.partyStatus}" else "Đăng nhập để mở khóa bài học nội bộ",
                   color = Color.White.copy(alpha = 0.7f),
                   fontSize = 10.5.sp
                 )
               }
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Auth Button Row
+            Row(
+              modifier = Modifier.fillMaxWidth(),
+              horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+              if (userProfile.isLoggedIn) {
+                Button(
+                  onClick = onOpenLoginDialog,
+                  colors = ButtonDefaults.buttonColors(containerColor = Color.White.copy(alpha = 0.2f)),
+                  shape = RoundedCornerShape(8.dp),
+                  contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                  modifier = Modifier.weight(1f)
+                ) {
+                  Text("Đổi tài khoản", color = Color.White, fontSize = 11.5.sp, fontWeight = FontWeight.Bold)
+                }
+
+                Button(
+                  onClick = onLogout,
+                  colors = ButtonDefaults.buttonColors(containerColor = CrimsonRed.copy(alpha = 0.8f)),
+                  shape = RoundedCornerShape(8.dp),
+                  contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                  modifier = Modifier.weight(1f)
+                ) {
+                  Text("Đăng xuất", color = Color.White, fontSize = 11.5.sp, fontWeight = FontWeight.Bold)
+                }
+              } else {
+                Button(
+                  onClick = onOpenLoginDialog,
+                  colors = ButtonDefaults.buttonColors(containerColor = GoldYellow),
+                  shape = RoundedCornerShape(8.dp),
+                  contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
+                  modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("btn_profile_login")
+                ) {
+                  Icon(Icons.Default.VerifiedUser, contentDescription = null, tint = NavyDeep, modifier = Modifier.size(16.dp))
+                  Spacer(modifier = Modifier.width(6.dp))
+                  Text("ĐĂNG NHẬP TÀI KHOẢN QUÂN NHÂN", color = NavyDeep, fontSize = 12.sp, fontWeight = FontWeight.Black)
+                }
+              }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
 
             // 4 Mini Metric Cards
             Row(

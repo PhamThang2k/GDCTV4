@@ -98,7 +98,17 @@ class GdctRepository(private val database: AppDatabase) {
     }
   }
 
-  fun getUserProfile(): UserProfile = UserProfile()
+  fun getUserProfile(): UserProfile = UserProfile(
+    isLoggedIn = false,
+    isInternalAccess = false,
+    name = "Khách (Chưa đăng nhập)",
+    rank = "Chiến sĩ",
+    role = "Tự do tham khảo GDCT",
+    unit = "Vùng 4 Hải quân",
+    militaryId = "GUEST-V4",
+    joinDate = "08/2026",
+    partyStatus = "Chưa xác thực tài khoản"
+  )
 
   fun getUserAccounts(): List<UserAccount> {
     return listOf(
@@ -109,24 +119,30 @@ class GdctRepository(private val database: AppDatabase) {
         rank = "Trung úy",
         role = "Trợ lý Chính trị",
         unit = "Lữ đoàn 162 - Vùng 4 Hải quân",
-        completedLessonsCount = 4,
-        totalLessonsCount = 4,
-        averageScore = 9.2,
+        completedLessonsCount = 6,
+        totalLessonsCount = 6,
+        averageScore = 9.5,
         lastActive = "10 phút trước",
-        status = "Hoàn thành tốt"
+        status = "Hoàn thành tốt",
+        pinCode = "123456",
+        isInternalAccess = true,
+        phone = "0988.112.233"
       ),
       UserAccount(
         id = "acc_02",
         militaryId = "HQ-V4-1842",
         fullName = "Thượng úy Lê Hoàng Nam",
         rank = "Thượng úy",
-        role = "Thuyền phó Tàu 015 Trần Hưng Đạo",
+        role = "Chính trị viên Tàu 015 Trần Hưng Đạo",
         unit = "Lữ đoàn 162",
-        completedLessonsCount = 4,
-        totalLessonsCount = 4,
-        averageScore = 9.5,
+        completedLessonsCount = 6,
+        totalLessonsCount = 6,
+        averageScore = 9.8,
         lastActive = "1 giờ trước",
-        status = "Hoàn thành tốt"
+        status = "Hoàn thành tốt",
+        pinCode = "123456",
+        isInternalAccess = true,
+        phone = "0977.445.566"
       ),
       UserAccount(
         id = "acc_03",
@@ -135,11 +151,14 @@ class GdctRepository(private val database: AppDatabase) {
         rank = "Trung tá",
         role = "Chính trị viên Tiểu đoàn",
         unit = "Lữ đoàn 101 Hải quân đánh bộ",
-        completedLessonsCount = 4,
-        totalLessonsCount = 4,
+        completedLessonsCount = 6,
+        totalLessonsCount = 6,
         averageScore = 9.8,
         lastActive = "30 phút trước",
-        status = "Hoàn thành tốt"
+        status = "Hoàn thành tốt",
+        pinCode = "123456",
+        isInternalAccess = true,
+        phone = "0912.334.455"
       ),
       UserAccount(
         id = "acc_04",
@@ -148,11 +167,14 @@ class GdctRepository(private val database: AppDatabase) {
         rank = "Thượng sĩ",
         role = "Khẩu đội trưởng Pháo Tàu 012",
         unit = "Lữ đoàn 162",
-        completedLessonsCount = 3,
-        totalLessonsCount = 4,
+        completedLessonsCount = 4,
+        totalLessonsCount = 6,
         averageScore = 8.4,
         lastActive = "Hôm qua",
-        status = "Đang học"
+        status = "Đang học",
+        pinCode = "123456",
+        isInternalAccess = true,
+        phone = "0903.667.788"
       ),
       UserAccount(
         id = "acc_05",
@@ -162,10 +184,13 @@ class GdctRepository(private val database: AppDatabase) {
         role = "Chiến sĩ Tiêu đồ đảo Trường Sa",
         unit = "Lữ đoàn 146 - Đoàn Trường Sa",
         completedLessonsCount = 3,
-        totalLessonsCount = 4,
+        totalLessonsCount = 6,
         averageScore = 8.0,
         lastActive = "2 giờ trước",
-        status = "Đang học"
+        status = "Đang học",
+        pinCode = "123456",
+        isInternalAccess = true,
+        phone = "0982.554.433"
       ),
       UserAccount(
         id = "acc_06",
@@ -174,11 +199,14 @@ class GdctRepository(private val database: AppDatabase) {
         rank = "Binh nhất",
         role = "Chiến sĩ Vệ binh",
         unit = "Tiểu đoàn 458 - Vùng 4",
-        completedLessonsCount = 1,
-        totalLessonsCount = 4,
+        completedLessonsCount = 2,
+        totalLessonsCount = 6,
         averageScore = 6.5,
         lastActive = "3 ngày trước",
-        status = "Cần đôn đốc"
+        status = "Cần đôn đốc",
+        pinCode = "123456",
+        isInternalAccess = true,
+        phone = "0966.778.899"
       ),
       UserAccount(
         id = "acc_07",
@@ -187,11 +215,14 @@ class GdctRepository(private val database: AppDatabase) {
         rank = "Thiếu úy QNCN",
         role = "Nhân viên Cơ điện Tàu 016",
         unit = "Lữ đoàn 162",
-        completedLessonsCount = 2,
-        totalLessonsCount = 4,
+        completedLessonsCount = 3,
+        totalLessonsCount = 6,
         averageScore = 7.6,
         lastActive = "Hôm nay 08:30",
-        status = "Đang học"
+        status = "Đang học",
+        pinCode = "123456",
+        isInternalAccess = true,
+        phone = "0934.112.299"
       ),
       UserAccount(
         id = "acc_08",
@@ -201,16 +232,20 @@ class GdctRepository(private val database: AppDatabase) {
         role = "Chiến sĩ mới",
         unit = "Trung tâm Huấn luyện Vùng 4",
         completedLessonsCount = 1,
-        totalLessonsCount = 4,
+        totalLessonsCount = 6,
         averageScore = 6.0,
         lastActive = "4 ngày trước",
-        status = "Cần đôn đốc"
+        status = "Cần đôn đốc",
+        pinCode = "123456",
+        isInternalAccess = true,
+        phone = "0971.889.900"
       )
     )
   }
 
   fun getLessons(): List<Lesson> {
     return listOf(
+      // === PUBLIC LESSONS (Ai cũng xem được) ===
       Lesson(
         id = "bai_1",
         code = "CĐ-01/2026",
@@ -224,6 +259,8 @@ class GdctRepository(private val database: AppDatabase) {
         audioUrl = "https://audio.vung4.vn/bai1_banlinh_chitrong.mp3",
         audioDuration = "18:40",
         audioSpeaker = "Thượng tá Nguyễn Văn A - Ban Tuyên huấn",
+        isInternal = false,
+        securityLevel = "Công khai",
         docAttachments = listOf(
           DocAttachment(
             id = "doc_1_pdf",
@@ -231,7 +268,8 @@ class GdctRepository(private val database: AppDatabase) {
             fileType = "PDF",
             fileSize = "2.8 MB",
             downloadUrl = "https://docs.vung4.vn/pdf/CD01_Full.pdf",
-            pageCount = 18
+            pageCount = 18,
+            isInternal = false
           ),
           DocAttachment(
             id = "doc_1_docx",
@@ -239,7 +277,8 @@ class GdctRepository(private val database: AppDatabase) {
             fileType = "DOCX",
             fileSize = "1.4 MB",
             downloadUrl = "https://docs.vung4.vn/docx/CD01_ThaoLuan.docx",
-            pageCount = 8
+            pageCount = 8,
+            isInternal = false
           )
         ),
         summary = "Quán triệt sâu sắc tình hình nhiệm vụ bảo vệ chủ quyền biển, đảo, thềm lục địa phía Nam của Tổ quốc trong tình hình mới; xây dựng bản lĩnh kiên định, vững vàng trước mọi thử thách sóng gió.",
@@ -375,6 +414,8 @@ class GdctRepository(private val database: AppDatabase) {
         audioUrl = "https://audio.vung4.vn/bai2_truyenthong_vung4.mp3",
         audioDuration = "15:20",
         audioSpeaker = "Trung tá Lê Hồng Minh - Ban Tuyên huấn",
+        isInternal = false,
+        securityLevel = "Công khai",
         docAttachments = listOf(
           DocAttachment(
             id = "doc_2_pdf",
@@ -382,7 +423,8 @@ class GdctRepository(private val database: AppDatabase) {
             fileType = "PDF",
             fileSize = "3.2 MB",
             downloadUrl = "https://docs.vung4.vn/pdf/CD02_Full.pdf",
-            pageCount = 24
+            pageCount = 24,
+            isInternal = false
           ),
           DocAttachment(
             id = "doc_2_docx",
@@ -390,7 +432,8 @@ class GdctRepository(private val database: AppDatabase) {
             fileType = "DOCX",
             fileSize = "1.6 MB",
             downloadUrl = "https://docs.vung4.vn/docx/CD02_GiaoAn.docx",
-            pageCount = 10
+            pageCount = 10,
+            isInternal = false
           )
         ),
         summary = "Ôn lại chặng đường lịch sử xây dựng, chiến đấu và trưởng thành của Vùng 4 Hải quân Anh hùng; từ Căn cứ Cam Ranh lịch sử đến quần đảo Trường Sa thiêng liêng.",
@@ -416,17 +459,6 @@ class GdctRepository(private val database: AppDatabase) {
             ),
             highlightQuote = "\"Đảo là nhà, biển cả là quê hương, bảo vệ Trường Sa là mệnh lệnh từ trái tim.\"",
             note = "Kể về các tấm gương chỉ huy, chiến sĩ anh dũng ngày đêm bám đảo giữ biển."
-          ),
-          SlideItem(
-            slideNumber = 3,
-            title = "3. Phát huy truyền thống trong thời kỳ chính quy, hiện đại hóa",
-            bullets = listOf(
-              "Được trang bị các tàu mặt nước hiện đại (Khinh hạm Gepard 3.9, tàu Tên lửa Molniya...).",
-              "Lữ đoàn 162 - 'Lữ đoàn Thép', Lữ đoàn 101 Hải quân đánh bộ tinh nhuệ, Lữ đoàn 146 Trường Sa.",
-              "Tích cực cứu hộ, cứu nạn, giúp đỡ nhân dân trong thiên tai, bão lũ (Hải quân làm điểm tựa cho ngư dân vươn khơi bám biển)."
-            ),
-            highlightQuote = "\"Xây dựng Vùng 4 Cách mạng, chính quy, tinh nhuệ, hiện đại, sẵn sàng chiến đấu cao.\"",
-            note = "Tự hào về màu cờ sắc áo của người lính Hải quân Vùng 4."
           )
         ),
         sections = listOf(
@@ -435,12 +467,6 @@ class GdctRepository(private val database: AppDatabase) {
             heading = "1. Mốc son lịch sử thành lập và phát triển",
             content = "Trải qua hơn 50 năm xây dựng, chiến đấu và trưởng thành, các thế hệ cán bộ, chiến sĩ Vùng 4 Hải quân đã lập nên nhiều chiến công xuất sắc, góp phần viết nên trang sử hào hùng của Quân chủng Hải quân Nhân dân Việt Nam anh hùng.",
             keyTakeaway = "Ngày truyền thống Vùng 4 Hải quân là ngày 26 tháng 10 năm 1975."
-          ),
-          LessonSection(
-            sectionNumber = 2,
-            heading = "2. Nét đẹp văn hóa 'Bộ đội Cụ Hồ - Người chiến sĩ Hải quân'",
-            content = "Hình ảnh người chiến sĩ Vùng 4 với bộ quân phục yếm trắng viền xanh, nụ cười kiên nghị bên cột mốc chủ quyền Trường Sa đã trở thành biểu tượng thiêng liêng của lòng yêu nước và ý chí kiên cường của dân tộc Việt Nam.",
-            keyTakeaway = "Mỗi cán bộ, chiến sĩ là một đại sứ mang hình ảnh đẹp của Hải quân nhân dân đến với nhân dân cả nước."
           )
         ),
         quizQuestions = listOf(
@@ -455,18 +481,6 @@ class GdctRepository(private val database: AppDatabase) {
             ),
             correctOptionIndex = 0,
             explanation = "Ngày 26/10/1975 là ngày thành lập Vùng 4 Duyên hải (nay là Bộ Tư lệnh Vùng 4 Hải quân)."
-          ),
-          QuizQuestion(
-            id = 2,
-            question = "Khẩu hiệu hành động thể hiện tình cảm gắn bó của cán bộ, chiến sĩ Trường Sa là gì?",
-            options = listOf(
-              "Đảo là nhà, biển cả là quê hương",
-              "Đi không dấu, nấu không khói",
-              "Đâu cần thanh niên có, đâu khó có thanh niên",
-              "Nước rút đến đâu, gieo trồng đến đó"
-            ),
-            correctOptionIndex = 0,
-            explanation = "Khẩu hiệu 'Đảo là nhà, biển cả là quê hương' gắn liền với tâm hồn và trách nhiệm của người lính Trường Sa."
           )
         )
       ),
@@ -484,6 +498,8 @@ class GdctRepository(private val database: AppDatabase) {
         audioUrl = "https://audio.vung4.vn/bai3_phapluat_bien.mp3",
         audioDuration = "22:15",
         audioSpeaker = "Trung tá Hoàng Minh Đức - Binh chủng Tuyên huấn",
+        isInternal = false,
+        securityLevel = "Công khai",
         docAttachments = listOf(
           DocAttachment(
             id = "doc_3_pdf",
@@ -491,15 +507,8 @@ class GdctRepository(private val database: AppDatabase) {
             fileType = "PDF",
             fileSize = "4.1 MB",
             downloadUrl = "https://docs.vung4.vn/pdf/CD03_LuatBien.pdf",
-            pageCount = 32
-          ),
-          DocAttachment(
-            id = "doc_3_docx",
-            fileName = "CD03_QuyTacUngXu_ThuyenTruong.docx",
-            fileType = "DOCX",
-            fileSize = "1.8 MB",
-            downloadUrl = "https://docs.vung4.vn/docx/CD03_QuyTac.docx",
-            pageCount = 14
+            pageCount = 32,
+            isInternal = false
           )
         ),
         summary = "Nghiên cứu Luật Biển Việt Nam 2012, UNCLOS 1982, các quy tắc đối sách khi xử lý các tình huống trên biển, bảo đảm đúng đối sách, kiên quyết, kiên trì, không để xảy ra xung đột.",
@@ -514,24 +523,13 @@ class GdctRepository(private val database: AppDatabase) {
             ),
             highlightQuote = "\"Việt Nam chủ trương giải quyết mọi tranh chấp trên biển bằng biện pháp hòa bình trên cơ sở luật pháp quốc tế.\"",
             note = "Cán bộ trên tàu phải nắm chắc phạm vi tọa độ các vùng biển chủ quyền."
-          ),
-          SlideItem(
-            slideNumber = 2,
-            title = "2. Nguyên tắc và quy trình xử lý tình huống trên biển",
-            bullets = listOf(
-              "Kiên quyết, kiên trì, tỉnh táo, kiềm chế, không nổ súng trước, không khiêu khích.",
-              "Thực hiện nghiêm chế độ báo cáo theo phân cấp, xử lý theo đúng phương án tác chiến và quy định pháp luật.",
-              "Tuyên truyền, xua đuổi tàu thuyền nước ngoài vi phạm vùng biển Việt Nam bằng biện pháp hòa bình, đúng đối sách."
-            ),
-            highlightQuote = "\"Bảo vệ vững chắc chủ quyền nhưng đồng thời giữ vững môi trường hòa bình, ổn định để phát triển đất nước.\"",
-            note = "Ghi chép nhật ký, quay phim, chụp ảnh làm tư liệu đấu tranh pháp lý và ngoại giao."
           )
         ),
         sections = listOf(
           LessonSection(
             sectionNumber = 1,
             heading = "1. Các vùng biển thuộc chủ quyền và quyền tài phán của Việt Nam",
-            content = "Luật Biển Việt Nam 2012 quy định rõ ranh giới lãnh hải 12 hải lý, vùng tiếp giáp lãnh hải 24 hải lý, vùng đặc quyền kinh tế 200 hải lý tính từ đường cơ sở. Lực lượng Hải quân có trách nhiệm tuần tra, kiểm soát, bảo vệ an ninh trật tự và chủ quyền quốc gia trong các vùng biển này.",
+            content = "Luật Biển Việt Nam 2012 quy định rõ ranh giới lãnh hải 12 hải lý, vùng tiếp giáp lãnh hải 24 hải lý, vùng đặc quyền kinh tế 200 hải lý tính từ đường cơ sở.",
             keyTakeaway = "Nắm chắc các ranh giới biển là yêu cầu bắt buộc đối với mọi thuyền trưởng và thủy thủ."
           )
         ),
@@ -542,18 +540,6 @@ class GdctRepository(private val database: AppDatabase) {
             options = listOf("12 hải lý", "24 hải lý", "200 hải lý", "3 hải lý"),
             correctOptionIndex = 0,
             explanation = "Theo Điều 11 Luật Biển Việt Nam 2012, Lãnh hải của Việt Nam rộng 12 hải lý tính từ đường cơ sở ra."
-          ),
-          QuizQuestion(
-            id = 2,
-            question = "Nguyên tắc cốt lõi khi xử lý tình huống tàu thuyền nước ngoài xâm phạm vùng biển của ta là gì?",
-            options = listOf(
-              "Kiên quyết, kiên trì, tỉnh táo, kiềm chế, xử lý đúng đối sách pháp luật",
-              "Tự ý nổ súng ngay lập tức không cần báo cáo",
-              "Không can thiệp, để tàu nước ngoài tự do di chuyển",
-              "Tự ý thương lượng riêng với tàu đối phương"
-            ),
-            correctOptionIndex = 0,
-            explanation = "Phương châm chỉ đạo của Đảng và Nhà nước là kiên quyết, kiên trì bảo vệ chủ quyền, xử lý đúng đối sách, giữ vững hòa bình ổn định."
           )
         )
       ),
@@ -571,6 +557,8 @@ class GdctRepository(private val database: AppDatabase) {
         audioUrl = "https://audio.vung4.vn/bai4_neuguong_bac.mp3",
         audioDuration = "20:10",
         audioSpeaker = "Thượng tá Nguyễn Văn A - Ban Tuyên huấn",
+        isInternal = false,
+        securityLevel = "Công khai",
         docAttachments = listOf(
           DocAttachment(
             id = "doc_4_pdf",
@@ -578,15 +566,8 @@ class GdctRepository(private val database: AppDatabase) {
             fileType = "PDF",
             fileSize = "2.9 MB",
             downloadUrl = "https://docs.vung4.vn/pdf/CD04_Full.pdf",
-            pageCount = 20
-          ),
-          DocAttachment(
-            id = "doc_4_docx",
-            fileName = "CD04_KeHoach_HocTap_LamTheoBac_2026.docx",
-            fileType = "DOCX",
-            fileSize = "1.2 MB",
-            downloadUrl = "https://docs.vung4.vn/docx/CD04_KeHoach.docx",
-            pageCount = 6
+            pageCount = 20,
+            isInternal = false
           )
         ),
         summary = "Nêu cao trách nhiệm nêu gương của cán bộ, đảng viên; xây dựng chi bộ '4 tốt', đảng bộ cơ sở '4 tốt'; giữ gìn sự đoàn kết thống nhất trong đơn vị.",
@@ -596,8 +577,7 @@ class GdctRepository(private val database: AppDatabase) {
             title = "1. Tư tưởng Hồ Chí Minh về sự nêu gương của người cán bộ",
             bullets = listOf(
               "\"Một tấm gương sống còn có giá trị hơn một trăm bài diễn văn tuyên truyền\".",
-              "Cán bộ cấp trên phải làm gương cho cấp dưới, đảng viên làm gương cho quần chúng.",
-              "Nêu gương trên cả 3 phương diện: Tư tưởng chính trị, đạo đức lối sống và tác phong công tác."
+              "Cán bộ cấp trên phải làm gương cho cấp dưới, đảng viên làm gương cho quần chúng."
             ),
             highlightQuote = "\"Cán bộ là cái gốc của mọi công việc. Muôn việc thành công hoặc thất bại, đều do cán bộ tốt hoặc kém.\"",
             note = "Thực hiện 'Nói đi đôi với làm', chống bệnh hình thức, quan liêu."
@@ -607,8 +587,8 @@ class GdctRepository(private val database: AppDatabase) {
           LessonSection(
             sectionNumber = 1,
             heading = "1. Tiêu chí rèn luyện người cán bộ Hải quân mẫu mực",
-            content = "Thấm nhuần lời dạy của Bác: 'Ngày trước ta chỉ có đêm và rừng. Ngày nay ta có ngày, có trời, có biển. Bờ biển ta dài, tươi đẹp, ta phải biết giữ gìn lấy nó'. Người cán bộ Hải quân hôm nay phải luôn tiên phong, mẫu mực trong mọi nhiệm vụ gian khó nhất.",
-            keyTakeaway = "Lời dạy của Bác Hồ là kim chỉ nam cho mọi thế hệ chiến sĩ Hải quân Nhân dân Việt Nam."
+            content = "Thấm nhuần lời dạy của Bác: 'Ngày trước ta chỉ có đêm và rừng. Ngày nay ta có ngày, có trời, có biển. Bờ biển ta dài, tươi đẹp, ta phải biết giữ gìn lấy nó'.",
+            keyTakeaway = "Lời dạy của Bác Hồ là kim chỉ nam cho mọi thế hệ chiến sĩ Hải quân."
           )
         ),
         quizQuestions = listOf(
@@ -623,6 +603,150 @@ class GdctRepository(private val database: AppDatabase) {
             ),
             correctOptionIndex = 0,
             explanation = "Năm 1961, khi thăm bộ đội Hải quân, Bác dặn: 'Ngày trước ta chỉ có đêm và rừng. Ngày nay ta có ngày, có trời, có biển. Bờ biển ta dài, tươi đẹp, ta phải biết giữ gìn lấy nó'."
+          )
+        )
+      ),
+
+      // === NỘI DUNG NỘI BỘ (Chỉ dành cho tài khoản cấp phát bởi Web Quản trị) ===
+      Lesson(
+        id = "cd_nb_01",
+        code = "CĐ-NB-01/2026",
+        title = "Nghị quyết chuyên đề Đảng ủy Vùng 4 về nâng cao chất lượng SSCĐ và bảo vệ Quần đảo Trường Sa",
+        category = "Lưu hành nội bộ - Đảng ủy Vùng 4",
+        targetAudience = "Sĩ quan, Đảng viên, Chính trị viên cấp Hải đội, Tàu",
+        durationMinutes = 60,
+        lecturer = "Thiếu tướng Bùi Xuân Thắng - Bí thư Đảng ủy, Chính ủy Vùng 4",
+        videoUrl = "https://example.com/gdct/cd_nb01_nghiquyet.mp4",
+        videoDuration = "28:30",
+        audioUrl = "https://audio.vung4.vn/cd_nb01_nghiquyet_audio.mp3",
+        audioDuration = "28:30",
+        audioSpeaker = "Đại tá Trần Hữu Quân - Trưởng phòng Chính trị",
+        isInternal = true,
+        securityLevel = "Lưu hành nội bộ",
+        docAttachments = listOf(
+          DocAttachment(
+            id = "doc_nb1_pdf",
+            fileName = "NQ_ChuyenDe_DangUy_Vung4_BaoVeTruongSa_2026.pdf",
+            fileType = "PDF",
+            fileSize = "3.8 MB",
+            downloadUrl = "https://docs.vung4.vn/pdf/NQ_DangUy_Vung4.pdf",
+            pageCount = 28,
+            isInternal = true
+          ),
+          DocAttachment(
+            id = "doc_nb1_docx",
+            fileName = "KeHoach_TrienKhai_ChiBo_DangVien.docx",
+            fileType = "DOCX",
+            fileSize = "1.9 MB",
+            downloadUrl = "https://docs.vung4.vn/docx/KeHoach_TrienKhai_ChiBo.docx",
+            pageCount = 12,
+            isInternal = true
+          )
+        ),
+        summary = "[LƯU HÀNH NỘI BỘ] Quán triệt phương hướng lãnh đạo, các chỉ tiêu CTĐ - CTCT trọng tâm năm 2026 và các phương án hiệp đồng tác chiến bảo vệ chủ quyền Quần đảo Trường Sa trong mọi tình huống.",
+        slides = listOf(
+          SlideItem(
+            slideNumber = 1,
+            title = "1. Đánh giá tình hình tác chiến và nhiệm vụ bảo vệ Trường Sa",
+            bullets = listOf(
+              "Phân tích âm mưu, thủ đoạn mới của các bên tranh chấp trên thực địa khu vực Trường Sa.",
+              "Yêu cầu nâng cao khả năng hiệp đồng giữa Tàu chiến đấu, Tên lửa bờ, Không quân Hải quân và Đảo.",
+              "Đảm bảo thông tin liên lạc thông suốt trong mọi tình huống chiến tranh công nghệ cao."
+            ),
+            highlightQuote = "\"Bảo vệ vững chắc chủ quyền biển đảo là nhiệm vụ chính trị trọng yếu hàng đầu của Vùng 4.\"",
+            note = "Tài liệu mật nội bộ: Nghiêm cấm sao chép, chụp ảnh đưa lên mạng xã hội."
+          ),
+          SlideItem(
+            slideNumber = 2,
+            title = "2. Các chỉ tiêu CTĐ - CTCT xây dựng Chi bộ, Đảng bộ trong sạch vững mạnh",
+            bullets = listOf(
+              "100% cán bộ, đảng viên an tâm tư tưởng, sẵn sàng nhận và hoàn thành xuất sắc nhiệm vụ đi biển dài ngày.",
+              "Không để xảy ra vi phạm kỷ luật nghiêm trọng, mất an toàn thông tin và vi phạm nồng độ cồn.",
+              "Xây dựng Đảng bộ Vùng 4 vững mạnh về chính trị, tư tưởng, đạo đức, tổ chức và cán bộ."
+            ),
+            highlightQuote = "\"Giữ vững sự lãnh đạo tuyệt đối, trực tiếp về mọi mặt của Đảng đối với Quân đội.\"",
+            note = "Ghi chép thu hoạch vào Sổ tay Đảng viên cá nhân."
+          )
+        ),
+        sections = listOf(
+          LessonSection(
+            sectionNumber = 1,
+            heading = "1. Trọng tâm công tác SSCĐ của Vùng 4 trong tình hình mới",
+            content = "Đảng ủy xác định tiếp tục duy trì nghiêm chế độ trực chỉ huy, trực ban, trực SSCĐ ở tất cả các cấp; chủ động nắm chắc tình hình từ sớm, từ xa, xử lý kịp thời, chính xác mọi tình huống theo đúng đối sách của Thường vụ Quân ủy Trung ương, không để bị động bất ngờ.",
+            keyTakeaway = "Tuyệt đối không để bị động, bất ngờ trong mọi tình huống trên vùng biển Vùng 4 quản lý."
+          )
+        ),
+        quizQuestions = listOf(
+          QuizQuestion(
+            id = 1,
+            question = "Mục tiêu then chốt trong Nghị quyết chuyên đề của Đảng ủy Vùng 4 là gì?",
+            options = listOf(
+              "Bảo vệ vững chắc chủ quyền Quần đảo Trường Sa và giữ vững môi trường hòa bình, ổn định",
+              "Mở rộng diện tích đóng quân đơn phương không có kế hoạch",
+              "Giảm bớt thời gian trực sẵn sàng chiến đấu trên đảo",
+              "Hạn chế tổ chức tuần tra trên biển"
+            ),
+            correctOptionIndex = 0,
+            explanation = "Nghị quyết khẳng định mục tiêu cao nhất là kiên quyết, kiên trì bảo vệ vững chắc chủ quyền Trường Sa, thềm lục địa và giữ vững hòa bình."
+          )
+        )
+      ),
+
+      Lesson(
+        id = "cd_nb_02",
+        code = "CĐ-NB-02/2026",
+        title = "Định hướng tư tưởng và phương pháp xử lý tình huống tâm lý bộ đội tàu chiến đấu trên biển dài ngày",
+        category = "Lưu hành nội bộ - Nghiệp vụ CTĐ, CTCT",
+        targetAudience = "Chính trị viên tàu, Bí thư chi bộ, Thuyền trưởng",
+        durationMinutes = 50,
+        lecturer = "Đại tá Lê Hồng Minh - Phòng Chính trị Vùng 4",
+        videoUrl = "https://example.com/gdct/cd_nb02_tamly.mp4",
+        videoDuration = "24:10",
+        audioUrl = "https://audio.vung4.vn/cd_nb02_tamly_audio.mp3",
+        audioDuration = "24:10",
+        audioSpeaker = "Thượng tá Nguyễn Văn Dương - Lữ đoàn 162",
+        isInternal = true,
+        securityLevel = "Lưu hành nội bộ",
+        docAttachments = listOf(
+          DocAttachment(
+            id = "doc_nb2_pdf",
+            fileName = "SoTay_NghiepVu_ChinhTriVien_TauChienDau.pdf",
+            fileType = "PDF",
+            fileSize = "3.1 MB",
+            downloadUrl = "https://docs.vung4.vn/pdf/SoTay_ChinhTriVien.pdf",
+            pageCount = 22,
+            isInternal = true
+          )
+        ),
+        summary = "[LƯU HÀNH NỘI BỘ] Cẩm nang nghiệp vụ dành cho Chính trị viên, Bí thư chi bộ trong việc quản lý, định hướng tư tưởng thủy thủ đoàn khi làm nhiệm vụ tuần tra, trực SSCĐ dài ngày trên biển xa.",
+        slides = listOf(
+          SlideItem(
+            slideNumber = 1,
+            title = "1. Đặc điểm tâm lý chiến sĩ tàu chiến đấu trong hải trình dài ngày",
+            bullets = listOf(
+              "Tác động của sóng gió, không gian hẹp, say sóng và xa gia đình đến tâm sinh lý quân nhân.",
+              "Hiện tượng căng thẳng (stress) và suy giảm thể lực sau 15-30 ngày liên tục trên biển.",
+              "Vai trò của tổ 3 người, tổ tư vấn tâm lý và hoạt động văn hóa tinh thần trên tàu."
+            ),
+            highlightQuote = "\"Thuyền trưởng là linh hồn chỉ huy tác chiến, Chính trị viên là chỗ dựa tinh thần của toàn tàu.\"",
+            note = "Thường xuyên lắng nghe tâm tư, nắm bắt diễn biến tư tưởng ngay từ những biểu hiện nhỏ nhất."
+          )
+        ),
+        sections = listOf(
+          LessonSection(
+            sectionNumber = 1,
+            heading = "1. Quy trình 4 bước giải quyết tư tưởng nảy sinh trên tàu",
+            content = "Bước 1: Nắm bắt phát hiện sớm. Bước 2: Phân loại, đánh giá nguyên nhân. Bước 3: Động viên, chia sẻ trực tiếp và phối hợp với cấp ủy, gia đình. Bước 4: Kiểm tra kết quả chuyển biến tư tưởng.",
+            keyTakeaway = "Chính trị viên phải như người anh, người chị, người bạn đồng hành tin cậy của chiến sĩ."
+          )
+        ),
+        quizQuestions = listOf(
+          QuizQuestion(
+            id = 1,
+            question = "Quy trình giải quyết tư tưởng trên tàu chiến đấu gồm mấy bước cơ bản?",
+            options = listOf("4 bước", "2 bước", "6 bước", "1 bước"),
+            correctOptionIndex = 0,
+            explanation = "Quy trình gồm 4 bước: Nắm bắt, phân loại đánh giá, động viên giải quyết, kiểm tra theo dõi."
           )
         )
       )

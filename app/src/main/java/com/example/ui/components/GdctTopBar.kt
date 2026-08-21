@@ -55,6 +55,7 @@ fun GdctTopBar(
   userProfile: UserProfile,
   onOpenQuoteDialog: () -> Unit,
   onOpenCommanderReport: () -> Unit,
+  onOpenLoginDialog: () -> Unit,
   modifier: Modifier = Modifier
 ) {
   Surface(
@@ -208,11 +209,14 @@ fun GdctTopBar(
           }
         }
 
-        // Quick Soldier Status & Search Bar (Geometric Balance translucent pill)
+        // Quick Soldier Status & Auth Pill
         Surface(
           shape = RoundedCornerShape(14.dp),
           color = Color.White.copy(alpha = 0.18f),
-          modifier = Modifier.fillMaxWidth()
+          modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onOpenLoginDialog() }
+            .testTag("bar_soldier_profile_status")
         ) {
           Row(
             modifier = Modifier
@@ -228,12 +232,12 @@ fun GdctTopBar(
               Icon(
                 imageVector = Icons.Default.Shield,
                 contentDescription = null,
-                tint = GoldYellow,
+                tint = if (userProfile.isLoggedIn) GoldYellow else Color.White.copy(alpha = 0.8f),
                 modifier = Modifier.size(15.dp)
               )
               Spacer(modifier = Modifier.width(6.dp))
               Text(
-                text = "${userProfile.rank} ${userProfile.name}",
+                text = if (userProfile.isLoggedIn) "${userProfile.rank} ${userProfile.name}" else "Chế độ Khách (Xem tự do)",
                 color = Color.White,
                 fontSize = 11.5.sp,
                 fontWeight = FontWeight.Bold,
@@ -241,7 +245,7 @@ fun GdctTopBar(
                 overflow = TextOverflow.Ellipsis
               )
               Text(
-                text = " • ${userProfile.unit}",
+                text = if (userProfile.isLoggedIn) " • ${userProfile.unit}" else " • Nhấn để đăng nhập",
                 color = Color.White.copy(alpha = 0.85f),
                 fontSize = 10.5.sp,
                 maxLines = 1,
@@ -251,14 +255,14 @@ fun GdctTopBar(
 
             Surface(
               shape = RoundedCornerShape(8.dp),
-              color = Color.White.copy(alpha = 0.25f)
+              color = if (userProfile.isLoggedIn) GoldYellow else Color.White.copy(alpha = 0.25f)
             ) {
               Text(
-                text = "Trực tuyến 2026",
-                color = Color.White,
+                text = if (userProfile.isLoggedIn) "Nội bộ" else "Đăng nhập",
+                color = if (userProfile.isLoggedIn) NavyDeep else Color.White,
                 fontSize = 9.5.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                fontWeight = FontWeight.Black,
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
               )
             }
           }

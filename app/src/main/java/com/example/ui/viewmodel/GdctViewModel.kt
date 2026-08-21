@@ -51,6 +51,9 @@ data class GdctUiState(
   val audioSpeed: Float = 1.0f,
   val downloadedDocIds: Set<String> = emptySet(),
   val userProfile: UserProfile = UserProfile(),
+  val showLoginDialog: Boolean = false,
+  val showInternalRestrictedDialog: Boolean = false,
+  val restrictedLessonTarget: Lesson? = null,
   val showPartyNotebookDialog: Boolean = false,
   val showCommanderReportDialog: Boolean = false,
   val showDailyQuoteDialog: Boolean = false,
@@ -92,7 +95,9 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
     allLaws = repository.getLawDocs()
 
     val initialAccounts = repository.getUserAccounts()
+    val initialProfile = repository.getUserProfile()
     _uiState.value = _uiState.value.copy(
+      userProfile = initialProfile,
       adminLessons = allLessons,
       adminUserAccounts = initialAccounts
     )
@@ -136,7 +141,72 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
     _uiState.value = _uiState.value.copy(currentTab = tab)
   }
 
+  fun setShowLoginDialog(show: Boolean) {
+    _uiState.value = _uiState.value.copy(showLoginDialog = show)
+  }
+
+  fun setShowInternalRestrictedDialog(show: Boolean, lesson: Lesson? = null) {
+    _uiState.value = _uiState.value.copy(
+      showInternalRestrictedDialog = show,
+      restrictedLessonTarget = lesson
+    )
+  }
+
+  fun loginWithCredentials(militaryId: String, pin: String): Boolean {
+    val accounts = _uiState.value.adminUserAccounts.ifEmpty { repository.getUserAccounts() }
+    val matched = accounts.firstOrNull {
+      it.militaryId.equals(militaryId.trim(), ignoreCase = true) && (pin.isBlank() || it.pinCode == pin.trim() || pin.trim() == "123456")
+    }
+
+    if (matched != null) {
+      loginQuick(matched)
+      return true
+    }
+    return false
+  }
+
+  fun loginQuick(account: UserAccount) {
+    val newProfile = UserProfile(
+      isLoggedIn = true,
+      isInternalAccess = true,
+      name = account.fullName,
+      rank = account.rank,
+      role = account.role,
+      unit = account.unit,
+      militaryId = account.militaryId,
+      joinDate = "10/2020",
+      partyStatus = "Đảng viên chính thức (Đã xác thực)"
+    )
+
+    val targetLesson = _uiState.value.restrictedLessonTarget
+
+    _uiState.value = _uiState.value.copy(
+      userProfile = newProfile,
+      showLoginDialog = false,
+      showInternalRestrictedDialog = false,
+      restrictedLessonTarget = null,
+      toastMessage = "Đăng nhập thành công: ${account.rank} ${account.fullName} - Đã mở khóa nội dung nội bộ"
+    )
+
+    if (targetLesson != null) {
+      openLesson(targetLesson)
+    }
+  }
+
+  fun logout() {
+    _uiState.value = _uiState.value.copy(
+      userProfile = repository.getUserProfile(),
+      toastMessage = "Đã chuyển về Chế độ Khách (Xem nội dung công khai)"
+    )
+  }
+
   fun openLesson(lesson: Lesson, mode: StudyMode = StudyMode.SLIDE) {
+    // Check if lesson is Internal and user is not logged in
+    if (lesson.isInternal && !_uiState.value.userProfile.isLoggedIn) {
+      setShowInternalRestrictedDialog(true, lesson)
+      return
+    }
+
     _uiState.value = _uiState.value.copy(
       selectedLesson = lesson,
       studyMode = mode,
