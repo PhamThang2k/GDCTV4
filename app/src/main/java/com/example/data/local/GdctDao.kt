@@ -59,3 +59,18 @@ interface BookmarkDao {
   @Query("DELETE FROM bookmarked_articles WHERE articleId = :articleId")
   suspend fun removeBookmark(articleId: String)
 }
+
+@Dao
+interface UserSessionDao {
+  @Query("SELECT * FROM user_session WHERE id = 1 LIMIT 1")
+  fun getUserSessionFlow(): Flow<UserSessionEntity?>
+
+  @Query("SELECT * FROM user_session WHERE id = 1 LIMIT 1")
+  suspend fun getUserSession(): UserSessionEntity?
+
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  suspend fun saveUserSession(session: UserSessionEntity)
+
+  @Query("DELETE FROM user_session")
+  suspend fun clearUserSession()
+}

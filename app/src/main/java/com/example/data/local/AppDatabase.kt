@@ -10,9 +10,10 @@ import androidx.room.RoomDatabase
     StudyProgressEntity::class,
     QuizSubmissionEntity::class,
     PersonalNoteEntity::class,
-    BookmarkedArticleEntity::class
+    BookmarkedArticleEntity::class,
+    UserSessionEntity::class
   ],
-  version = 1,
+  version = 2,
   exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -20,6 +21,7 @@ abstract class AppDatabase : RoomDatabase() {
   abstract fun quizDao(): QuizDao
   abstract fun noteDao(): NoteDao
   abstract fun bookmarkDao(): BookmarkDao
+  abstract fun userSessionDao(): UserSessionDao
 
   companion object {
     @Volatile

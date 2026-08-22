@@ -81,7 +81,9 @@ data class GdctUiState(
   val editingLesson: Lesson? = null,
   val showAddAccountDialog: Boolean = false,
   val adminActiveSubTab: Int = 0, // 0: Nội dung GDCT, 1: Quản lý tài khoản, 2: Thống kê báo cáo
-  val toastMessage: String? = null
+  val toastMessage: String? = null,
+  val customServerUrl: String = "",
+  val serverConnectionStatus: String = "Đã kết nối Máy chủ Giáo dục Chính trị Vùng 4"
 )
 
 class GdctViewModel(application: Application) : AndroidViewModel(application) {
@@ -98,6 +100,9 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
   val personalNotes: StateFlow<List<PersonalNoteEntity>>
   val bookmarkedIds: StateFlow<Set<String>>
 
+  @Volatile
+  private var cachedWorkingHost: String? = null
+
   init {
     val db = AppDatabase.getDatabase(application)
     repository = GdctRepository(db)
@@ -112,6 +117,29 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
       adminUserAccounts = initialAccounts,
       adminLaws = allLaws
     )
+
+    // Check and restore persistent saved user session
+    viewModelScope.launch {
+      val saved = repository.getSavedUserSession()
+      if (saved != null && saved.isLoggedIn) {
+        val restored = UserProfile(
+          isLoggedIn = true,
+          isInternalAccess = saved.isInternalAccess,
+          name = saved.name,
+          username = saved.username,
+          password = saved.password,
+          rank = saved.rank,
+          role = saved.role,
+          unit = saved.unit,
+          militaryId = saved.militaryId,
+          orderNumber = saved.orderNumber,
+          joinDate = saved.joinDate,
+          partyStatus = saved.partyStatus,
+          phone = saved.phone
+        )
+        _uiState.value = _uiState.value.copy(userProfile = restored)
+      }
+    }
 
     studyProgressMap = repository.allProgress
       .combine(MutableStateFlow(Unit)) { progressList, _ ->
@@ -235,7 +263,21 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
       toastMessage = "Đã cập nhật thông tin quân nhân và đồng bộ về Cổng Web Quản trị Vùng 4!"
     )
 
+    viewModelScope.launch(Dispatchers.IO) {
+      repository.saveUserSession(updatedProfile)
+    }
+
     syncProfileToWebAdmin(updatedProfile)
+  }
+
+  fun setCustomServerUrl(url: String) {
+    val clean = url.trim()
+    _uiState.value = _uiState.value.copy(
+      customServerUrl = clean,
+      toastMessage = if (clean.isNotBlank()) "Đã cấu hình địa chỉ máy chủ Web Quản trị: $clean" else "Đã xóa địa chỉ máy chủ tùy chỉnh"
+    )
+    cachedWorkingHost = null
+    syncAllWithWebAdmin()
   }
 
   private fun syncProfileToWebAdmin(profile: UserProfile) {
@@ -286,28 +328,53 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
 
       withContext(Dispatchers.Main) {
         _uiState.value = _uiState.value.copy(
-          toastMessage = if (success) "Đồng bộ hai chiều với Cổng Web Quản trị hoàn tất thành công!" else "Đã đồng bộ dữ liệu cục bộ!"
+          toastMessage = if (success) "Đồng bộ hai chiều với Cổng Web Quản trị hoàn tất thành công!" else "Đã đồng bộ dữ liệu nội bộ!"
         )
       }
     }
   }
 
+  private fun getCandidateHosts(endpoint: String): List<String> {
+    val cleanEndpoint = if (endpoint.startsWith("/")) endpoint else "/$endpoint"
+    val list = mutableListOf<String>()
+
+    val custom = _uiState.value.customServerUrl.trim().trimEnd('/')
+    if (custom.isNotBlank()) {
+      list.add("$custom$cleanEndpoint")
+    }
+
+    cachedWorkingHost?.let {
+      val base = it.trimEnd('/')
+      list.add("$base$cleanEndpoint")
+    }
+
+    list.add("https://ais-dev-fg3vokzh3myfkmipyfaqdl-910262898976.asia-southeast1.run.app$cleanEndpoint")
+    list.add("https://ais-pre-fg3vokzh3myfkmipyfaqdl-910262898976.asia-southeast1.run.app$cleanEndpoint")
+    list.add("http://10.0.2.2:3000$cleanEndpoint")
+    list.add("http://127.0.0.1:3000$cleanEndpoint")
+    list.add("http://localhost:3000$cleanEndpoint")
+
+    return list.distinct()
+  }
+
   private fun performHttpGet(endpoint: String): String? {
-    val hostUrls = listOf("http://10.0.2.2:3000$endpoint", "http://127.0.0.1:3000$endpoint", "http://localhost:3000$endpoint")
+    val hostUrls = getCandidateHosts(endpoint)
     for (urlStr in hostUrls) {
       try {
         val url = URL(urlStr)
         val conn = (url.openConnection() as HttpURLConnection).apply {
           requestMethod = "GET"
           setRequestProperty("Accept", "application/json")
-          connectTimeout = 1500
-          readTimeout = 2000
+          connectTimeout = 2500
+          readTimeout = 3000
         }
         if (conn.responseCode in 200..299) {
           val reader = BufferedReader(InputStreamReader(conn.inputStream, Charsets.UTF_8))
           val response = reader.readText()
           reader.close()
           conn.disconnect()
+          val base = if (urlStr.contains("/api/")) urlStr.substringBefore("/api/") else urlStr
+          cachedWorkingHost = base
           return response
         }
         conn.disconnect()
@@ -319,7 +386,7 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
   }
 
   private fun sendJsonPost(endpoint: String, json: JSONObject): String? {
-    val hostUrls = listOf("http://10.0.2.2:3000$endpoint", "http://127.0.0.1:3000$endpoint", "http://localhost:3000$endpoint")
+    val hostUrls = getCandidateHosts(endpoint)
     for (urlStr in hostUrls) {
       try {
         val url = URL(urlStr)
@@ -328,8 +395,8 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
           setRequestProperty("Content-Type", "application/json; charset=utf-8")
           setRequestProperty("Accept", "application/json")
           doOutput = true
-          connectTimeout = 1500
-          readTimeout = 2000
+          connectTimeout = 2500
+          readTimeout = 3000
         }
         conn.outputStream.use { os ->
           os.write(json.toString().toByteArray(Charsets.UTF_8))
@@ -340,6 +407,8 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
           val response = reader.readText()
           reader.close()
           conn.disconnect()
+          val base = if (urlStr.contains("/api/")) urlStr.substringBefore("/api/") else urlStr
+          cachedWorkingHost = base
           return response
         }
         conn.disconnect()
@@ -400,8 +469,12 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
                 role = currentAccount.role,
                 unit = currentAccount.unit,
                 militaryId = currentAccount.militaryId,
-                password = currentAccount.password
+                password = currentAccount.password,
+                phone = if (currentAccount.phone.isNotBlank()) currentAccount.phone else currentProfile.phone
               )
+              viewModelScope.launch(Dispatchers.IO) {
+                repository.saveUserSession(updatedProfile)
+              }
             }
           }
 
@@ -642,11 +715,15 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
       if (acc.password == oldPass.trim() || oldPass.trim() == "12345@abc") {
         val updatedAcc = acc.copy(password = newPass.trim())
         accounts[userIndex] = updatedAcc
+        val updatedProfile = currentProfile.copy(password = newPass.trim())
         _uiState.value = _uiState.value.copy(
           adminUserAccounts = accounts,
-          userProfile = currentProfile.copy(password = newPass.trim()),
+          userProfile = updatedProfile,
           toastMessage = "Đổi mật khẩu thành công! Mật khẩu mới đã được cập nhật và gửi về Web Quản trị."
         )
+        viewModelScope.launch(Dispatchers.IO) {
+          repository.saveUserSession(updatedProfile)
+        }
         syncPasswordToWebAdmin(currentProfile.username, oldPass.trim(), newPass.trim())
         return true
       }
@@ -712,7 +789,8 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
       password = account.password,
       orderNumber = account.orderNumber,
       joinDate = "10/2020",
-      partyStatus = "Đảng viên chính thức (Đã xác thực)"
+      partyStatus = "Đảng viên chính thức (Đã xác thực)",
+      phone = account.phone
     )
 
     val targetLesson = _uiState.value.restrictedLessonTarget
@@ -722,8 +800,12 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
       showLoginDialog = false,
       showInternalRestrictedDialog = false,
       restrictedLessonTarget = null,
-      toastMessage = "Đăng nhập thành công: ${account.rank} ${account.fullName} (${account.username}) - Đã mở khóa chuyên đề nội bộ"
+      toastMessage = "Đăng nhập thành công: ${account.rank} ${account.fullName} (${account.username}) - Đã lưu phiên đăng nhập!"
     )
+
+    viewModelScope.launch(Dispatchers.IO) {
+      repository.saveUserSession(newProfile)
+    }
 
     if (targetLesson != null) {
       openLesson(targetLesson)
@@ -731,10 +813,14 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
   }
 
   fun logout() {
+    val guestProfile = repository.getUserProfile()
     _uiState.value = _uiState.value.copy(
-      userProfile = repository.getUserProfile(),
-      toastMessage = "Đã chuyển về Chế độ Khách (Xem nội dung công khai)"
+      userProfile = guestProfile,
+      toastMessage = "Đã đăng xuất tài khoản và chuyển về Chế độ Khách"
     )
+    viewModelScope.launch(Dispatchers.IO) {
+      repository.clearUserSession()
+    }
   }
 
   fun openLesson(lesson: Lesson, mode: StudyMode = StudyMode.SLIDE) {

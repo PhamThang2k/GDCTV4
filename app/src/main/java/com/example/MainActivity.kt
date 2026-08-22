@@ -172,7 +172,10 @@ fun GdctApp(viewModel: GdctViewModel = viewModel()) {
             onSyncWithServer = { viewModel.triggerManualSync() },
             adminUserAccounts = uiState.adminUserAccounts,
             onResetAccountPassword = { userId -> viewModel.resetUserPassword(userId) },
-            onLogout = { viewModel.logout() }
+            onLogout = { viewModel.logout() },
+            serverStatus = uiState.serverConnectionStatus,
+            customServerUrl = uiState.customServerUrl,
+            onSetCustomServerUrl = { viewModel.setCustomServerUrl(it) }
           )
         }
       }

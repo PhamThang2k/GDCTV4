@@ -5,6 +5,7 @@ import com.example.data.local.BookmarkedArticleEntity
 import com.example.data.local.PersonalNoteEntity
 import com.example.data.local.QuizSubmissionEntity
 import com.example.data.local.StudyProgressEntity
+import com.example.data.local.UserSessionEntity
 import com.example.data.model.DocAttachment
 import com.example.data.model.LawDoc
 import com.example.data.model.Lesson
@@ -21,6 +22,33 @@ class GdctRepository(private val database: AppDatabase) {
   val allQuizSubmissions: Flow<List<QuizSubmissionEntity>> = database.quizDao().getAllSubmissions()
   val allNotes: Flow<List<PersonalNoteEntity>> = database.noteDao().getAllNotes()
   val allBookmarks: Flow<List<BookmarkedArticleEntity>> = database.bookmarkDao().getAllBookmarks()
+  val savedUserSessionFlow: Flow<UserSessionEntity?> = database.userSessionDao().getUserSessionFlow()
+
+  suspend fun getSavedUserSession(): UserSessionEntity? = database.userSessionDao().getUserSession()
+
+  suspend fun saveUserSession(profile: UserProfile) {
+    val session = UserSessionEntity(
+      id = 1,
+      isLoggedIn = profile.isLoggedIn,
+      isInternalAccess = profile.isInternalAccess,
+      name = profile.name,
+      username = profile.username,
+      password = profile.password,
+      rank = profile.rank,
+      role = profile.role,
+      unit = profile.unit,
+      militaryId = profile.militaryId,
+      orderNumber = profile.orderNumber,
+      joinDate = profile.joinDate,
+      partyStatus = profile.partyStatus,
+      phone = profile.phone
+    )
+    database.userSessionDao().saveUserSession(session)
+  }
+
+  suspend fun clearUserSession() {
+    database.userSessionDao().clearUserSession()
+  }
 
   suspend fun saveStudyProgress(
     lessonId: String,

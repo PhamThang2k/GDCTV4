@@ -44,3 +44,21 @@ data class BookmarkedArticleEntity(
   @PrimaryKey val articleId: String,
   val timestamp: Long
 )
+
+@Entity(tableName = "user_session")
+data class UserSessionEntity(
+  @PrimaryKey val id: Int = 1,
+  val isLoggedIn: Boolean = false,
+  val isInternalAccess: Boolean = false,
+  val name: String = "",
+  val username: String = "",
+  val password: String = "12345@abc",
+  val rank: String = "Chiến sĩ",
+  val role: String = "Chiến sĩ",
+  val unit: String = "Vùng 4 Hải quân",
+  val militaryId: String = "",
+  val orderNumber: Int = 1,
+  val joinDate: String = "08/2026",
+  val partyStatus: String = "Đảng viên dự bị",
+  val phone: String = ""
+)

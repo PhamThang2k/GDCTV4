@@ -37,6 +37,7 @@ import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.material.icons.filled.Visibility
@@ -48,6 +49,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
@@ -110,12 +112,17 @@ fun ProfileAdminScreen(
   adminUserAccounts: List<UserAccount> = emptyList(),
   onResetAccountPassword: ((String) -> Unit)? = null,
   onLogout: () -> Unit,
+  serverStatus: String = "Máy chủ Internet trực tuyến",
+  customServerUrl: String = "",
+  onSetCustomServerUrl: ((String) -> Unit)? = null,
   modifier: Modifier = Modifier
 ) {
   val context = LocalContext.current
   var selectedSubTab by remember { mutableIntStateOf(0) } // 0: Hồ sơ học tập, 1: Báo cáo Quản trị & Cổng Web CMS
   var showChangePasswordDialog by remember { mutableStateOf(false) }
   var showEditProfileDialog by remember { mutableStateOf(false) }
+  var showServerConfigDialog by remember { mutableStateOf(false) }
+  var serverUrlInput by remember(customServerUrl) { mutableStateOf(customServerUrl) }
   
   var oldPasswordInput by remember { mutableStateOf("") }
   var newPasswordInput by remember { mutableStateOf("") }
@@ -206,6 +213,22 @@ fun ProfileAdminScreen(
                 }
 
                 Spacer(modifier = Modifier.height(2.dp))
+
+                if (userProfile.isLoggedIn) {
+                  Surface(
+                    shape = RoundedCornerShape(4.dp),
+                    color = SuccessGreen.copy(alpha = 0.3f),
+                    modifier = Modifier.padding(vertical = 2.dp)
+                  ) {
+                    Text(
+                      text = "✓ ĐÃ LƯU ĐĂNG NHẬP TRÊN THIẾT BỊ",
+                      color = GoldYellow,
+                      fontSize = 9.5.sp,
+                      fontWeight = FontWeight.Bold,
+                      modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                    )
+                  }
+                }
 
                 Text(
                   text = if (userProfile.isLoggedIn) "Cấp bậc: ${userProfile.rank} • ${userProfile.role}" else "Chưa đăng nhập tài khoản quân nhân",
@@ -502,6 +525,21 @@ fun ProfileAdminScreen(
               modifier = Modifier.fillMaxWidth()
             ) {
               Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                  Box(
+                    modifier = Modifier
+                      .size(10.dp)
+                      .background(SuccessGreen, shape = CircleShape)
+                  )
+                  Spacer(modifier = Modifier.width(6.dp))
+                  Text(
+                    text = "Trực tuyến: Tự động đồng bộ thời gian thực 2 chiều (3.5s)",
+                    color = SuccessGreen,
+                    fontSize = 11.5.sp,
+                    fontWeight = FontWeight.Bold
+                  )
+                }
+
                 Text(
                   text = "🔑 Thông tin đăng nhập Cổng Quản trị trên Trình duyệt:",
                   color = NavyPrimary,
@@ -521,11 +559,19 @@ fun ProfileAdminScreen(
                   fontWeight = FontWeight.SemiBold
                 )
                 Text(
-                  text = "• Địa chỉ cổng Web: http://localhost:3000 (hoặc truy cập trực tiếp link máy chủ AI Studio)",
+                  text = "• Cổng Cloud Internet: https://ais-dev-fg3vokzh3myfkmipyfaqdl-910262898976.asia-southeast1.run.app",
                   color = Color(0xFF0F766E),
                   fontSize = 11.sp,
                   fontWeight = FontWeight.Medium
                 )
+                if (customServerUrl.isNotBlank()) {
+                  Text(
+                    text = "• Máy chủ tùy chỉnh: $customServerUrl",
+                    color = NavyPrimary,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.SemiBold
+                  )
+                }
               }
             }
 
@@ -537,8 +583,9 @@ fun ProfileAdminScreen(
             ) {
               Button(
                 onClick = {
+                  val targetUrl = if (customServerUrl.isNotBlank()) customServerUrl else "https://ais-dev-fg3vokzh3myfkmipyfaqdl-910262898976.asia-southeast1.run.app"
                   try {
-                    val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("http://localhost:3000"))
+                    val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(targetUrl))
                     context.startActivity(browserIntent)
                   } catch (e: Exception) {
                     onSyncWithServer?.invoke()
@@ -546,11 +593,11 @@ fun ProfileAdminScreen(
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = NavyPrimary),
                 shape = RoundedCornerShape(10.dp),
-                modifier = Modifier.weight(1.3f).testTag("btn_open_web_admin")
+                modifier = Modifier.weight(1.2f).testTag("btn_open_web_admin")
               ) {
                 Icon(Icons.Default.OpenInBrowser, contentDescription = null, tint = Color.White, modifier = Modifier.size(16.dp))
                 Spacer(modifier = Modifier.width(6.dp))
-                Text("MỞ WEB QUẢN TRỊ", fontWeight = FontWeight.Bold, fontSize = 11.5.sp)
+                Text("MỞ WEB CLOUD", fontWeight = FontWeight.Bold, fontSize = 11.sp)
               }
 
               Button(
@@ -561,7 +608,18 @@ fun ProfileAdminScreen(
               ) {
                 Icon(Icons.Default.Sync, contentDescription = null, tint = Color.White, modifier = Modifier.size(16.dp))
                 Spacer(modifier = Modifier.width(4.dp))
-                Text("ĐỒNG BỘ NGAY", fontWeight = FontWeight.Bold, fontSize = 11.5.sp)
+                Text("ĐỒNG BỘ", fontWeight = FontWeight.Bold, fontSize = 11.sp)
+              }
+
+              OutlinedButton(
+                onClick = { showServerConfigDialog = true },
+                shape = RoundedCornerShape(10.dp),
+                contentPadding = PaddingValues(horizontal = 8.dp),
+                modifier = Modifier.weight(0.8f)
+              ) {
+                Icon(Icons.Default.Settings, contentDescription = null, tint = NavyDeep, modifier = Modifier.size(14.dp))
+                Spacer(modifier = Modifier.width(2.dp))
+                Text("Cấu hình", color = NavyDeep, fontSize = 10.sp, fontWeight = FontWeight.Bold)
               }
             }
           }
@@ -978,6 +1036,75 @@ fun ProfileAdminScreen(
                 modifier = Modifier.weight(1.5f).testTag("btn_save_password")
               ) {
                 Text("LƯU MẬT KHẨU", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+              }
+            }
+          }
+        }
+      }
+    }
+
+    if (showServerConfigDialog) {
+      Dialog(onDismissRequest = { showServerConfigDialog = false }) {
+        Card(
+          shape = RoundedCornerShape(16.dp),
+          colors = CardDefaults.cardColors(containerColor = Color.White),
+          elevation = CardDefaults.cardElevation(8.dp),
+          modifier = Modifier.fillMaxWidth()
+        ) {
+          Column(
+            modifier = Modifier.padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+          ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+              Icon(Icons.Default.Settings, contentDescription = null, tint = NavyPrimary)
+              Spacer(modifier = Modifier.width(8.dp))
+              Text(
+                text = "Cấu hình Máy chủ Web Quản trị",
+                color = NavyDeep,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Bold
+              )
+            }
+
+            Text(
+              text = "Ứng dụng tự động kết nối qua mạng Internet đến Cổng Web Cloud. Nếu bạn có địa chỉ máy chủ nội bộ hoặc Cloud riêng, bạn có thể nhập vào đây:",
+              fontSize = 12.sp,
+              color = Color(0xFF475569)
+            )
+
+            OutlinedTextField(
+              value = serverUrlInput,
+              onValueChange = { serverUrlInput = it },
+              label = { Text("Địa chỉ Máy chủ (URL)", fontSize = 12.sp) },
+              placeholder = { Text("https://ais-dev-fg3vokzh3myfkmipyfaqdl-910262898976.asia-southeast1.run.app", fontSize = 10.sp) },
+              singleLine = true,
+              shape = RoundedCornerShape(10.dp),
+              modifier = Modifier.fillMaxWidth()
+            )
+
+            Row(
+              modifier = Modifier.fillMaxWidth(),
+              horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+              Button(
+                onClick = { showServerConfigDialog = false },
+                colors = ButtonDefaults.outlinedButtonColors(),
+                shape = RoundedCornerShape(10.dp),
+                modifier = Modifier.weight(1f)
+              ) {
+                Text("Đóng", color = Color(0xFF64748B), fontSize = 12.sp)
+              }
+
+              Button(
+                onClick = {
+                  onSetCustomServerUrl?.invoke(serverUrlInput)
+                  showServerConfigDialog = false
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = NavyPrimary),
+                shape = RoundedCornerShape(10.dp),
+                modifier = Modifier.weight(1.3f)
+              ) {
+                Text("LƯU & KẾT NỐI", fontWeight = FontWeight.Bold, fontSize = 12.sp)
               }
             }
           }
