@@ -348,6 +348,9 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
       list.add("$base$cleanEndpoint")
     }
 
+    // Primary official Render server for GDCT Vung 4
+    list.add("https://gdctv4.onrender.com$cleanEndpoint")
+    list.add("https://gdctv4.onrender.com/api$cleanEndpoint")
     list.add("https://ais-dev-fg3vokzh3myfkmipyfaqdl-910262898976.asia-southeast1.run.app$cleanEndpoint")
     list.add("https://ais-pre-fg3vokzh3myfkmipyfaqdl-910262898976.asia-southeast1.run.app$cleanEndpoint")
     list.add("http://10.0.2.2:3000$cleanEndpoint")

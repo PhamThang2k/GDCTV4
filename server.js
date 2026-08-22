@@ -2,7 +2,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const WEB_ADMIN_DIR = path.join(__dirname, 'web-admin');
 const DB_FILE = path.join(WEB_ADMIN_DIR, 'db.json');
 

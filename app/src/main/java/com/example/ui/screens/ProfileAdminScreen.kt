@@ -559,7 +559,7 @@ fun ProfileAdminScreen(
                   fontWeight = FontWeight.SemiBold
                 )
                 Text(
-                  text = "• Cổng Cloud Internet: https://ais-dev-fg3vokzh3myfkmipyfaqdl-910262898976.asia-southeast1.run.app",
+                  text = "• Cổng Cloud Internet: https://gdctv4.onrender.com",
                   color = Color(0xFF0F766E),
                   fontSize = 11.sp,
                   fontWeight = FontWeight.Medium
@@ -583,7 +583,7 @@ fun ProfileAdminScreen(
             ) {
               Button(
                 onClick = {
-                  val targetUrl = if (customServerUrl.isNotBlank()) customServerUrl else "https://ais-dev-fg3vokzh3myfkmipyfaqdl-910262898976.asia-southeast1.run.app"
+                  val targetUrl = if (customServerUrl.isNotBlank()) customServerUrl else "https://gdctv4.onrender.com"
                   try {
                     val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(targetUrl))
                     context.startActivity(browserIntent)
@@ -1076,7 +1076,7 @@ fun ProfileAdminScreen(
               value = serverUrlInput,
               onValueChange = { serverUrlInput = it },
               label = { Text("Địa chỉ Máy chủ (URL)", fontSize = 12.sp) },
-              placeholder = { Text("https://ais-dev-fg3vokzh3myfkmipyfaqdl-910262898976.asia-southeast1.run.app", fontSize = 10.sp) },
+              placeholder = { Text("https://gdctv4.onrender.com", fontSize = 10.sp) },
               singleLine = true,
               shape = RoundedCornerShape(10.dp),
               modifier = Modifier.fillMaxWidth()
