@@ -64,6 +64,9 @@ android {
     compose = true
     buildConfig = true
   }
+  composeOptions {
+    kotlinCompilerExtensionVersion = "1.5.14"
+  }
   testOptions { unitTests { isIncludeAndroidResources = true } }
   dependenciesInfo {
     includeInApk = false
