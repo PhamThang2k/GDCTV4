@@ -57,8 +57,8 @@
         <i class="fa-solid fa-user-shield"></i>
       </div>
       <div class="admin-info">
-        <div class="admin-name">Đại tá Nguyễn Văn Hiến</div>
-        <div class="admin-role">Phòng Chính trị Vùng 4</div>
+        <div class="admin-name">Vùng 4 Hải quân</div>
+        <div class="admin-role">Bộ Tư lệnh Vùng 4 Hải quân</div>
       </div>
       <button class="btn-outline btn-sm" id="btn-logout" title="Đăng xuất" style="padding: 4px 8px; color: #94A3B8; background: transparent; border: none;">
         <i class="fa-solid fa-arrow-right-from-bracket"></i>
@@ -534,6 +534,24 @@
           <div class="form-group">
             <label class="form-label">Tóm tắt nội dung trọng tâm</label>
             <textarea class="form-control" id="lesson-summary" placeholder="Tóm tắt mục đích, yêu cầu và nội dung cốt lõi của bài giảng..."></textarea>
+          </div>
+
+          <!-- Dynamic Sections for Lesson Modules -->
+          <div style="margin-top: 14px; border: 1.5px solid #CBD5E1; border-radius: 8px; padding: 14px; background: #FFFFFF;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <div style="font-size: 13px; font-weight: 700; color: var(--navy-primary);">
+                <i class="fa-solid fa-list-check" style="color: var(--navy-primary);"></i> Cụ thể từng phần nội dung bài giảng (Hiển thị trên App để người học tích Đã học)
+              </div>
+              <button type="button" class="btn btn-primary btn-sm" id="btn-add-section-item" style="padding: 4px 10px; font-size: 11px;">
+                <i class="fa-solid fa-plus"></i> Thêm Phần mới
+              </button>
+            </div>
+            <p style="font-size: 11.5px; color: var(--slate-600); margin-bottom: 12px;">
+              Mỗi phần nhập vào đây sẽ được hiển thị thành một mục nội dung riêng trên Ứng dụng điện thoại kèm ô tích chọn <b>"Đã học"</b> để theo dõi tiến độ chi tiết của quân nhân.
+            </p>
+            <div id="lesson-sections-container" style="display: flex; flex-direction: column; gap: 12px;">
+              <!-- Dynamic section items injected by JavaScript -->
+            </div>
           </div>
 
           <!-- Tabs inside Modal for Multimedia -->

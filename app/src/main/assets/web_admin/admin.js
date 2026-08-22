@@ -19,7 +19,27 @@ const DEFAULT_LESSONS = [
     pdfAttachment: "Chuyen_de_01_Chu_quyen_bien_dao.pdf",
     videoUrl: "https://video.gdct.vung4.vn/cd-01-hd.mp4",
     audioUrl: "https://audio.gdct.vung4.vn/cd-01-phat-thanh.mp3",
-    quizCount: 4
+    quizCount: 4,
+    sections: [
+      {
+        sectionNumber: 1,
+        heading: "Phần 1: Bối cảnh tình hình Biển Đông và yêu cầu nhiệm vụ bảo vệ chủ quyền",
+        content: "Tình hình an ninh hàng hải, tranh chấp chủ quyền trên Biển Đông tiếp tục diễn biến phức tạp, khó lường. Vùng 4 Hải quân quản lý vùng biển rộng lớn, trọng điểm có vị trí chiến lược đặc biệt quan trọng.",
+        keyTakeaway: "Kiên quyết, kiên trì đấu tranh bảo vệ vững chắc độc lập, chủ quyền, thống nhất, toàn vẹn lãnh thổ."
+      },
+      {
+        sectionNumber: 2,
+        heading: "Phần 2: Quan điểm, chủ trương, phương châm của Đảng về giải quyết tranh chấp biển đảo",
+        content: "Thực hiện nhất quán phương châm 'Kiên quyết, kiên trì, bình tĩnh, khôn khéo', giải quyết tranh chấp bằng biện pháp hòa bình trên cơ sở luật pháp quốc tế, đặc biệt là UNCLOS 1982 và DOC.",
+        keyTakeaway: "Giữ vững môi trường hòa bình, ổn định đồng thời bảo vệ vững chắc từng sải biển, tấc đảo."
+      },
+      {
+        sectionNumber: 3,
+        heading: "Phần 3: Trách nhiệm và quyết tâm chiến đấu của cán bộ, chiến sĩ Vùng 4",
+        content: "Cán bộ, chiến sĩ toàn Vùng luôn nêu cao tinh thần cảnh giác cách mạng, sẵn sàng chiến đấu cao, làm chủ tàu thuyền, vũ khí trang bị hiện đại, quyết tâm hoàn thành xuất sắc mọi nhiệm vụ được giao.",
+        keyTakeaway: "Sẵn sàng chiến đấu, hy sinh để bảo vệ chủ quyền biển, đảo thiêng liêng của Tổ quốc."
+      }
+    ]
   },
   {
     id: "cd-02",
@@ -35,7 +55,27 @@ const DEFAULT_LESSONS = [
     pdfAttachment: "Chuyen_de_02_Ban_linh_chinh_tri_thuy_thu.pdf",
     videoUrl: "https://video.gdct.vung4.vn/cd-02-hd.mp4",
     audioUrl: "https://audio.gdct.vung4.vn/cd-02-phat-thanh.mp3",
-    quizCount: 4
+    quizCount: 4,
+    sections: [
+      {
+        sectionNumber: 1,
+        heading: "Phần 1: Đặc thù hoạt động và yêu cầu bản lĩnh thép của thủy thủ tàu chiến đấu",
+        content: "Hoạt động dài ngày trên biển, đối mặt với sóng to gió lớn và áp lực tác chiến đòi hỏi mỗi thủy thủ phải có thể lực dẻo dai, tâm lý vững vàng và bản lĩnh chính trị kiên định tuyệt đối.",
+        keyTakeaway: "Bản lĩnh chính trị là nhân tố quyết định sức mạnh chiến đấu của bộ đội tàu."
+      },
+      {
+        sectionNumber: 2,
+        heading: "Phần 2: Rèn luyện ý chí vượt khó, đoàn kết hiệp đồng, lập công tập thể",
+        content: "Trên một con tàu, tất cả cán bộ chiến sĩ là một khối thống nhất 'Cùng chung một con tàu, cùng chung một ý chí'. Tinh thần đồng đội và kỷ luật nghiêm minh là chìa khóa chiến thắng.",
+        keyTakeaway: "Đoàn kết, hiệp đồng chặt chẽ, phát huy sức mạnh tổng hợp của toàn tàu."
+      },
+      {
+        sectionNumber: 3,
+        heading: "Phần 3: Làm chủ vũ khí trang bị kỹ thuật hiện đại, sẵn sàng lập công",
+        content: "Khắc phục khó khăn, làm chủ công nghệ và vũ khí trang bị mới của tàu mặt nước và tàu ngầm; giữ tốt, dùng bền, an toàn, tiết kiệm.",
+        keyTakeaway: "Giỏi chuyên môn, thuần thục trang bị, sẵn sàng đánh thắng mọi kẻ thù xâm phạm."
+      }
+    ]
   },
   {
     id: "cd-03",
@@ -51,7 +91,27 @@ const DEFAULT_LESSONS = [
     pdfAttachment: "Chuyen_de_03_Truyen_thong_Vung4.pdf",
     videoUrl: "https://video.gdct.vung4.vn/cd-03-hd.mp4",
     audioUrl: "https://audio.gdct.vung4.vn/cd-03-phat-thanh.mp3",
-    quizCount: 4
+    quizCount: 4,
+    sections: [
+      {
+        sectionNumber: 1,
+        heading: "Phần 1: Những mốc son lịch sử chói lọi của Hải quân nhân dân Việt Nam",
+        content: "Chiến công đánh thắng trận đầu ngày 2 và 5/8/1964; con đường huyền thoại Hồ Chí Minh trên biển; chiến dịch giải phóng quần đảo Trường Sa năm 1975.",
+        keyTakeaway: "Kế thừa và phát huy truyền thống anh hùng của thế hệ cha anh đi trước."
+      },
+      {
+        sectionNumber: 2,
+        heading: "Phần 2: Khúc tráng ca Trường Sa và truyền thống vẻ vang của Vùng 4 Hải quân",
+        content: "Vùng 4 Hải quân tự hào là lực lượng nòng cốt bảo vệ quần đảo Trường Sa, với biểu tượng 'Vòng tròn bất tử' tại Gạc Ma ngày 14/3/1988 ngời sáng tinh thần yêu nước.",
+        keyTakeaway: "'Không lùi bước, sẵn sàng lấy máu mình để tô thắm lá cờ Tổ quốc'."
+      },
+      {
+        sectionNumber: 3,
+        heading: "Phần 3: Phát huy truyền thống trong sự nghiệp xây dựng Vùng 4 hiện đại",
+        content: "Mỗi cán bộ, chiến sĩ hôm nay nguyện kế tục xứng đáng truyền thống anh hùng, nỗ lực học tập, rèn luyện, hoàn thành xuất sắc mọi nhiệm vụ Đảng và Nhân dân giao phó.",
+        keyTakeaway: "Giữ vững danh hiệu Đơn vị Anh hùng lực lượng vũ trang nhân dân."
+      }
+    ]
   },
   {
     id: "cd-04",
@@ -67,7 +127,27 @@ const DEFAULT_LESSONS = [
     pdfAttachment: "Chuyen_de_04_Ky_luat_an_toan.pdf",
     videoUrl: "https://video.gdct.vung4.vn/cd-04-hd.mp4",
     audioUrl: "https://audio.gdct.vung4.vn/cd-04-phat-thanh.mp3",
-    quizCount: 4
+    quizCount: 4,
+    sections: [
+      {
+        sectionNumber: 1,
+        heading: "Phần 1: Quán triệt Thông tư 143/2023/TT-BQP và các quy định kỷ luật mới của Quân đội",
+        content: "Nắm vững các nhóm hành vi vi phạm kỷ luật quân đội và các hình thức xử lý nghiêm minh; thực hiện văn hóa pháp luật trong đời sống quân ngũ.",
+        keyTakeaway: "'Kỷ luật là sức mạnh của Quân đội', là cội nguồn của mọi thắng lợi."
+      },
+      {
+        sectionNumber: 2,
+        heading: "Phần 2: Các biện pháp phòng ngừa vi phạm kỷ luật, tệ nạn và mất an toàn giao thông",
+        content: "Nghiêm cấm tuyệt đối uống rượu bia khi tham gia giao thông và trong giờ làm việc; cấm đánh bạc, vay nợ trái phép qua mạng xã hội; chấp hành nghiêm quy định bảo mật thông tin quân sự.",
+        keyTakeaway: "Nói không với vi phạm nồng độ cồn, cờ bạc mạng và vay nợ bất hợp pháp."
+      },
+      {
+        sectionNumber: 3,
+        heading: "Phần 3: Xây dựng nền nếp chính quy, môi trường văn hóa quân sự lành mạnh",
+        content: "Duy trì nghiêm 11 chế độ trong ngày, 3 chế độ trong tuần; xưng hô chào hỏi đúng điều lệnh, xây dựng mối quan hệ cán - binh thân ái, gắn bó.",
+        keyTakeaway: "Tự giác chấp hành kỷ luật, xây dựng đơn vị vững mạnh toàn diện 'Mẫu mực, tiêu biểu'."
+      }
+    ]
   },
   {
     id: "cd-05",
@@ -76,14 +156,34 @@ const DEFAULT_LESSONS = [
     targetAudience: "Cán bộ, Đảng viên, Đoàn viên thanh niên",
     estimatedMinutes: 40,
     summary: "Học tập phong cách tận tụy, cần kiệm liêm chính, chí công vô tư của Bác; lời căn dặn của Bác với Hải quân: Ngày nay ta có ngày, có trời, có biển, ta phải biết giữ gìn lấy nó.",
-    lecturer: "Đại tá Nguyễn Văn Hiến",
+    lecturer: "Bộ Tư lệnh Vùng 4 Hải quân",
     unit: "Phòng Chính trị Vùng 4",
     slidesCount: 8,
     docxAttachment: "Chuyen_de_05_Tu_tuong_Bac_Ho.docx",
     pdfAttachment: "Chuyen_de_05_Tu_tuong_Bac_Ho.pdf",
     videoUrl: "https://video.gdct.vung4.vn/cd-05-hd.mp4",
     audioUrl: "https://audio.gdct.vung4.vn/cd-05-phat-thanh.mp3",
-    quizCount: 4
+    quizCount: 4,
+    sections: [
+      {
+        sectionNumber: 1,
+        heading: "Phần 1: Tư tưởng Hồ Chí Minh về tinh thần trách nhiệm và phụng sự Tổ quốc",
+        content: "Chủ tịch Hồ Chí Minh luôn đặt lợi ích của Tổ quốc và nhân dân lên trên hết. Người chỉ rõ: 'Bất kỳ ai, ở địa vị nào, làm công tác gì, gặp hoàn cảnh nào, đều phải có tinh thần trách nhiệm'. Đối với Quân đội nhân dân Việt Nam, trách nhiệm là sẵn sàng chiến đấu, hy sinh vì độc lập tự do.",
+        keyTakeaway: "Luôn đặt lợi ích của Đảng, Tổ quốc và Nhân dân lên trên hết, trước hết."
+      },
+      {
+        sectionNumber: 2,
+        heading: "Phần 2: Lời căn dặn thiêng liêng của Bác đối với Bộ đội Hải quân",
+        content: "Ngày 15/3/1961, khi về thăm Bộ đội Hải quân, Bác Hồ đã ân cần căn dặn: 'Ngày trước ta chỉ có đêm và rừng. Ngày nay ta có ngày, có trời, có biển. Bờ biển ta dài, tươi đẹp, ta phải biết giữ gìn lấy nó'. Lời dạy ấy đã trở thành kim chỉ nam cho các thế hệ cán bộ, chiến sĩ Vùng 4 Hải quân.",
+        keyTakeaway: "Khắc sâu và thực hiện xuất sắc lời căn dặn của Bác Hồ: 'Bờ biển ta dài tươi đẹp, ta phải biết giữ gìn lấy nó'."
+      },
+      {
+        sectionNumber: 3,
+        heading: "Phần 3: Trách nhiệm nêu gương và hành động của cán bộ, chiến sĩ Vùng 4 hôm nay",
+        content: "Mỗi cán bộ, chiến sĩ Vùng 4 Hải quân cần nêu cao tinh thần tự giác, gương mẫu trong học tập và công tác. Giữ nghiêm kỷ luật, thành thạo làm chủ vũ khí trang bị kỹ thuật mới, kiên quyết bảo vệ vững chắc từng tấc đảo, sải biển thiêng liêng.",
+        keyTakeaway: "Nêu cao tính gương mẫu, tinh thần đoàn kết và ý chí quyết tâm bảo vệ chủ quyền biển đảo."
+      }
+    ]
   }
 ];
 
@@ -410,6 +510,106 @@ function closeModal(id) {
   document.getElementById(id)?.classList.remove("show");
 }
 
+// DYNAMIC SECTIONS MANAGEMENT FOR LESSONS
+function renderLessonSectionsForm(sections = []) {
+  const container = document.getElementById("lesson-sections-container");
+  if (!container) return;
+  container.innerHTML = "";
+  if (!sections || sections.length === 0) {
+    sections = [
+      {
+        sectionNumber: 1,
+        heading: "Phần 1: Bối cảnh, mục đích và sự cần thiết",
+        content: "Nội dung phân tích bối cảnh lịch sử, tình hình thực tiễn và tính cấp thiết của chuyên đề GDCT.",
+        keyTakeaway: "Nắm vững lý do và tính tất yếu của bài học."
+      },
+      {
+        sectionNumber: 2,
+        heading: "Phần 2: Nội dung tư tưởng và quan điểm cốt lõi",
+        content: "Phân tích các luận điểm then chốt, đường lối của Đảng và yêu cầu nhiệm vụ của Quân chủng Hải quân.",
+        keyTakeaway: "Khắc sâu nguyên tắc chỉ đạo và bản lĩnh chính trị kiên định."
+      },
+      {
+        sectionNumber: 3,
+        heading: "Phần 3: Trách nhiệm và hành động của cán bộ, chiến sĩ",
+        content: "Liên hệ thực tiễn vị trí công tác, quyết tâm hoàn thành tốt mọi nhiệm vụ, giữ nghiêm kỷ luật.",
+        keyTakeaway: "Nêu cao tính gương mẫu, tinh thần đoàn kết và ý chí quyết chiến quyết thắng."
+      }
+    ];
+  }
+  sections.forEach((sec, idx) => {
+    addSectionItemToForm(sec, idx + 1);
+  });
+}
+
+function addSectionItemToForm(sec = {}, num = null) {
+  const container = document.getElementById("lesson-sections-container");
+  if (!container) return;
+  const currentCount = container.children.length;
+  const sectionNum = num || currentCount + 1;
+  const itemDiv = document.createElement("div");
+  itemDiv.className = "section-form-item";
+  itemDiv.style = "border: 1px solid #E2E8F0; background: #F8FAFC; border-radius: 8px; padding: 12px; position: relative;";
+  itemDiv.innerHTML = `
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+      <span style="font-size: 12px; font-weight: 700; color: #1E3A8A; background: #DBEAFE; padding: 2px 8px; border-radius: 4px;">
+        PHẦN ${sectionNum} (Mục học tập)
+      </span>
+      <button type="button" class="btn-delete-section" style="background: transparent; border: none; color: #EF4444; cursor: pointer; font-size: 13px;" title="Xóa phần này">
+        <i class="fa-solid fa-trash-can"></i> Xóa mục
+      </button>
+    </div>
+    <div style="margin-bottom: 8px;">
+      <label style="font-size: 11px; font-weight: 600; color: #334155; display: block; margin-bottom: 4px;">Tiêu đề Phần *</label>
+      <input type="text" class="form-control section-heading" value="${sec.heading || `Phần ${sectionNum}: Tiêu đề nội dung`}" placeholder="VD: Phần ${sectionNum}: Quan điểm và tư tưởng chỉ đạo" required style="font-size: 12.5px;">
+    </div>
+    <div style="margin-bottom: 8px;">
+      <label style="font-size: 11px; font-weight: 600; color: #334155; display: block; margin-bottom: 4px;">Nội dung chi tiết phần học *</label>
+      <textarea class="form-control section-content" rows="3" placeholder="Nhập nội dung giảng dạy chi tiết của phần này..." required style="font-size: 12px;">${sec.content || ''}</textarea>
+    </div>
+    <div>
+      <label style="font-size: 11px; font-weight: 600; color: #B45309; display: block; margin-bottom: 4px;">Điểm cốt lõi / Ghi nhớ (Key takeaway)</label>
+      <input type="text" class="form-control section-takeaway" value="${sec.keyTakeaway || ''}" placeholder="VD: Nắm vững và thực hiện tốt trách nhiệm được giao" style="font-size: 12px; background: #FEF3C7; border-color: #FDE68A;">
+    </div>
+  `;
+  itemDiv.querySelector(".btn-delete-section")?.addEventListener("click", () => {
+    if (container.children.length <= 1) {
+      alert("Bài giảng cần có ít nhất 1 phần nội dung!");
+      return;
+    }
+    itemDiv.remove();
+    renumberSectionItems();
+  });
+  container.appendChild(itemDiv);
+}
+
+function renumberSectionItems() {
+  const container = document.getElementById("lesson-sections-container");
+  if (!container) return;
+  Array.from(container.children).forEach((child, index) => {
+    const badge = child.querySelector("span");
+    if (badge) badge.textContent = `PHẦN ${index + 1} (Mục học tập)`;
+  });
+}
+
+function getSectionsFromForm() {
+  const container = document.getElementById("lesson-sections-container");
+  if (!container) return [];
+  const sections = [];
+  Array.from(container.children).forEach((child, index) => {
+    const heading = child.querySelector(".section-heading")?.value.trim() || `Phần ${index + 1}`;
+    const content = child.querySelector(".section-content")?.value.trim() || `Nội dung Phần ${index + 1}`;
+    const keyTakeaway = child.querySelector(".section-takeaway")?.value.trim() || `Ghi nhớ cốt lõi Phần ${index + 1}`;
+    sections.push({
+      sectionNumber: index + 1,
+      heading,
+      content,
+      keyTakeaway
+    });
+  });
+  return sections;
+}
+
 function initActionButtons() {
   // Global buttons
   document.getElementById("btn-urge-all")?.addEventListener("click", () => {
@@ -426,6 +626,11 @@ function initActionButtons() {
     }
   });
 
+  // Dynamic Add Section in Lesson Modal
+  document.getElementById("btn-add-section-item")?.addEventListener("click", () => {
+    addSectionItemToForm();
+  });
+
   // Filter Listeners
   document.getElementById("lesson-search")?.addEventListener("input", renderLessonsTable);
   document.getElementById("lesson-filter-category")?.addEventListener("change", renderLessonsTable);
@@ -438,6 +643,7 @@ function initActionButtons() {
     document.getElementById("modal-lesson-title").textContent = "Soạn Bài giảng Giáo dục Chính trị mới";
     document.getElementById("form-lesson").reset();
     document.getElementById("lesson-id").value = "";
+    renderLessonSectionsForm();
     openModal("modal-lesson");
   });
 
@@ -449,6 +655,7 @@ function initActionButtons() {
     const duration = parseInt(document.getElementById("lesson-duration").value) || 45;
     const summary = document.getElementById("lesson-summary").value.trim();
     const id = document.getElementById("lesson-id").value || code.toLowerCase();
+    const sections = getSectionsFromForm();
 
     if (!code || !title) {
       alert("Vui lòng nhập đầy đủ Mã bài giảng và Tên chuyên đề!");
@@ -470,7 +677,8 @@ function initActionButtons() {
       pdfAttachment: document.getElementById("lesson-pdf-name").value || `${code}_Tai_Lieu.pdf`,
       videoUrl: document.getElementById("lesson-video-url").value || `https://video.gdct.vung4.vn/${code}.mp4`,
       audioUrl: document.getElementById("lesson-audio-url").value || `https://audio.gdct.vung4.vn/${code}.mp3`,
-      quizCount: 4
+      quizCount: 4,
+      sections: sections
     };
 
     if (existingIdx >= 0) {
@@ -601,6 +809,7 @@ window.editLesson = function(id) {
   document.getElementById("lesson-video-url").value = lesson.videoUrl || "";
   document.getElementById("lesson-audio-url").value = lesson.audioUrl || "";
 
+  renderLessonSectionsForm(lesson.sections || []);
   openModal("modal-lesson");
 };
 
@@ -618,6 +827,23 @@ window.previewLesson = function(id) {
   const lesson = store.lessons.find(l => l.id === id);
   if (!lesson) return;
 
+  const sectionsHtml = (lesson.sections && lesson.sections.length > 0)
+    ? lesson.sections.map((sec, sIdx) => `
+        <div style="background: white; border: 1.5px solid #CBD5E1; border-radius: 8px; padding: 12px; margin-bottom: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <span style="font-weight: 700; color: var(--navy-primary); font-size: 13px;">${sec.heading}</span>
+            <span style="font-size: 11px; background: #DCFCE7; color: #166534; font-weight: 700; padding: 2px 8px; border-radius: 4px; border: 1px solid #86EFAC;">
+              <i class="fa-solid fa-square-check"></i> Ô tích Đã học trên App
+            </span>
+          </div>
+          <p style="font-size: 12px; color: #334155; line-height: 1.6; margin-bottom: 8px;">${sec.content}</p>
+          <div style="background: #FEF3C7; border-left: 3px solid #D97706; padding: 6px 10px; border-radius: 4px; font-size: 11.5px; color: #92400E;">
+            <b><i class="fa-solid fa-lightbulb"></i> Cốt lõi:</b> ${sec.keyTakeaway || 'Ghi nhớ trọng tâm'}
+          </div>
+        </div>
+      `).join("")
+    : `<div style="font-size: 12px; color: #64748B;">Chưa thiết lập phần chi tiết.</div>`;
+
   document.getElementById("preview-modal-title").textContent = `Xem trước: [${lesson.id.toUpperCase()}] ${lesson.title}`;
   const body = document.getElementById("preview-modal-body");
   body.innerHTML = `
@@ -625,6 +851,13 @@ window.previewLesson = function(id) {
       <span class="badge badge-navy">${lesson.category}</span>
       <h3 style="color: var(--navy-primary); font-size: 15px; margin: 8px 0;">${lesson.title}</h3>
       <p style="font-size: 12.5px; color: var(--slate-600); line-height: 1.5;">${lesson.summary}</p>
+    </div>
+
+    <div style="margin-bottom: 14px;">
+      <h4 style="font-size: 13px; color: var(--navy-primary); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+        <i class="fa-solid fa-list-check"></i> Danh sách từng phần bài giảng hiển thị trên App (${(lesson.sections || []).length} phần):
+      </h4>
+      ${sectionsHtml}
     </div>
 
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 12px;">

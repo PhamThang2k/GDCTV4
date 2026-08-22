@@ -1,5 +1,8 @@
 package com.example.ui.components
 
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -9,6 +12,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -30,6 +34,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.EditNote
@@ -39,12 +44,15 @@ import androidx.compose.material.icons.filled.Headphones
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.MilitaryTech
+import androidx.compose.material.icons.filled.OpenInNew
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Replay10
 import androidx.compose.material.icons.filled.Slideshow
 import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.Videocam
+import androidx.compose.material.icons.filled.ZoomIn
+import androidx.compose.material.icons.filled.ZoomOut
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -63,11 +71,16 @@ import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -75,6 +88,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.example.data.local.StudyProgressEntity
 import com.example.data.model.DocAttachment
 import com.example.data.model.Lesson
@@ -119,6 +134,17 @@ fun LessonDetailView(
   onAddNote: () -> Unit
 ) {
   val currentProgressPercent = progress?.progressPercent ?: 0
+  var viewingDoc by remember { mutableStateOf<DocAttachment?>(null) }
+
+  if (viewingDoc != null) {
+    DocumentReaderViewerDialog(
+      doc = viewingDoc!!,
+      lesson = lesson,
+      checkedSections = checkedSections,
+      onToggleChecked = onToggleSectionChecked,
+      onDismiss = { viewingDoc = null }
+    )
+  }
 
   Column(
     modifier = Modifier
@@ -319,6 +345,7 @@ fun LessonDetailView(
             checkedSections = checkedSections,
             downloadedDocIds = downloadedDocIds,
             onDownloadDoc = onDownloadDoc,
+            onOpenDoc = { doc -> viewingDoc = doc },
             onToggleChecked = onToggleSectionChecked,
             onStartQuiz = onStartQuiz,
             onAddNote = onAddNote
@@ -567,10 +594,17 @@ fun DocumentReaderViewer(
   checkedSections: Set<Int>,
   downloadedDocIds: Set<String>,
   onDownloadDoc: (DocAttachment) -> Unit,
+  onOpenDoc: (DocAttachment) -> Unit,
   onToggleChecked: (Int) -> Unit,
   onStartQuiz: () -> Unit,
   onAddNote: () -> Unit
 ) {
+  val totalSections = lesson.sections.size
+  val completedSectionsCount = checkedSections.count { secNum ->
+    lesson.sections.any { it.sectionNumber == secNum }
+  }
+  val sectionPct = if (totalSections > 0) (completedSectionsCount * 100) / totalSections else 0
+
   LazyColumn(
     modifier = Modifier
       .fillMaxSize()
@@ -594,14 +628,14 @@ fun DocumentReaderViewer(
             ) {
               Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                  imageVector = Icons.Default.Download,
+                  imageVector = Icons.Default.Description,
                   contentDescription = null,
                   tint = NavyPrimary,
                   modifier = Modifier.size(18.dp)
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
-                  text = "TÀI LIỆU BÀI GIẢNG ĐÍNH KÈM (DOCX / PDF)",
+                  text = "TÀI LIỆU VĂN KIỆN ĐÍNH KÈM (DOCX / PDF)",
                   color = NavyDeep,
                   fontSize = 12.sp,
                   fontWeight = FontWeight.Bold
@@ -624,6 +658,7 @@ fun DocumentReaderViewer(
                 modifier = Modifier
                   .fillMaxWidth()
                   .padding(vertical = 4.dp)
+                  .clickable { onOpenDoc(doc) }
               ) {
                 Row(
                   modifier = Modifier.padding(10.dp),
@@ -637,14 +672,14 @@ fun DocumentReaderViewer(
                     Surface(
                       shape = RoundedCornerShape(6.dp),
                       color = if (doc.fileType == "PDF") CrimsonRed.copy(alpha = 0.15f) else Color(0xFF0284C7).copy(alpha = 0.15f),
-                      modifier = Modifier.size(36.dp)
+                      modifier = Modifier.size(38.dp)
                     ) {
                       Box(contentAlignment = Alignment.Center) {
                         Text(
                           text = doc.fileType,
                           color = if (doc.fileType == "PDF") CrimsonRed else Color(0xFF0284C7),
                           fontWeight = FontWeight.Black,
-                          fontSize = 10.5.sp
+                          fontSize = 11.sp
                         )
                       }
                     }
@@ -655,7 +690,7 @@ fun DocumentReaderViewer(
                       Text(
                         text = doc.fileName,
                         color = NavyDeep,
-                        fontSize = 12.sp,
+                        fontSize = 12.5.sp,
                         fontWeight = FontWeight.Bold,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
@@ -668,24 +703,33 @@ fun DocumentReaderViewer(
                     }
                   }
 
+                  Spacer(modifier = Modifier.width(8.dp))
+
                   Button(
-                    onClick = { onDownloadDoc(doc) },
+                    onClick = {
+                      if (isDownloaded) {
+                        onOpenDoc(doc)
+                      } else {
+                        onDownloadDoc(doc)
+                        onOpenDoc(doc)
+                      }
+                    },
                     colors = ButtonDefaults.buttonColors(
                       containerColor = if (isDownloaded) SuccessGreen else NavyPrimary
                     ),
                     shape = RoundedCornerShape(8.dp),
-                    contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 10.dp, vertical = 4.dp),
-                    modifier = Modifier.height(32.dp).testTag("btn_download_${doc.id}")
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                    modifier = Modifier.height(34.dp).testTag("btn_doc_action_${doc.id}")
                   ) {
                     Icon(
-                      imageVector = if (isDownloaded) Icons.Default.Check else Icons.Default.Download,
+                      imageVector = if (isDownloaded) Icons.Default.MenuBook else Icons.Default.Download,
                       contentDescription = null,
-                      modifier = Modifier.size(13.dp)
+                      modifier = Modifier.size(14.dp)
                     )
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.width(5.dp))
                     Text(
-                      text = if (isDownloaded) "Đã tải" else "Tải về",
-                      fontSize = 11.sp,
+                      text = if (isDownloaded) "Mở lên" else "Tải về",
+                      fontSize = 11.5.sp,
                       fontWeight = FontWeight.Bold
                     )
                   }
@@ -756,15 +800,75 @@ fun DocumentReaderViewer(
       }
     }
 
+    // 3. Section Tracker Header & Progress Card
     item {
-      Text(
-        text = "Nội dung các phần (Đánh dấu đã đọc để lưu tiến độ):",
-        fontSize = 13.sp,
-        fontWeight = FontWeight.Bold,
-        color = NavyDeep
-      )
+      Card(
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = if (sectionPct >= 100) Color(0xFFF0FDF4) else Color.White),
+        border = androidx.compose.foundation.BorderStroke(
+          1.dp,
+          if (sectionPct >= 100) Color(0xFF86EFAC) else Color(0xFFCBD5E1)
+        )
+      ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+          Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+          ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+              Icon(
+                imageVector = Icons.Default.CheckBox,
+                contentDescription = null,
+                tint = if (sectionPct >= 100) SuccessGreen else NavyPrimary,
+                modifier = Modifier.size(18.dp)
+              )
+              Spacer(modifier = Modifier.width(6.dp))
+              Text(
+                text = "NỘI DUNG TỪNG PHẦN HỌC TẬP",
+                fontSize = 12.5.sp,
+                fontWeight = FontWeight.Bold,
+                color = NavyDeep
+              )
+            }
+
+            Surface(
+              shape = RoundedCornerShape(6.dp),
+              color = if (sectionPct >= 100) SuccessGreen else NavyPrimary
+            ) {
+              Text(
+                text = "Đã học: $completedSectionsCount/$totalSections phần ($sectionPct%)",
+                color = Color.White,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+              )
+            }
+          }
+
+          Spacer(modifier = Modifier.height(8.dp))
+
+          LinearProgressIndicator(
+            progress = { if (totalSections > 0) completedSectionsCount.toFloat() / totalSections.toFloat() else 0f },
+            modifier = Modifier
+              .fillMaxWidth()
+              .height(6.dp)
+              .clip(RoundedCornerShape(3.dp)),
+            color = if (sectionPct >= 100) SuccessGreen else GoldYellow,
+            trackColor = Color(0xFFE2E8F0)
+          )
+
+          Spacer(modifier = Modifier.height(4.dp))
+          Text(
+            text = "Tích chọn vào từng phần bên dưới sau khi đọc xong để cập nhật tiến độ học tập.",
+            color = Color(0xFF64748B),
+            fontSize = 11.sp
+          )
+        }
+      }
     }
 
+    // 4. Granular Section Cards
     itemsIndexed(lesson.sections) { idx, section ->
       val isChecked = checkedSections.contains(section.sectionNumber)
 
@@ -774,47 +878,83 @@ fun DocumentReaderViewer(
           containerColor = if (isChecked) Color(0xFFF0FDF4) else Color.White
         ),
         border = androidx.compose.foundation.BorderStroke(
-          1.dp,
+          1.5.dp,
           if (isChecked) Color(0xFF86EFAC) else Color(0xFFE2E8F0)
         ),
         elevation = CardDefaults.cardElevation(2.dp)
       ) {
         Column(modifier = Modifier.padding(16.dp)) {
+          // Section header with badge and checkbox
           Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
           ) {
-            Text(
-              text = section.heading,
-              color = NavyPrimary,
-              fontSize = 15.sp,
-              fontWeight = FontWeight.Bold,
-              modifier = Modifier.weight(1f)
-            )
-
-            IconButton(
-              onClick = { onToggleChecked(section.sectionNumber) },
-              modifier = Modifier.testTag("btn_check_section_${section.sectionNumber}")
+            Surface(
+              shape = RoundedCornerShape(6.dp),
+              color = if (isChecked) Color(0xFFDCFCE7) else NavyContainer
             ) {
-              Icon(
-                imageVector = if (isChecked) Icons.Default.CheckBox else Icons.Default.CheckBoxOutlineBlank,
-                contentDescription = "Đã đọc",
-                tint = if (isChecked) SuccessGreen else Color(0xFF94A3B8)
+              Text(
+                text = "PHẦN ${section.sectionNumber}",
+                color = if (isChecked) Color(0xFF15803D) else NavyPrimary,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Black,
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
               )
             }
+
+            Surface(
+              shape = RoundedCornerShape(8.dp),
+              color = if (isChecked) Color(0xFFDCFCE7) else Color(0xFFF1F5F9),
+              border = androidx.compose.foundation.BorderStroke(
+                1.dp,
+                if (isChecked) Color(0xFF86EFAC) else Color(0xFFCBD5E1)
+              ),
+              modifier = Modifier
+                .clickable { onToggleChecked(section.sectionNumber) }
+                .testTag("btn_toggle_section_${section.sectionNumber}")
+            ) {
+              Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
+              ) {
+                Icon(
+                  imageVector = if (isChecked) Icons.Default.CheckCircle else Icons.Default.CheckBoxOutlineBlank,
+                  contentDescription = null,
+                  tint = if (isChecked) SuccessGreen else Color(0xFF64748B),
+                  modifier = Modifier.size(16.dp)
+                )
+                Spacer(modifier = Modifier.width(5.dp))
+                Text(
+                  text = if (isChecked) "Đã học xong" else "Tích đã học",
+                  color = if (isChecked) Color(0xFF15803D) else Color(0xFF475569),
+                  fontSize = 11.5.sp,
+                  fontWeight = FontWeight.Bold
+                )
+              }
+            }
           }
+
+          Spacer(modifier = Modifier.height(10.dp))
+
+          Text(
+            text = section.heading,
+            color = NavyPrimary,
+            fontSize = 15.sp,
+            fontWeight = FontWeight.Bold,
+            lineHeight = 21.sp
+          )
 
           Spacer(modifier = Modifier.height(8.dp))
 
           Text(
             text = section.content,
             color = Color(0xFF1E293B),
-            fontSize = 14.sp,
-            lineHeight = 22.sp
+            fontSize = 13.5.sp,
+            lineHeight = 21.sp
           )
 
-          Spacer(modifier = Modifier.height(10.dp))
+          Spacer(modifier = Modifier.height(12.dp))
 
           Surface(
             shape = RoundedCornerShape(8.dp),
@@ -833,7 +973,7 @@ fun DocumentReaderViewer(
               )
               Spacer(modifier = Modifier.width(6.dp))
               Text(
-                text = "Cốt lõi: ${section.keyTakeaway}",
+                text = "Ghi nhớ cốt lõi: ${section.keyTakeaway}",
                 color = Color(0xFF92400E),
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Medium,
@@ -861,6 +1001,341 @@ fun DocumentReaderViewer(
         Text("Làm bài kiểm tra trắc nghiệm", fontSize = 14.sp, fontWeight = FontWeight.Bold)
       }
       Spacer(modifier = Modifier.height(16.dp))
+    }
+  }
+}
+
+/**
+ * Fullscreen / Modal Document Reader Viewer Dialog
+ */
+@Composable
+fun DocumentReaderViewerDialog(
+  doc: DocAttachment,
+  lesson: Lesson,
+  checkedSections: Set<Int>,
+  onToggleChecked: (Int) -> Unit,
+  onDismiss: () -> Unit
+) {
+  val context = LocalContext.current
+  var fontSizeSp by remember { mutableStateOf(14) }
+
+  Dialog(
+    onDismissRequest = onDismiss,
+    properties = DialogProperties(usePlatformDefaultWidth = false)
+  ) {
+    Surface(
+      modifier = Modifier
+        .fillMaxSize()
+        .background(Color(0xFFF1F5F9)),
+      color = Color(0xFFF1F5F9)
+    ) {
+      Column(modifier = Modifier.fillMaxSize()) {
+        // Official Top Banner
+        Surface(
+          color = NavyDeep,
+          modifier = Modifier.fillMaxWidth()
+        ) {
+          Column(
+            modifier = Modifier
+              .statusBarsPadding()
+              .padding(horizontal = 14.dp, vertical = 10.dp)
+          ) {
+            Row(
+              modifier = Modifier.fillMaxWidth(),
+              horizontalArrangement = Arrangement.SpaceBetween,
+              verticalAlignment = Alignment.CenterVertically
+            ) {
+              Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+                Icon(
+                  imageVector = Icons.Default.MilitaryTech,
+                  contentDescription = null,
+                  tint = GoldYellow,
+                  modifier = Modifier.size(24.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Column {
+                  Text(
+                    text = "BỘ TƯ LỆNH VÙNG 4 HẢI QUÂN",
+                    color = GoldYellow,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Black,
+                    letterSpacing = 0.5.sp
+                  )
+                  Text(
+                    text = doc.fileName,
+                    color = Color.White,
+                    fontSize = 13.5.sp,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                  )
+                }
+              }
+
+              IconButton(onClick = onDismiss) {
+                Icon(Icons.Default.Close, contentDescription = "Đóng", tint = Color.White)
+              }
+            }
+
+            Spacer(modifier = Modifier.height(6.dp))
+
+            // Sub toolbar with zoom controls & format badge
+            Row(
+              modifier = Modifier.fillMaxWidth(),
+              horizontalArrangement = Arrangement.SpaceBetween,
+              verticalAlignment = Alignment.CenterVertically
+            ) {
+              Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                Surface(
+                  shape = RoundedCornerShape(4.dp),
+                  color = if (doc.fileType == "PDF") CrimsonRed else Color(0xFF0284C7)
+                ) {
+                  Text(
+                    text = doc.fileType,
+                    color = Color.White,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                  )
+                }
+
+                Surface(
+                  shape = RoundedCornerShape(4.dp),
+                  color = Color.White.copy(alpha = 0.15f)
+                ) {
+                  Text(
+                    text = "${doc.pageCount} trang • ${doc.fileSize}",
+                    color = Color(0xFFE2E8F0),
+                    fontSize = 10.5.sp,
+                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                  )
+                }
+              }
+
+              // Text Zoom
+              Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("Cỡ chữ: ", color = Color(0xFFCBD5E1), fontSize = 11.sp)
+                IconButton(
+                  onClick = { if (fontSizeSp > 12) fontSizeSp -= 2 },
+                  modifier = Modifier.size(28.dp)
+                ) {
+                  Icon(Icons.Default.ZoomOut, contentDescription = "Nhỏ lại", tint = Color.White, modifier = Modifier.size(16.dp))
+                }
+                Text("${fontSizeSp}pt", color = GoldYellow, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                IconButton(
+                  onClick = { if (fontSizeSp < 22) fontSizeSp += 2 },
+                  modifier = Modifier.size(28.dp)
+                ) {
+                  Icon(Icons.Default.ZoomIn, contentDescription = "Lớn hơn", tint = Color.White, modifier = Modifier.size(16.dp))
+                }
+              }
+            }
+          }
+        }
+
+        // Document Reader Content
+        LazyColumn(
+          modifier = Modifier
+            .weight(1f)
+            .fillMaxWidth()
+            .padding(horizontal = 14.dp, vertical = 10.dp),
+          verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+          // Document Header Letterhead
+          item {
+            Card(
+              shape = RoundedCornerShape(12.dp),
+              colors = CardDefaults.cardColors(containerColor = Color.White),
+              elevation = CardDefaults.cardElevation(2.dp)
+            ) {
+              Column(
+                modifier = Modifier
+                  .fillMaxWidth()
+                  .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+              ) {
+                Text(
+                  text = "QUÂN CHỦNG HẢI QUÂN\nBỘ TƯ LỆNH VÙNG 4",
+                  fontSize = 12.sp,
+                  fontWeight = FontWeight.Bold,
+                  color = NavyDeep,
+                  textAlign = TextAlign.Center
+                )
+                Text(
+                  text = "-------------------",
+                  fontSize = 11.sp,
+                  color = Color.Gray,
+                  textAlign = TextAlign.Center
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                  text = "TÀI LIỆU HỌC TẬP GIÁO DỤC CHÍNH TRỊ NĂM 2026",
+                  fontSize = 13.sp,
+                  fontWeight = FontWeight.Black,
+                  color = CrimsonRed,
+                  textAlign = TextAlign.Center
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                  text = "Chuyên đề: ${lesson.title}",
+                  fontSize = 14.sp,
+                  fontWeight = FontWeight.Bold,
+                  color = NavyPrimary,
+                  textAlign = TextAlign.Center
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                  text = "Giảng viên biên soạn: ${lesson.audioSpeaker} • Đối tượng: ${lesson.targetAudience}",
+                  fontSize = 11.5.sp,
+                  color = Color(0xFF64748B),
+                  textAlign = TextAlign.Center
+                )
+              }
+            }
+          }
+
+          // Document Summary
+          item {
+            Card(
+              shape = RoundedCornerShape(12.dp),
+              colors = CardDefaults.cardColors(containerColor = Color.White)
+            ) {
+              Column(modifier = Modifier.padding(14.dp)) {
+                Text(
+                  text = "I. MỤC ĐÍCH, YÊU CẦU VÀ NỘI DUNG TỔNG QUAN",
+                  fontSize = (fontSizeSp).sp,
+                  fontWeight = FontWeight.Bold,
+                  color = NavyPrimary
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                  text = lesson.summary,
+                  fontSize = fontSizeSp.sp,
+                  color = Color(0xFF1E293B),
+                  lineHeight = (fontSizeSp + 7).sp
+                )
+              }
+            }
+          }
+
+          // Render Sections in Document Format
+          itemsIndexed(lesson.sections) { idx, sec ->
+            val isChecked = checkedSections.contains(sec.sectionNumber)
+
+            Card(
+              shape = RoundedCornerShape(12.dp),
+              colors = CardDefaults.cardColors(
+                containerColor = if (isChecked) Color(0xFFF0FDF4) else Color.White
+              ),
+              border = androidx.compose.foundation.BorderStroke(
+                1.dp,
+                if (isChecked) Color(0xFF86EFAC) else Color(0xFFE2E8F0)
+              )
+            ) {
+              Column(modifier = Modifier.padding(14.dp)) {
+                Row(
+                  modifier = Modifier.fillMaxWidth(),
+                  horizontalArrangement = Arrangement.SpaceBetween,
+                  verticalAlignment = Alignment.CenterVertically
+                ) {
+                  Text(
+                    text = sec.heading,
+                    fontSize = (fontSizeSp + 1).sp,
+                    fontWeight = FontWeight.Bold,
+                    color = NavyPrimary,
+                    modifier = Modifier.weight(1f)
+                  )
+
+                  IconButton(onClick = { onToggleChecked(sec.sectionNumber) }) {
+                    Icon(
+                      imageVector = if (isChecked) Icons.Default.CheckCircle else Icons.Default.CheckBoxOutlineBlank,
+                      contentDescription = "Đã học",
+                      tint = if (isChecked) SuccessGreen else Color(0xFF94A3B8)
+                    )
+                  }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                  text = sec.content,
+                  fontSize = fontSizeSp.sp,
+                  color = Color(0xFF334155),
+                  lineHeight = (fontSizeSp + 7).sp
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Surface(
+                  shape = RoundedCornerShape(6.dp),
+                  color = Color(0xFFFEF3C7),
+                  modifier = Modifier.fillMaxWidth()
+                ) {
+                  Row(modifier = Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                      Icons.Default.Lightbulb,
+                      contentDescription = null,
+                      tint = Color(0xFFD97706),
+                      modifier = Modifier.size(15.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                      text = "Ý nghĩa cốt lõi: ${sec.keyTakeaway}",
+                      color = Color(0xFF92400E),
+                      fontSize = (fontSizeSp - 2).coerceAtLeast(10).sp,
+                      fontWeight = FontWeight.Medium
+                    )
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        // Bottom Action Bar
+        Surface(
+          color = Color.White,
+          shadowElevation = 8.dp,
+          modifier = Modifier.fillMaxWidth()
+        ) {
+          Row(
+            modifier = Modifier
+              .padding(12.dp)
+              .fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+          ) {
+            OutlinedButton(
+              onClick = {
+                try {
+                  val intent = Intent(Intent.ACTION_VIEW).apply {
+                    val mimeType = if (doc.fileType == "PDF") "application/pdf" else "application/msword"
+                    setDataAndType(Uri.parse("file:///android_asset/documents/${doc.fileName}"), mimeType)
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                  }
+                  context.startActivity(Intent.createChooser(intent, "Mở tài liệu bằng:"))
+                } catch (e: Exception) {
+                  Toast.makeText(context, "Đã mở tài liệu trong chế độ đọc chuẩn quân đội!", Toast.LENGTH_SHORT).show()
+                }
+              },
+              shape = RoundedCornerShape(10.dp),
+              modifier = Modifier.weight(1f).height(44.dp)
+            ) {
+              Icon(Icons.Default.OpenInNew, contentDescription = null, modifier = Modifier.size(16.dp))
+              Spacer(modifier = Modifier.width(6.dp))
+              Text("Mở bằng app ngoài", fontSize = 12.sp)
+            }
+
+            Button(
+              onClick = onDismiss,
+              colors = ButtonDefaults.buttonColors(containerColor = NavyPrimary),
+              shape = RoundedCornerShape(10.dp),
+              modifier = Modifier.weight(1f).height(44.dp)
+            ) {
+              Text("Đóng tài liệu", fontSize = 12.5.sp, fontWeight = FontWeight.Bold)
+            }
+          }
+        }
+      }
     }
   }
 }
