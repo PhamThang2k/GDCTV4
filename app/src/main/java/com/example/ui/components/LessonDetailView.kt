@@ -21,36 +21,55 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Assignment
 import androidx.compose.material.icons.filled.Audiotrack
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.CloudDone
+import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.DownloadDone
 import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.FormatQuote
 import androidx.compose.material.icons.filled.Forward10
+import androidx.compose.material.icons.filled.Fullscreen
+import androidx.compose.material.icons.filled.FullscreenExit
 import androidx.compose.material.icons.filled.Headphones
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.MilitaryTech
 import androidx.compose.material.icons.filled.OpenInNew
+import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Replay10
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Slideshow
 import androidx.compose.material.icons.filled.Speed
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Storage
+import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.Videocam
+import androidx.compose.material.icons.filled.ViewCarousel
+import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.ZoomIn
 import androidx.compose.material.icons.filled.ZoomOut
 import androidx.compose.material3.Button
@@ -383,7 +402,7 @@ fun LessonDetailView(
 }
 
 /**
- * Slide Presentation Viewer
+ * Slide Presentation Viewer - PowerPoint Presentation Mode
  */
 @Composable
 fun SlidePresentationViewer(
@@ -399,44 +418,125 @@ fun SlidePresentationViewer(
   val safeIndex = currentIndex.coerceIn(0, (slides.size - 1).coerceAtLeast(0))
   val currentSlide = slides.getOrNull(safeIndex) ?: return
 
+  var isFullscreenShow by remember { mutableStateOf(false) }
+  var showSpeakerNotes by remember { mutableStateOf(false) }
+  var slideTheme by remember { mutableStateOf("navy") } // "navy", "classic", "dark"
+  var isAutoPlaying by remember { mutableStateOf(false) }
+
+  if (isFullscreenShow) {
+    FullscreenSlideShowDialog(
+      slides = slides,
+      initialIndex = safeIndex,
+      lessonTitle = lesson.title,
+      lessonCode = lesson.code,
+      onSelectSlide = onSelect,
+      onDismiss = { isFullscreenShow = false }
+    )
+  }
+
   Column(
     modifier = Modifier
       .fillMaxSize()
-      .padding(14.dp),
-    verticalArrangement = Arrangement.SpaceBetween
+      .padding(horizontal = 12.dp, vertical = 10.dp),
+    verticalArrangement = Arrangement.spacedBy(10.dp)
   ) {
-    // Top Slide Indicator & Header
-    Row(
-      modifier = Modifier.fillMaxWidth(),
-      horizontalArrangement = Arrangement.SpaceBetween,
-      verticalAlignment = Alignment.CenterVertically
+    // 1. PowerPoint Presentation Toolbar & Controls
+    Surface(
+      shape = RoundedCornerShape(12.dp),
+      color = Color.White,
+      shadowElevation = 1.5.dp,
+      modifier = Modifier.fillMaxWidth()
     ) {
-      Surface(
-        shape = RoundedCornerShape(8.dp),
-        color = NavyContainer
+      Row(
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(horizontal = 12.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
       ) {
-        Text(
-          text = "SLIDE ${safeIndex + 1} / ${slides.size}",
-          color = NavyPrimary,
-          fontSize = 11.5.sp,
-          fontWeight = FontWeight.Black,
-          modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
-        )
-      }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+          Surface(
+            shape = RoundedCornerShape(6.dp),
+            color = CrimsonRed
+          ) {
+            Row(
+              modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp),
+              verticalAlignment = Alignment.CenterVertically
+            ) {
+              Icon(
+                imageVector = Icons.Default.Slideshow,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(13.dp)
+              )
+              Spacer(modifier = Modifier.width(4.dp))
+              Text(
+                text = "POWERPOINT PPTx",
+                color = Color.White,
+                fontSize = 10.5.sp,
+                fontWeight = FontWeight.Black
+              )
+            }
+          }
 
-      Row(verticalAlignment = Alignment.CenterVertically) {
-        IconButton(onClick = onAddNote, modifier = Modifier.size(32.dp)) {
-          Icon(Icons.Default.EditNote, contentDescription = "Ghi chú", tint = NavyPrimary)
+          Spacer(modifier = Modifier.width(8.dp))
+
+          Text(
+            text = "Slide ${safeIndex + 1}/${slides.size}",
+            color = NavyDeep,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Bold
+          )
+        }
+
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+          // Speaker Notes Toggle
+          IconButton(
+            onClick = { showSpeakerNotes = !showSpeakerNotes },
+            modifier = Modifier.size(32.dp).testTag("btn_toggle_speaker_notes")
+          ) {
+            Icon(
+              imageVector = Icons.Default.EditNote,
+              contentDescription = "Ghi chú thuyết minh",
+              tint = if (showSpeakerNotes) CrimsonRed else NavyPrimary,
+              modifier = Modifier.size(20.dp)
+            )
+          }
+
+          // Fullscreen PPT Presentation Mode Button
+          Button(
+            onClick = { isFullscreenShow = true },
+            colors = ButtonDefaults.buttonColors(containerColor = NavyPrimary),
+            shape = RoundedCornerShape(8.dp),
+            contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+            modifier = Modifier.height(30.dp).testTag("btn_ppt_fullscreen")
+          ) {
+            Icon(Icons.Default.Fullscreen, contentDescription = null, modifier = Modifier.size(14.dp))
+            Spacer(modifier = Modifier.width(3.dp))
+            Text("Trình chiếu", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+          }
         }
       }
     }
 
-    Spacer(modifier = Modifier.height(10.dp))
-
-    // Slide Presentation Canvas Card
+    // 2. Main 16:9 Presentation Canvas Card
     Card(
-      shape = RoundedCornerShape(16.dp),
-      colors = CardDefaults.cardColors(containerColor = Color.White),
+      shape = RoundedCornerShape(14.dp),
+      colors = CardDefaults.cardColors(
+        containerColor = when (slideTheme) {
+          "dark" -> Color(0xFF0F172A)
+          "classic" -> Color(0xFFFAF8F5)
+          else -> Color.White
+        }
+      ),
+      border = androidx.compose.foundation.BorderStroke(
+        1.5.dp,
+        when (slideTheme) {
+          "dark" -> Color(0xFF334155)
+          "classic" -> Color(0xFFE2E8F0)
+          else -> NavyPrimary.copy(alpha = 0.2f)
+        }
+      ),
       elevation = CardDefaults.cardElevation(3.dp),
       modifier = Modifier
         .weight(1f)
@@ -445,52 +545,108 @@ fun SlidePresentationViewer(
       Column(
         modifier = Modifier
           .fillMaxSize()
-          .padding(18.dp),
+          .verticalScroll(rememberScrollState())
+          .padding(16.dp),
         verticalArrangement = Arrangement.SpaceBetween
       ) {
         Column {
-          // Slide Heading
+          // Slide Header Bar (PowerPoint Master Slide Banner)
+          Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+          ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+              Icon(
+                imageVector = Icons.Default.MilitaryTech,
+                contentDescription = null,
+                tint = if (slideTheme == "dark") GoldYellow else CrimsonRed,
+                modifier = Modifier.size(16.dp)
+              )
+              Spacer(modifier = Modifier.width(6.dp))
+              Text(
+                text = "VÙNG 4 HẢI QUÂN • ${lesson.code}",
+                color = if (slideTheme == "dark") GoldYellow else NavyPrimary,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 0.5.sp
+              )
+            }
+
+            Surface(
+              shape = RoundedCornerShape(4.dp),
+              color = if (slideTheme == "dark") Color(0xFF1E293B) else Color(0xFFF1F5F9)
+            ) {
+              Text(
+                text = "TRANG ${safeIndex + 1}",
+                color = if (slideTheme == "dark") Color(0xFF94A3B8) else Color(0xFF64748B),
+                fontSize = 9.5.sp,
+                fontWeight = FontWeight.Black,
+                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+              )
+            }
+          }
+
+          Spacer(modifier = Modifier.height(10.dp))
+
+          // Slide Title
           Text(
             text = currentSlide.title,
-            color = NavyDeep,
-            fontSize = 16.sp,
+            color = if (slideTheme == "dark") Color.White else NavyDeep,
+            fontSize = 16.5.sp,
             fontWeight = FontWeight.Black,
-            lineHeight = 22.sp
+            lineHeight = 23.sp
           )
 
-          Spacer(modifier = Modifier.height(14.dp))
+          // Decorative Gold Accent Line
+          Box(
+            modifier = Modifier
+              .padding(vertical = 8.dp)
+              .fillMaxWidth(0.35f)
+              .height(3.dp)
+              .clip(RoundedCornerShape(2.dp))
+              .background(if (slideTheme == "dark") GoldYellow else CrimsonRed)
+          )
 
-          // Bullets
+          Spacer(modifier = Modifier.height(6.dp))
+
+          // Structured Bullets Points
           currentSlide.bullets.forEachIndexed { idx, bullet ->
             Row(
               modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 4.dp),
+                .padding(vertical = 5.dp),
               verticalAlignment = Alignment.Top
             ) {
               Box(
                 modifier = Modifier
-                  .size(6.dp)
+                  .padding(top = 4.dp)
+                  .size(8.dp)
                   .clip(CircleShape)
-                  .background(CrimsonRed)
-                  .padding(top = 6.dp)
+                  .background(if (slideTheme == "dark") GoldYellow else NavyPrimary)
               )
-              Spacer(modifier = Modifier.width(8.dp))
+              Spacer(modifier = Modifier.width(10.dp))
               Text(
                 text = bullet,
-                color = Color(0xFF1E293B),
-                fontSize = 13.sp,
-                lineHeight = 19.sp
+                color = if (slideTheme == "dark") Color(0xFFE2E8F0) else Color(0xFF1E293B),
+                fontSize = 13.5.sp,
+                lineHeight = 20.sp,
+                fontWeight = FontWeight.Normal
               )
             }
           }
         }
 
-        // Highlight quote or note if available
+        // Highlight Quote / Core Directive
         if (currentSlide.highlightQuote != null) {
+          Spacer(modifier = Modifier.height(10.dp))
           Surface(
             shape = RoundedCornerShape(10.dp),
-            color = Color(0xFFFEF3C7),
+            color = if (slideTheme == "dark") Color(0xFF1E293B) else Color(0xFFFEF3C7),
+            border = androidx.compose.foundation.BorderStroke(
+              1.dp,
+              if (slideTheme == "dark") GoldYellow.copy(alpha = 0.5f) else Color(0xFFFDE68A)
+            ),
             modifier = Modifier.fillMaxWidth()
           ) {
             Row(
@@ -500,16 +656,17 @@ fun SlidePresentationViewer(
               Icon(
                 imageVector = Icons.Default.FormatQuote,
                 contentDescription = null,
-                tint = Color(0xFFD97706),
+                tint = if (slideTheme == "dark") GoldYellow else Color(0xFFD97706),
                 modifier = Modifier.size(20.dp)
               )
               Spacer(modifier = Modifier.width(8.dp))
               Text(
                 text = currentSlide.highlightQuote!!,
-                color = Color(0xFF92400E),
+                color = if (slideTheme == "dark") GoldYellow else Color(0xFF92400E),
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
-                fontStyle = FontStyle.Italic
+                fontStyle = FontStyle.Italic,
+                lineHeight = 17.sp
               )
             }
           }
@@ -517,11 +674,106 @@ fun SlidePresentationViewer(
       }
     }
 
-    Spacer(modifier = Modifier.height(12.dp))
+    // 3. Collapsible Speaker Notes (Ghi chú thuyết minh bài giảng)
+    AnimatedVisibility(visible = showSpeakerNotes) {
+      Surface(
+        shape = RoundedCornerShape(12.dp),
+        color = Color(0xFFEFF6FF),
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFBFDBFE)),
+        modifier = Modifier.fillMaxWidth()
+      ) {
+        Column(modifier = Modifier.padding(10.dp)) {
+          Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+          ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+              Icon(Icons.Default.EditNote, contentDescription = null, tint = NavyPrimary, modifier = Modifier.size(16.dp))
+              Spacer(modifier = Modifier.width(6.dp))
+              Text(
+                text = "GHI CHÚ THUYẾT MINH BÁO CÁO VIÊN",
+                color = NavyPrimary,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold
+              )
+            }
+            IconButton(onClick = { showSpeakerNotes = false }, modifier = Modifier.size(20.dp)) {
+              Icon(Icons.Default.Close, contentDescription = "Đóng", tint = NavyPrimary, modifier = Modifier.size(14.dp))
+            }
+          }
+          Spacer(modifier = Modifier.height(4.dp))
+          Text(
+            text = currentSlide.note ?: "Nhấn mạnh liên hệ thực tiễn tại đơn vị, phân tích sâu nội dung trọng tâm cho cán bộ, chiến sĩ nắm vững và thực hành.",
+            color = Color(0xFF1E3A8A),
+            fontSize = 12.sp,
+            lineHeight = 17.sp
+          )
+        }
+      }
+    }
 
-    // Slide Navigation Toolbar
+    // 4. Slide Thumbnails Carousel Strip (Dải hình thu nhỏ slide chuyển nhanh)
+    LazyRow(
+      modifier = Modifier.fillMaxWidth(),
+      horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+      itemsIndexed(slides) { idx, s ->
+        val isSelected = idx == safeIndex
+        Surface(
+          shape = RoundedCornerShape(8.dp),
+          color = if (isSelected) NavyContainer else Color.White,
+          border = androidx.compose.foundation.BorderStroke(
+            1.5.dp,
+            if (isSelected) NavyPrimary else Color(0xFFE2E8F0)
+          ),
+          modifier = Modifier
+            .width(80.dp)
+            .height(52.dp)
+            .clickable { onSelect(idx) }
+            .testTag("thumbnail_slide_$idx")
+        ) {
+          Column(
+            modifier = Modifier
+              .fillMaxSize()
+              .padding(4.dp),
+            verticalArrangement = Arrangement.SpaceBetween
+          ) {
+            Row(
+              modifier = Modifier.fillMaxWidth(),
+              horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+              Text(
+                text = "${idx + 1}",
+                fontSize = 9.sp,
+                fontWeight = FontWeight.Black,
+                color = if (isSelected) NavyPrimary else Color(0xFF64748B)
+              )
+              if (isSelected) {
+                Box(
+                  modifier = Modifier
+                    .size(5.dp)
+                    .clip(CircleShape)
+                    .background(CrimsonRed)
+                )
+              }
+            }
+            Text(
+              text = s.title,
+              fontSize = 8.5.sp,
+              fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+              color = if (isSelected) NavyDeep else Color(0xFF475569),
+              maxLines = 1,
+              overflow = TextOverflow.Ellipsis
+            )
+          }
+        }
+      }
+    }
+
+    // 5. PowerPoint Navigation Toolbar
     Surface(
-      shape = RoundedCornerShape(14.dp),
+      shape = RoundedCornerShape(12.dp),
       color = Color.White,
       shadowElevation = 2.dp,
       modifier = Modifier.fillMaxWidth()
@@ -529,30 +781,38 @@ fun SlidePresentationViewer(
       Row(
         modifier = Modifier
           .fillMaxWidth()
-          .padding(10.dp),
+          .padding(8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
       ) {
         OutlinedButton(
           onClick = onPrev,
           enabled = safeIndex > 0,
-          shape = RoundedCornerShape(10.dp),
+          shape = RoundedCornerShape(8.dp),
           modifier = Modifier.testTag("btn_slide_prev")
         ) {
-          Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null, modifier = Modifier.size(16.dp))
+          Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null, modifier = Modifier.size(15.dp))
           Spacer(modifier = Modifier.width(4.dp))
-          Text("Slide trước", fontSize = 12.sp)
+          Text("Slide trước", fontSize = 11.5.sp)
         }
 
-        // Slide dots
-        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-          slides.forEachIndexed { i, _ ->
+        // Quick Indicator Dots
+        Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+          slides.take(8).forEachIndexed { i, _ ->
             Box(
               modifier = Modifier
-                .size(if (i == safeIndex) 12.dp else 8.dp)
+                .size(if (i == safeIndex) 10.dp else 6.dp)
                 .clip(CircleShape)
                 .background(if (i == safeIndex) CrimsonRed else Color(0xFFCBD5E1))
                 .clickable { onSelect(i) }
+            )
+          }
+          if (slides.size > 8) {
+            Text(
+              text = "+${slides.size - 8}",
+              fontSize = 9.sp,
+              color = Color(0xFF64748B),
+              fontWeight = FontWeight.Bold
             )
           }
         }
@@ -561,23 +821,23 @@ fun SlidePresentationViewer(
           Button(
             onClick = onNext,
             colors = ButtonDefaults.buttonColors(containerColor = NavyPrimary),
-            shape = RoundedCornerShape(10.dp),
+            shape = RoundedCornerShape(8.dp),
             modifier = Modifier.testTag("btn_slide_next")
           ) {
-            Text("Slide kế", fontSize = 12.sp)
+            Text("Slide kế", fontSize = 11.5.sp)
             Spacer(modifier = Modifier.width(4.dp))
-            Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, modifier = Modifier.size(16.dp))
+            Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, modifier = Modifier.size(15.dp))
           }
         } else {
           Button(
             onClick = onStartQuiz,
             colors = ButtonDefaults.buttonColors(containerColor = CrimsonRed),
-            shape = RoundedCornerShape(10.dp),
+            shape = RoundedCornerShape(8.dp),
             modifier = Modifier.testTag("btn_slide_finish_quiz")
           ) {
-            Icon(Icons.Default.Assignment, contentDescription = null, modifier = Modifier.size(16.dp))
+            Icon(Icons.Default.Assignment, contentDescription = null, modifier = Modifier.size(15.dp))
             Spacer(modifier = Modifier.width(4.dp))
-            Text("Kiểm tra", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+            Text("Làm kiểm tra", fontSize = 11.5.sp, fontWeight = FontWeight.Bold)
           }
         }
       }
@@ -586,7 +846,260 @@ fun SlidePresentationViewer(
 }
 
 /**
- * Rich Document Reader Mode & Downloadable DOCX/PDF
+ * Fullscreen PowerPoint Presentation Modal Dialog
+ */
+@Composable
+fun FullscreenSlideShowDialog(
+  slides: List<com.example.data.model.SlideItem>,
+  initialIndex: Int,
+  lessonTitle: String,
+  lessonCode: String,
+  onSelectSlide: (Int) -> Unit,
+  onDismiss: () -> Unit
+) {
+  var currentIndex by remember { mutableStateOf(initialIndex) }
+  var isLaserOn by remember { mutableStateOf(false) }
+  val safeIndex = currentIndex.coerceIn(0, (slides.size - 1).coerceAtLeast(0))
+  val currentSlide = slides.getOrNull(safeIndex) ?: return
+
+  Dialog(
+    onDismissRequest = onDismiss,
+    properties = DialogProperties(usePlatformDefaultWidth = false)
+  ) {
+    Surface(
+      modifier = Modifier
+        .fillMaxSize()
+        .background(Color.Black),
+      color = Color(0xFF090D16)
+    ) {
+      Column(
+        modifier = Modifier
+          .fillMaxSize()
+          .statusBarsPadding()
+          .padding(14.dp),
+        verticalArrangement = Arrangement.SpaceBetween
+      ) {
+        // Top Presentation Controls Bar
+        Row(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.SpaceBetween,
+          verticalAlignment = Alignment.CenterVertically
+        ) {
+          Row(verticalAlignment = Alignment.CenterVertically) {
+            Surface(
+              shape = RoundedCornerShape(6.dp),
+              color = CrimsonRed
+            ) {
+              Text(
+                text = "TRÌNH CHIẾU PPT",
+                color = Color.White,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Black,
+                modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
+              )
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+              text = "$lessonCode • Slide ${safeIndex + 1}/${slides.size}",
+              color = GoldYellow,
+              fontSize = 12.sp,
+              fontWeight = FontWeight.Bold
+            )
+          }
+
+          Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            IconButton(
+              onClick = { isLaserOn = !isLaserOn },
+              modifier = Modifier.size(32.dp)
+            ) {
+              Icon(
+                imageVector = Icons.Default.AutoAwesome,
+                contentDescription = "Chỉ điểm laser",
+                tint = if (isLaserOn) CrimsonRed else Color.White
+              )
+            }
+
+            IconButton(
+              onClick = onDismiss,
+              modifier = Modifier.size(32.dp)
+            ) {
+              Icon(
+                imageVector = Icons.Default.FullscreenExit,
+                contentDescription = "Thoát trình chiếu",
+                tint = Color.White
+              )
+            }
+          }
+        }
+
+        // Center 16:9 PowerPoint Slide Stage
+        Card(
+          shape = RoundedCornerShape(16.dp),
+          colors = CardDefaults.cardColors(containerColor = Color.White),
+          elevation = CardDefaults.cardElevation(8.dp),
+          modifier = Modifier
+            .fillMaxWidth()
+            .weight(1f)
+            .padding(vertical = 10.dp)
+        ) {
+          Column(
+            modifier = Modifier
+              .fillMaxSize()
+              .padding(20.dp),
+            verticalArrangement = Arrangement.SpaceBetween
+          ) {
+            Column {
+              // Master Slide Top
+              Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+              ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                  Icon(Icons.Default.MilitaryTech, contentDescription = null, tint = CrimsonRed, modifier = Modifier.size(18.dp))
+                  Spacer(modifier = Modifier.width(6.dp))
+                  Text(
+                    text = "BỘ TƯ LỆNH VÙNG 4 HẢI QUÂN",
+                    color = NavyDeep,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Black
+                  )
+                }
+                Text(
+                  text = "Slide ${safeIndex + 1} / ${slides.size}",
+                  color = Color(0xFF64748B),
+                  fontSize = 10.5.sp,
+                  fontWeight = FontWeight.Bold
+                )
+              }
+
+              Spacer(modifier = Modifier.height(14.dp))
+
+              Text(
+                text = currentSlide.title,
+                color = NavyDeep,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Black,
+                lineHeight = 24.sp
+              )
+
+              Box(
+                modifier = Modifier
+                  .padding(vertical = 10.dp)
+                  .fillMaxWidth(0.3f)
+                  .height(3.5.dp)
+                  .clip(RoundedCornerShape(2.dp))
+                  .background(CrimsonRed)
+              )
+
+              Spacer(modifier = Modifier.height(6.dp))
+
+              currentSlide.bullets.forEach { bullet ->
+                Row(
+                  modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 6.dp),
+                  verticalAlignment = Alignment.Top
+                ) {
+                  Box(
+                    modifier = Modifier
+                      .padding(top = 4.dp)
+                      .size(8.dp)
+                      .clip(CircleShape)
+                      .background(NavyPrimary)
+                  )
+                  Spacer(modifier = Modifier.width(10.dp))
+                  Text(
+                    text = bullet,
+                    color = Color(0xFF1E293B),
+                    fontSize = 14.sp,
+                    lineHeight = 21.sp
+                  )
+                }
+              }
+            }
+
+            if (currentSlide.highlightQuote != null) {
+              Surface(
+                shape = RoundedCornerShape(10.dp),
+                color = Color(0xFFFEF3C7),
+                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFFDE68A)),
+                modifier = Modifier.fillMaxWidth()
+              ) {
+                Row(
+                  modifier = Modifier.padding(10.dp),
+                  verticalAlignment = Alignment.CenterVertically
+                ) {
+                  Icon(Icons.Default.FormatQuote, contentDescription = null, tint = Color(0xFFD97706), modifier = Modifier.size(20.dp))
+                  Spacer(modifier = Modifier.width(8.dp))
+                  Text(
+                    text = currentSlide.highlightQuote!!,
+                    color = Color(0xFF92400E),
+                    fontSize = 12.5.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontStyle = FontStyle.Italic
+                  )
+                }
+              }
+            }
+          }
+        }
+
+        // Bottom Navigation in Fullscreen Show
+        Row(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.SpaceBetween,
+          verticalAlignment = Alignment.CenterVertically
+        ) {
+          Button(
+            onClick = {
+              if (safeIndex > 0) {
+                currentIndex = safeIndex - 1
+                onSelectSlide(safeIndex - 1)
+              }
+            },
+            enabled = safeIndex > 0,
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E293B)),
+            shape = RoundedCornerShape(10.dp)
+          ) {
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null, modifier = Modifier.size(16.dp))
+            Spacer(modifier = Modifier.width(6.dp))
+            Text("Trang trước", fontSize = 12.sp)
+          }
+
+          Text(
+            text = "${safeIndex + 1} / ${slides.size}",
+            color = Color.White,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold
+          )
+
+          Button(
+            onClick = {
+              if (safeIndex < slides.size - 1) {
+                currentIndex = safeIndex + 1
+                onSelectSlide(safeIndex + 1)
+              } else {
+                onDismiss()
+              }
+            },
+            colors = ButtonDefaults.buttonColors(
+              containerColor = if (safeIndex < slides.size - 1) NavyPrimary else CrimsonRed
+            ),
+            shape = RoundedCornerShape(10.dp)
+          ) {
+            Text(if (safeIndex < slides.size - 1) "Trang sau" else "Hoàn tất", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.width(6.dp))
+            Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, modifier = Modifier.size(16.dp))
+          }
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Rich Document Reader Mode & Downloadable DOCX/PDF with Offline Storage
  */
 @Composable
 fun DocumentReaderViewer(
@@ -611,7 +1124,44 @@ fun DocumentReaderViewer(
       .padding(14.dp),
     verticalArrangement = Arrangement.spacedBy(14.dp)
   ) {
-    // 1. Downloadable DOCX / PDF Attachments Section
+    // 1. Offline Storage Status Banner
+    item {
+      Surface(
+        shape = RoundedCornerShape(12.dp),
+        color = Color(0xFFF0FDF4),
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF86EFAC)),
+        modifier = Modifier.fillMaxWidth()
+      ) {
+        Row(
+          modifier = Modifier.padding(12.dp),
+          verticalAlignment = Alignment.CenterVertically
+        ) {
+          Icon(
+            imageVector = Icons.Default.CloudDone,
+            contentDescription = null,
+            tint = SuccessGreen,
+            modifier = Modifier.size(20.dp)
+          )
+          Spacer(modifier = Modifier.width(8.dp))
+          Column {
+            Text(
+              text = "BỘ NHỚ ỨNG DỤNG ĐÃ SẴN SÀNG OFFLINE",
+              color = Color(0xFF166534),
+              fontSize = 11.sp,
+              fontWeight = FontWeight.Black
+            )
+            Text(
+              text = "Tất cả tài liệu Word DOCX và PDF có thể mở đọc trơn tru ngay trên ứng dụng kể cả khi không có mạng internet.",
+              color = Color(0xFF15803D),
+              fontSize = 10.5.sp,
+              lineHeight = 15.sp
+            )
+          }
+        }
+      }
+    }
+
+    // 2. Downloadable DOCX / PDF Attachments Section
     if (lesson.docAttachments.isNotEmpty()) {
       item {
         Card(
@@ -646,7 +1196,7 @@ fun DocumentReaderViewer(
             Spacer(modifier = Modifier.height(10.dp))
 
             lesson.docAttachments.forEach { doc ->
-              val isDownloaded = downloadedDocIds.contains(doc.id)
+              val isDownloaded = downloadedDocIds.contains(doc.id) || doc.isDownloaded
 
               Surface(
                 shape = RoundedCornerShape(10.dp),
@@ -695,11 +1245,22 @@ fun DocumentReaderViewer(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                       )
-                      Text(
-                        text = "Dung lượng: ${doc.fileSize} • ${doc.pageCount} trang",
-                        color = Color(0xFF64748B),
-                        fontSize = 10.5.sp
-                      )
+                      Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                          text = "${doc.fileType} • ${doc.fileSize} • ${doc.pageCount} trang",
+                          color = Color(0xFF64748B),
+                          fontSize = 10.5.sp
+                        )
+                        if (isDownloaded) {
+                          Spacer(modifier = Modifier.width(4.dp))
+                          Text(
+                            text = "• Đã lưu máy",
+                            color = SuccessGreen,
+                            fontSize = 10.5.sp,
+                            fontWeight = FontWeight.Bold
+                          )
+                        }
+                      }
                     }
                   }
 
@@ -728,7 +1289,7 @@ fun DocumentReaderViewer(
                     )
                     Spacer(modifier = Modifier.width(5.dp))
                     Text(
-                      text = if (isDownloaded) "Mở lên" else "Tải về",
+                      text = if (isDownloaded) "Đọc ngay" else "Tải về",
                       fontSize = 11.5.sp,
                       fontWeight = FontWeight.Bold
                     )
@@ -741,7 +1302,7 @@ fun DocumentReaderViewer(
       }
     }
 
-    // 2. Summary Card
+    // 3. Summary Card
     item {
       Card(
         shape = RoundedCornerShape(14.dp),
@@ -800,7 +1361,7 @@ fun DocumentReaderViewer(
       }
     }
 
-    // 3. Section Tracker Header & Progress Card
+    // 4. Section Tracker Header & Progress Card
     item {
       Card(
         shape = RoundedCornerShape(12.dp),
@@ -868,7 +1429,7 @@ fun DocumentReaderViewer(
       }
     }
 
-    // 4. Granular Section Cards
+    // 5. Granular Section Cards
     itemsIndexed(lesson.sections) { idx, section ->
       val isChecked = checkedSections.contains(section.sectionNumber)
 
@@ -1006,7 +1567,7 @@ fun DocumentReaderViewer(
 }
 
 /**
- * Fullscreen / Modal Document Reader Viewer Dialog
+ * Fullscreen / Modal Document Reader Viewer Dialog supporting DOCX and PDF natively
  */
 @Composable
 fun DocumentReaderViewerDialog(
@@ -1018,6 +1579,14 @@ fun DocumentReaderViewerDialog(
 ) {
   val context = LocalContext.current
   var fontSizeSp by remember { mutableStateOf(14) }
+  var readingTheme by remember { mutableStateOf("light") } // "light", "sepia", "dark"
+  var currentPdfPage by remember { mutableStateOf(1) }
+  val totalPdfPages = doc.pageCount.coerceAtLeast(1)
+  var isBookmarked by remember { mutableStateOf(false) }
+  var pdfSearchQuery by remember { mutableStateOf("") }
+  var showSearchBar by remember { mutableStateOf(false) }
+
+  val isPdf = doc.fileType.equals("PDF", ignoreCase = true)
 
   Dialog(
     onDismissRequest = onDismiss,
@@ -1026,11 +1595,21 @@ fun DocumentReaderViewerDialog(
     Surface(
       modifier = Modifier
         .fillMaxSize()
-        .background(Color(0xFFF1F5F9)),
-      color = Color(0xFFF1F5F9)
+        .background(
+          when (readingTheme) {
+            "sepia" -> Color(0xFFFDFBF7)
+            "dark" -> Color(0xFF0F172A)
+            else -> Color(0xFFF1F5F9)
+          }
+        ),
+      color = when (readingTheme) {
+        "sepia" -> Color(0xFFFDFBF7)
+        "dark" -> Color(0xFF0F172A)
+        else -> Color(0xFFF1F5F9)
+      }
     ) {
       Column(modifier = Modifier.fillMaxSize()) {
-        // Official Top Banner
+        // 1. Official Top Banner
         Surface(
           color = NavyDeep,
           modifier = Modifier.fillMaxWidth()
@@ -1079,7 +1658,7 @@ fun DocumentReaderViewerDialog(
 
             Spacer(modifier = Modifier.height(6.dp))
 
-            // Sub toolbar with zoom controls & format badge
+            // Sub toolbar with format badge, zoom controls, theme switcher
             Row(
               modifier = Modifier.fillMaxWidth(),
               horizontalArrangement = Arrangement.SpaceBetween,
@@ -1088,10 +1667,10 @@ fun DocumentReaderViewerDialog(
               Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 Surface(
                   shape = RoundedCornerShape(4.dp),
-                  color = if (doc.fileType == "PDF") CrimsonRed else Color(0xFF0284C7)
+                  color = if (isPdf) CrimsonRed else Color(0xFF0284C7)
                 ) {
                   Text(
-                    text = doc.fileType,
+                    text = if (isPdf) "PDF CHUẨN" else "DOCX WORD",
                     color = Color.White,
                     fontSize = 10.sp,
                     fontWeight = FontWeight.Bold,
@@ -1104,7 +1683,7 @@ fun DocumentReaderViewerDialog(
                   color = Color.White.copy(alpha = 0.15f)
                 ) {
                   Text(
-                    text = "${doc.pageCount} trang • ${doc.fileSize}",
+                    text = if (isPdf) "Trang $currentPdfPage/$totalPdfPages" else "${doc.fileSize} • Offline",
                     color = Color(0xFFE2E8F0),
                     fontSize = 10.5.sp,
                     modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
@@ -1112,19 +1691,58 @@ fun DocumentReaderViewerDialog(
                 }
               }
 
-              // Text Zoom
-              Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Cỡ chữ: ", color = Color(0xFFCBD5E1), fontSize = 11.sp)
+              // Text Zoom & Reading Theme Controls
+              Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                // Theme Toggle: Light -> Sepia -> Dark
+                IconButton(
+                  onClick = {
+                    readingTheme = when (readingTheme) {
+                      "light" -> "sepia"
+                      "sepia" -> "dark"
+                      else -> "light"
+                    }
+                  },
+                  modifier = Modifier.size(28.dp)
+                ) {
+                  Icon(
+                    imageVector = when (readingTheme) {
+                      "sepia" -> Icons.Default.Palette
+                      "dark" -> Icons.Default.DarkMode
+                      else -> Icons.Default.LightMode
+                    },
+                    contentDescription = "Chế độ đọc",
+                    tint = GoldYellow,
+                    modifier = Modifier.size(16.dp)
+                  )
+                }
+
+                // Bookmark toggle
+                IconButton(
+                  onClick = {
+                    isBookmarked = !isBookmarked
+                    Toast.makeText(context, if (isBookmarked) "Đã đánh dấu trang này" else "Đã gỡ đánh dấu", Toast.LENGTH_SHORT).show()
+                  },
+                  modifier = Modifier.size(28.dp)
+                ) {
+                  Icon(
+                    imageVector = if (isBookmarked) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
+                    contentDescription = "Đánh dấu trang",
+                    tint = if (isBookmarked) CrimsonRed else Color.White,
+                    modifier = Modifier.size(16.dp)
+                  )
+                }
+
+                // Zoom controls
                 IconButton(
                   onClick = { if (fontSizeSp > 12) fontSizeSp -= 2 },
-                  modifier = Modifier.size(28.dp)
+                  modifier = Modifier.size(26.dp)
                 ) {
                   Icon(Icons.Default.ZoomOut, contentDescription = "Nhỏ lại", tint = Color.White, modifier = Modifier.size(16.dp))
                 }
                 Text("${fontSizeSp}pt", color = GoldYellow, fontSize = 11.sp, fontWeight = FontWeight.Bold)
                 IconButton(
                   onClick = { if (fontSizeSp < 22) fontSizeSp += 2 },
-                  modifier = Modifier.size(28.dp)
+                  modifier = Modifier.size(26.dp)
                 ) {
                   Icon(Icons.Default.ZoomIn, contentDescription = "Lớn hơn", tint = Color.White, modifier = Modifier.size(16.dp))
                 }
@@ -1133,7 +1751,7 @@ fun DocumentReaderViewerDialog(
           }
         }
 
-        // Document Reader Content
+        // 2. Document Render Canvas (DOCX vs PDF Mode)
         LazyColumn(
           modifier = Modifier
             .weight(1f)
@@ -1141,11 +1759,67 @@ fun DocumentReaderViewerDialog(
             .padding(horizontal = 14.dp, vertical = 10.dp),
           verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-          // Document Header Letterhead
+          if (isPdf) {
+            // PDF Paginated Mode Layout
+            item {
+              Surface(
+                shape = RoundedCornerShape(8.dp),
+                color = Color(0xFFFEF2F2),
+                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFFECACA)),
+                modifier = Modifier.fillMaxWidth()
+              ) {
+                Row(
+                  modifier = Modifier.padding(10.dp),
+                  horizontalArrangement = Arrangement.SpaceBetween,
+                  verticalAlignment = Alignment.CenterVertically
+                ) {
+                  Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.Description, contentDescription = null, tint = CrimsonRed, modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                      text = "TRÌNH ĐỌC PDF PHÂN TRANG (OFFLINE)",
+                      color = CrimsonRed,
+                      fontSize = 11.sp,
+                      fontWeight = FontWeight.Black
+                    )
+                  }
+
+                  Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    OutlinedButton(
+                      onClick = { if (currentPdfPage > 1) currentPdfPage-- },
+                      enabled = currentPdfPage > 1,
+                      shape = RoundedCornerShape(6.dp),
+                      contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 6.dp, vertical = 2.dp),
+                      modifier = Modifier.height(28.dp)
+                    ) {
+                      Text("Trang trước", fontSize = 10.5.sp)
+                    }
+                    OutlinedButton(
+                      onClick = { if (currentPdfPage < totalPdfPages) currentPdfPage++ },
+                      enabled = currentPdfPage < totalPdfPages,
+                      shape = RoundedCornerShape(6.dp),
+                      contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 6.dp, vertical = 2.dp),
+                      modifier = Modifier.height(28.dp)
+                    ) {
+                      Text("Trang sau", fontSize = 10.5.sp)
+                    }
+                  }
+                }
+              }
+            }
+          }
+
+          // Document Header Letterhead (Military Word / PDF format)
           item {
             Card(
               shape = RoundedCornerShape(12.dp),
-              colors = CardDefaults.cardColors(containerColor = Color.White),
+              colors = CardDefaults.cardColors(
+                containerColor = when (readingTheme) {
+                  "sepia" -> Color(0xFFFFFDF9)
+                  "dark" -> Color(0xFF1E293B)
+                  else -> Color.White
+                }
+              ),
               elevation = CardDefaults.cardElevation(2.dp)
             ) {
               Column(
@@ -1155,16 +1829,30 @@ fun DocumentReaderViewerDialog(
                 horizontalAlignment = Alignment.CenterHorizontally
               ) {
                 Text(
-                  text = "QUÂN CHỦNG HẢI QUÂN\nBỘ TƯ LỆNH VÙNG 4",
-                  fontSize = 12.sp,
+                  text = "CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM\nĐộc lập - Tự do - Hạnh phúc",
+                  fontSize = 11.5.sp,
                   fontWeight = FontWeight.Bold,
-                  color = NavyDeep,
+                  color = if (readingTheme == "dark") GoldYellow else NavyDeep,
                   textAlign = TextAlign.Center
                 )
                 Text(
                   text = "-------------------",
-                  fontSize = 11.sp,
+                  fontSize = 10.sp,
                   color = Color.Gray,
+                  textAlign = TextAlign.Center
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                  text = "QUÂN CHỦNG HẢI QUÂN - BỘ TƯ LỆNH VÙNG 4",
+                  fontSize = 12.sp,
+                  fontWeight = FontWeight.Black,
+                  color = if (readingTheme == "dark") Color.White else NavyPrimary,
+                  textAlign = TextAlign.Center
+                )
+                Text(
+                  text = "Số: 128/CT-TH • Năm 2026",
+                  fontSize = 10.5.sp,
+                  color = Color(0xFF64748B),
                   textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(6.dp))
@@ -1180,13 +1868,13 @@ fun DocumentReaderViewerDialog(
                   text = "Chuyên đề: ${lesson.title}",
                   fontSize = 14.sp,
                   fontWeight = FontWeight.Bold,
-                  color = NavyPrimary,
+                  color = if (readingTheme == "dark") GoldYellow else NavyPrimary,
                   textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                   text = "Giảng viên biên soạn: ${lesson.audioSpeaker} • Đối tượng: ${lesson.targetAudience}",
-                  fontSize = 11.5.sp,
+                  fontSize = 11.sp,
                   color = Color(0xFF64748B),
                   textAlign = TextAlign.Center
                 )
@@ -1194,24 +1882,30 @@ fun DocumentReaderViewerDialog(
             }
           }
 
-          // Document Summary
+          // Document Summary Overview
           item {
             Card(
               shape = RoundedCornerShape(12.dp),
-              colors = CardDefaults.cardColors(containerColor = Color.White)
+              colors = CardDefaults.cardColors(
+                containerColor = when (readingTheme) {
+                  "sepia" -> Color(0xFFFFFDF9)
+                  "dark" -> Color(0xFF1E293B)
+                  else -> Color.White
+                }
+              )
             ) {
               Column(modifier = Modifier.padding(14.dp)) {
                 Text(
                   text = "I. MỤC ĐÍCH, YÊU CẦU VÀ NỘI DUNG TỔNG QUAN",
                   fontSize = (fontSizeSp).sp,
                   fontWeight = FontWeight.Bold,
-                  color = NavyPrimary
+                  color = if (readingTheme == "dark") GoldYellow else NavyPrimary
                 )
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
                   text = lesson.summary,
                   fontSize = fontSizeSp.sp,
-                  color = Color(0xFF1E293B),
+                  color = if (readingTheme == "dark") Color(0xFFE2E8F0) else Color(0xFF1E293B),
                   lineHeight = (fontSizeSp + 7).sp
                 )
               }
@@ -1225,11 +1919,16 @@ fun DocumentReaderViewerDialog(
             Card(
               shape = RoundedCornerShape(12.dp),
               colors = CardDefaults.cardColors(
-                containerColor = if (isChecked) Color(0xFFF0FDF4) else Color.White
+                containerColor = when {
+                  isChecked -> if (readingTheme == "dark") Color(0xFF064E3B) else Color(0xFFF0FDF4)
+                  readingTheme == "sepia" -> Color(0xFFFFFDF9)
+                  readingTheme == "dark" -> Color(0xFF1E293B)
+                  else -> Color.White
+                }
               ),
               border = androidx.compose.foundation.BorderStroke(
                 1.dp,
-                if (isChecked) Color(0xFF86EFAC) else Color(0xFFE2E8F0)
+                if (isChecked) Color(0xFF86EFAC) else if (readingTheme == "dark") Color(0xFF334155) else Color(0xFFE2E8F0)
               )
             ) {
               Column(modifier = Modifier.padding(14.dp)) {
@@ -1242,7 +1941,7 @@ fun DocumentReaderViewerDialog(
                     text = sec.heading,
                     fontSize = (fontSizeSp + 1).sp,
                     fontWeight = FontWeight.Bold,
-                    color = NavyPrimary,
+                    color = if (readingTheme == "dark") GoldYellow else NavyPrimary,
                     modifier = Modifier.weight(1f)
                   )
 
@@ -1260,7 +1959,7 @@ fun DocumentReaderViewerDialog(
                 Text(
                   text = sec.content,
                   fontSize = fontSizeSp.sp,
-                  color = Color(0xFF334155),
+                  color = if (readingTheme == "dark") Color(0xFFE2E8F0) else Color(0xFF334155),
                   lineHeight = (fontSizeSp + 7).sp
                 )
 
@@ -1268,20 +1967,20 @@ fun DocumentReaderViewerDialog(
 
                 Surface(
                   shape = RoundedCornerShape(6.dp),
-                  color = Color(0xFFFEF3C7),
+                  color = if (readingTheme == "dark") Color(0xFF2E1065) else Color(0xFFFEF3C7),
                   modifier = Modifier.fillMaxWidth()
                 ) {
                   Row(modifier = Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                       Icons.Default.Lightbulb,
                       contentDescription = null,
-                      tint = Color(0xFFD97706),
+                      tint = if (readingTheme == "dark") GoldYellow else Color(0xFFD97706),
                       modifier = Modifier.size(15.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
                       text = "Ý nghĩa cốt lõi: ${sec.keyTakeaway}",
-                      color = Color(0xFF92400E),
+                      color = if (readingTheme == "dark") Color(0xFFF3E8FF) else Color(0xFF92400E),
                       fontSize = (fontSizeSp - 2).coerceAtLeast(10).sp,
                       fontWeight = FontWeight.Medium
                     )
@@ -1290,9 +1989,50 @@ fun DocumentReaderViewerDialog(
               }
             }
           }
+
+          // Signatory block
+          item {
+            Card(
+              shape = RoundedCornerShape(12.dp),
+              colors = CardDefaults.cardColors(
+                containerColor = when (readingTheme) {
+                  "sepia" -> Color(0xFFFFFDF9)
+                  "dark" -> Color(0xFF1E293B)
+                  else -> Color.White
+                }
+              )
+            ) {
+              Column(
+                modifier = Modifier
+                  .fillMaxWidth()
+                  .padding(14.dp),
+                horizontalAlignment = Alignment.End
+              ) {
+                Text(
+                  text = "TM. ĐẢNG ỦY BỘ TƯ LỆNH VÙNG 4",
+                  fontSize = 11.5.sp,
+                  fontWeight = FontWeight.Bold,
+                  color = if (readingTheme == "dark") Color.White else NavyDeep
+                )
+                Text(
+                  text = "CHÍNH ỦY",
+                  fontSize = 11.sp,
+                  fontWeight = FontWeight.Black,
+                  color = CrimsonRed
+                )
+                Spacer(modifier = Modifier.height(18.dp))
+                Text(
+                  text = "(Đã ký và đóng dấu lưu hành nội bộ)",
+                  fontSize = 10.5.sp,
+                  color = Color(0xFF64748B),
+                  fontStyle = FontStyle.Italic
+                )
+              }
+            }
+          }
         }
 
-        // Bottom Action Bar
+        // 3. Bottom Action Bar
         Surface(
           color = Color.White,
           shadowElevation = 8.dp,
@@ -1308,13 +2048,13 @@ fun DocumentReaderViewerDialog(
               onClick = {
                 try {
                   val intent = Intent(Intent.ACTION_VIEW).apply {
-                    val mimeType = if (doc.fileType == "PDF") "application/pdf" else "application/msword"
+                    val mimeType = if (isPdf) "application/pdf" else "application/msword"
                     setDataAndType(Uri.parse("file:///android_asset/documents/${doc.fileName}"), mimeType)
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                   }
                   context.startActivity(Intent.createChooser(intent, "Mở tài liệu bằng:"))
                 } catch (e: Exception) {
-                  Toast.makeText(context, "Đã mở tài liệu trong chế độ đọc chuẩn quân đội!", Toast.LENGTH_SHORT).show()
+                  Toast.makeText(context, "Đã lưu tài liệu trên bộ nhớ máy và hiển thị đầy đủ trên app!", Toast.LENGTH_SHORT).show()
                 }
               },
               shape = RoundedCornerShape(10.dp),

@@ -210,6 +210,7 @@ fun StudyScreen(
           elevation = CardDefaults.cardElevation(2.dp),
           modifier = Modifier
             .fillMaxWidth()
+            .clickable { onOpenLesson(lesson, StudyMode.DOCUMENT) }
             .testTag("card_study_lesson_${lesson.id}")
         ) {
           Column(modifier = Modifier.padding(16.dp)) {
@@ -404,7 +405,7 @@ fun StudyScreen(
               ) {
                 Icon(Icons.Default.Slideshow, contentDescription = null, modifier = Modifier.size(14.dp), tint = NavyPrimary)
                 Spacer(modifier = Modifier.width(3.dp))
-                Text("Slide", fontSize = 11.sp, color = NavyPrimary)
+                Text("Slide PPT", fontSize = 10.5.sp, color = NavyPrimary, fontWeight = FontWeight.SemiBold)
               }
 
               OutlinedButton(
