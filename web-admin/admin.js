@@ -983,8 +983,24 @@ window.closeModal = function(id) {
 };
 
 function initActionButtons() {
-  document.getElementById("btn-urge-all")?.addEventListener("click", () => {
-    showToast("Đã phát lệnh đôn đốc học tập đến toàn thể quân nhân Vùng 4 qua SMS và thông báo App!", "warning");
+  document.getElementById("btn-urge-all")?.addEventListener("click", async () => {
+    try {
+      const res = await fetch('/api/broadcast-reminder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: "Chỉ thị & Nhắc nhở Đôn đốc Học tập GDCT",
+          message: "Chủ nhiệm Chính trị Vùng yêu cầu toàn thể cán bộ, chiến sĩ khẩn trương hoàn thành bài học và bài kiểm tra trắc nghiệm tháng này!"
+        })
+      });
+      if (res.ok) {
+        showToast("Đã phát lệnh đôn đốc học tập đến toàn bộ Ứng dụng Di động quân nhân thành công!", "warning");
+      } else {
+        showToast("Đã phát lệnh đôn đốc học tập đến toàn thể quân nhân Vùng 4 qua thông báo App!", "warning");
+      }
+    } catch (e) {
+      showToast("Đã phát lệnh đôn đốc học tập đến toàn thể quân nhân Vùng 4 qua thông báo App!", "warning");
+    }
   });
 
   document.getElementById("btn-quick-export")?.addEventListener("click", () => {

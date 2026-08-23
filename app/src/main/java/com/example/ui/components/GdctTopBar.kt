@@ -53,6 +53,8 @@ import com.example.ui.theme.NavyDeep
 @Composable
 fun GdctTopBar(
   userProfile: UserProfile,
+  unreadNotificationCount: Int = 0,
+  onOpenNotifications: () -> Unit = {},
   onOpenQuoteDialog: () -> Unit,
   onOpenCommanderReport: () -> Unit,
   onOpenLoginDialog: () -> Unit,
@@ -177,29 +179,42 @@ fun GdctTopBar(
               }
             }
 
-            // Commander / Notification Badge
+            // Real-time Notification Badge from Web Admin
             Surface(
               shape = CircleShape,
               color = Color.White.copy(alpha = 0.2f),
               modifier = Modifier
                 .size(38.dp)
-                .clickable { onOpenCommanderReport() }
-                .testTag("btn_top_report")
+                .clickable { onOpenNotifications() }
+                .testTag("btn_top_notifications")
             ) {
               Box(contentAlignment = Alignment.Center) {
-                BadgedBox(
-                  badge = {
-                    Badge(
-                      containerColor = GoldYellow,
-                      contentColor = NavyDeep
-                    ) {
-                      Text("1", fontSize = 9.sp, fontWeight = FontWeight.Black)
+                if (unreadNotificationCount > 0) {
+                  BadgedBox(
+                    badge = {
+                      Badge(
+                        containerColor = GoldYellow,
+                        contentColor = NavyDeep
+                      ) {
+                        Text(
+                          text = if (unreadNotificationCount > 99) "99+" else "$unreadNotificationCount",
+                          fontSize = 9.sp,
+                          fontWeight = FontWeight.Black
+                        )
+                      }
                     }
+                  ) {
+                    Icon(
+                      imageVector = Icons.Default.Notifications,
+                      contentDescription = "Thông báo",
+                      tint = Color.White,
+                      modifier = Modifier.size(20.dp)
+                    )
                   }
-                ) {
+                } else {
                   Icon(
                     imageVector = Icons.Default.Notifications,
-                    contentDescription = "Báo cáo Chỉ huy",
+                    contentDescription = "Thông báo",
                     tint = Color.White,
                     modifier = Modifier.size(20.dp)
                   )

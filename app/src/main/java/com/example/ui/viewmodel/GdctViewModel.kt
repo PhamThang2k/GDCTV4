@@ -7,6 +7,7 @@ import com.example.data.local.AppDatabase
 import com.example.data.local.PersonalNoteEntity
 import com.example.data.local.QuizSubmissionEntity
 import com.example.data.local.StudyProgressEntity
+import com.example.data.model.AppNotification
 import com.example.data.model.DocAttachment
 import com.example.data.model.LawDoc
 import com.example.data.model.Lesson
@@ -83,8 +84,15 @@ data class GdctUiState(
   val adminActiveSubTab: Int = 0, // 0: Nội dung GDCT, 1: Quản lý tài khoản, 2: Thống kê báo cáo
   val toastMessage: String? = null,
   val customServerUrl: String = "",
-  val serverConnectionStatus: String = "Đã kết nối Máy chủ Giáo dục Chính trị Vùng 4"
-)
+  val serverConnectionStatus: String = "Đã kết nối Máy chủ Giáo dục Chính trị Vùng 4",
+  val notifications: List<AppNotification> = emptyList(),
+  val showNotificationsDialog: Boolean = false,
+  val isDownloadingDoc: Boolean = false,
+  val downloadingDocFileName: String? = null,
+  val downloadProgress: Float = 0f
+) {
+  val unreadNotificationsCount: Int get() = notifications.count { !it.isRead }
+}
 
 class GdctViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -111,11 +119,36 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
 
     val initialAccounts = repository.getUserAccounts()
     val initialProfile = repository.getUserProfile()
+    val initialNotifications = listOf(
+      AppNotification(
+        id = "notif_01",
+        title = "Chuyên đề GDCT trọng tâm năm 2026",
+        message = "Bộ Tư lệnh Vùng 4 vừa ban hành bài giảng: Nâng cao bản lĩnh chính trị, ý chí quyết chiến quyết thắng của cán bộ, chiến sĩ Vùng 4 Hải quân",
+        lessonId = "bai_1",
+        lessonCode = "CĐ-01/2026",
+        timestamp = System.currentTimeMillis() - 3600000 * 5,
+        timeFormatted = "Hôm nay, 08:30",
+        isRead = false,
+        type = "NEW_LESSON"
+      ),
+      AppNotification(
+        id = "notif_02",
+        title = "Chỉ thị & Nhắc nhở từ Phòng Chính trị",
+        message = "Đề nghị toàn thể cán bộ, chiến sĩ khẩn trương hoàn thành nội dung học tập và bài thi trắc nghiệm các chuyên đề quý 1/2026.",
+        lessonId = "bai_1",
+        lessonCode = "CĐ-01/2026",
+        timestamp = System.currentTimeMillis() - 3600000 * 2,
+        timeFormatted = "Hôm nay, 10:15",
+        isRead = false,
+        type = "COMMANDER_DIRECTIVE"
+      )
+    )
     _uiState.value = _uiState.value.copy(
       userProfile = initialProfile,
       adminLessons = allLessons,
       adminUserAccounts = initialAccounts,
-      adminLaws = allLaws
+      adminLaws = allLaws,
+      notifications = initialNotifications
     )
 
     // Check and restore persistent saved user session
@@ -701,6 +734,31 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
           repository.insertOrUpdateQuizSubmission(entity)
         }
       }
+
+      // 5. Sync Notifications & Directives from Web Admin
+      val notifsArray = rootJson.optJSONArray("notifications")
+      if (notifsArray != null && notifsArray.length() > 0) {
+        val parsedNotifs = mutableListOf<AppNotification>()
+        for (i in 0 until notifsArray.length()) {
+          val nObj = notifsArray.getJSONObject(i)
+          parsedNotifs.add(
+            AppNotification(
+              id = nObj.optString("id", "notif_$i"),
+              title = nObj.optString("title", "Thông báo Giáo dục Chính trị"),
+              message = nObj.optString("message", "Nội dung cập nhật mới từ Phòng Chính trị"),
+              lessonId = if (nObj.has("lessonId") && !nObj.isNull("lessonId") && nObj.optString("lessonId").isNotBlank()) nObj.optString("lessonId") else null,
+              lessonCode = if (nObj.has("lessonCode") && !nObj.isNull("lessonCode") && nObj.optString("lessonCode").isNotBlank()) nObj.optString("lessonCode") else null,
+              timestamp = nObj.optLong("timestamp", System.currentTimeMillis()),
+              timeFormatted = nObj.optString("timeFormatted", "Vừa xong"),
+              isRead = nObj.optBoolean("isRead", false),
+              type = nObj.optString("type", "NEW_LESSON")
+            )
+          )
+        }
+        withContext(Dispatchers.Main) {
+          _uiState.value = _uiState.value.copy(notifications = parsedNotifs)
+        }
+      }
     } catch (e: Exception) {
       e.printStackTrace()
     }
@@ -931,12 +989,76 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
 
   // Document downloads
   fun downloadDoc(doc: DocAttachment) {
-    val currentDownloaded = _uiState.value.downloadedDocIds.toMutableSet()
-    currentDownloaded.add(doc.id)
+    viewModelScope.launch {
+      val currentDownloaded = _uiState.value.downloadedDocIds.toMutableSet()
+      currentDownloaded.add(doc.id)
+      _uiState.value = _uiState.value.copy(
+        downloadedDocIds = currentDownloaded,
+        toastMessage = "Đã lưu trữ ngoại tuyến tiêu chuẩn tệp ${doc.fileType}: ${doc.fileName} (${doc.fileSize})"
+      )
+    }
+  }
+
+  // Notifications Management
+  fun setShowNotificationsDialog(show: Boolean) {
+    _uiState.value = _uiState.value.copy(showNotificationsDialog = show)
+  }
+
+  fun markNotificationAsRead(id: String) {
+    val current = _uiState.value.notifications.map {
+      if (it.id == id) it.copy(isRead = true) else it
+    }
+    _uiState.value = _uiState.value.copy(notifications = current)
+    viewModelScope.launch(Dispatchers.IO) {
+      try {
+        val payload = JSONObject().apply { put("id", id) }
+        sendJsonPost("/api/notifications/mark-read", payload)
+      } catch (e: Exception) {}
+    }
+  }
+
+  fun markAllNotificationsAsRead() {
+    val current = _uiState.value.notifications.map { it.copy(isRead = true) }
     _uiState.value = _uiState.value.copy(
-      downloadedDocIds = currentDownloaded,
-      toastMessage = "Đã tải xuống thành công tài liệu: ${doc.fileName} (${doc.fileSize})"
+      notifications = current,
+      toastMessage = "Đã đánh dấu tất cả thông báo đã đọc"
     )
+    viewModelScope.launch(Dispatchers.IO) {
+      try {
+        val payload = JSONObject().apply { put("all", true) }
+        sendJsonPost("/api/notifications/mark-read", payload)
+      } catch (e: Exception) {}
+    }
+  }
+
+  fun deleteNotification(id: String) {
+    val current = _uiState.value.notifications.filterNot { it.id == id }
+    _uiState.value = _uiState.value.copy(notifications = current)
+  }
+
+  fun clearAllNotifications() {
+    _uiState.value = _uiState.value.copy(
+      notifications = emptyList(),
+      toastMessage = "Đã xóa toàn bộ thông báo"
+    )
+    viewModelScope.launch(Dispatchers.IO) {
+      try {
+        sendJsonPost("/api/notifications/clear", JSONObject())
+      } catch (e: Exception) {}
+    }
+  }
+
+  fun openLessonById(lessonId: String) {
+    val target = _uiState.value.adminLessons.find { it.id == lessonId }
+      ?: allLessons.find { it.id == lessonId }
+    if (target != null) {
+      openLesson(target)
+    } else {
+      _uiState.value = _uiState.value.copy(
+        currentTab = AppTab.STUDY,
+        toastMessage = "Đã chuyển đến danh mục Chuyên đề GDCT"
+      )
+    }
   }
 
   private fun updateStudyProgress(lesson: Lesson) {

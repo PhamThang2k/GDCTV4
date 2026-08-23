@@ -106,6 +106,18 @@ data class UserProfile(
   val phone: String = ""
 )
 
+data class AppNotification(
+  val id: String,
+  val title: String,
+  val message: String,
+  val lessonId: String? = null,
+  val lessonCode: String? = null,
+  val timestamp: Long = System.currentTimeMillis(),
+  val timeFormatted: String = "Vừa xong",
+  val isRead: Boolean = false,
+  val type: String = "NEW_LESSON" // "NEW_LESSON", "COMMANDER_DIRECTIVE", "SYSTEM"
+)
+
 enum class StudyMode {
   SLIDE,
   DOCUMENT,

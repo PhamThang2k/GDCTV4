@@ -24,6 +24,7 @@ import com.example.ui.components.InternalRestrictedDialog
 import com.example.ui.components.LawDetailDialog
 import com.example.ui.components.LessonDetailView
 import com.example.ui.components.LoginDialog
+import com.example.ui.components.NotificationDialog
 import com.example.ui.components.QuizEngineDialog
 import com.example.ui.screens.HomeScreen
 import com.example.ui.screens.ProfileAdminScreen
@@ -102,6 +103,8 @@ fun GdctApp(viewModel: GdctViewModel = viewModel()) {
       topBar = {
         GdctTopBar(
           userProfile = uiState.userProfile,
+          unreadNotificationCount = uiState.unreadNotificationsCount,
+          onOpenNotifications = { viewModel.setShowNotificationsDialog(true) },
           onOpenQuoteDialog = { viewModel.setDailyQuoteDialog(true) },
           onOpenCommanderReport = { viewModel.setTab(AppTab.PROFILE) },
           onOpenLoginDialog = { viewModel.setShowLoginDialog(true) }
@@ -236,6 +239,21 @@ fun GdctApp(viewModel: GdctViewModel = viewModel()) {
         viewModel.savePersonalNote(lessonId, title, content, category)
       },
       onDismiss = { viewModel.setAddNoteDialog(false) }
+    )
+  }
+
+  if (uiState.showNotificationsDialog) {
+    NotificationDialog(
+      notifications = uiState.notifications,
+      onMarkAllAsRead = { viewModel.markAllNotificationsAsRead() },
+      onMarkAsRead = { viewModel.markNotificationAsRead(it) },
+      onDeleteNotification = { viewModel.deleteNotification(it) },
+      onClearAll = { viewModel.clearAllNotifications() },
+      onOpenLesson = { lessonId ->
+        viewModel.setShowNotificationsDialog(false)
+        viewModel.openLessonById(lessonId)
+      },
+      onDismiss = { viewModel.setShowNotificationsDialog(false) }
     )
   }
 }

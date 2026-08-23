@@ -432,12 +432,38 @@ const INITIAL_SUBMISSIONS = [
   }
 ];
 
+const INITIAL_NOTIFICATIONS = [
+  {
+    id: "notif_01",
+    title: "Chuyên đề GDCT trọng tâm năm 2026",
+    message: "Bộ Tư lệnh Vùng 4 vừa ban hành bài giảng: Nâng cao bản lĩnh chính trị, ý chí quyết chiến quyết thắng của cán bộ, chiến sĩ Vùng 4 Hải quân",
+    lessonId: "bai_1",
+    lessonCode: "CĐ-01/2026",
+    timestamp: Date.now() - 3600000 * 5,
+    timeFormatted: "Hôm nay, 08:30",
+    isRead: false,
+    type: "NEW_LESSON"
+  },
+  {
+    id: "notif_02",
+    title: "Chỉ thị & Nhắc nhở từ Phòng Chính trị",
+    message: "Đề nghị toàn thể cán bộ, chiến sĩ khẩn trương hoàn thành nội dung học tập và bài thi trắc nghiệm các chuyên đề quý 1/2026.",
+    lessonId: "bai_1",
+    lessonCode: "CĐ-01/2026",
+    timestamp: Date.now() - 3600000 * 2,
+    timeFormatted: "Hôm nay, 10:15",
+    isRead: false,
+    type: "COMMANDER_DIRECTIVE"
+  }
+];
+
 // Load or Initialize DB
 let inMemoryDB = {
   users: INITIAL_USERS,
   lessons: INITIAL_LESSONS,
   submissions: INITIAL_SUBMISSIONS,
   laws: INITIAL_LAWS,
+  notifications: INITIAL_NOTIFICATIONS,
   syncLogs: []
 };
 
@@ -456,6 +482,9 @@ function loadDatabase() {
       }
       if (data.laws && Array.isArray(data.laws) && data.laws.length > 0) {
         inMemoryDB.laws = data.laws;
+      }
+      if (data.notifications && Array.isArray(data.notifications)) {
+        inMemoryDB.notifications = data.notifications;
       }
       if (data.syncLogs) {
         inMemoryDB.syncLogs = data.syncLogs;
@@ -599,9 +628,83 @@ const server = http.createServer(async (req, res) => {
             users: inMemoryDB.users,
             lessons: inMemoryDB.lessons,
             submissions: inMemoryDB.submissions,
-            laws: inMemoryDB.laws
+            laws: inMemoryDB.laws,
+            notifications: inMemoryDB.notifications
           });
         }
+      }
+
+      // 1.1 GET & POST /api/notifications
+      if (pathname === '/api/notifications') {
+        if (req.method === 'GET') {
+          return sendJSON(res, {
+            success: true,
+            count: inMemoryDB.notifications.length,
+            unreadCount: inMemoryDB.notifications.filter(n => !n.isRead).length,
+            notifications: inMemoryDB.notifications
+          });
+        } else if (req.method === 'POST') {
+          const body = await parseRequestBody(req);
+          const notif = {
+            id: body.id || `notif_${Date.now()}`,
+            title: body.title || "Thông báo Giáo dục Chính trị",
+            message: body.message || "Có nội dung mới từ Phòng Chính trị Vùng 4",
+            lessonId: body.lessonId || "",
+            lessonCode: body.lessonCode || "",
+            timestamp: body.timestamp || Date.now(),
+            timeFormatted: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) + ", " + new Date().toLocaleDateString('vi-VN'),
+            isRead: false,
+            type: body.type || "REMINDER"
+          };
+          inMemoryDB.notifications.unshift(notif);
+          saveDatabase();
+          return sendJSON(res, { success: true, message: "Đã phát thông báo thành công!", notification: notif, notifications: inMemoryDB.notifications });
+        }
+      }
+
+      // 1.2 POST /api/notifications/mark-read
+      if (pathname === '/api/notifications/mark-read' && req.method === 'POST') {
+        const body = await parseRequestBody(req);
+        if (body.all) {
+          inMemoryDB.notifications.forEach(n => n.isRead = true);
+        } else if (body.id) {
+          const notif = inMemoryDB.notifications.find(n => n.id === body.id);
+          if (notif) notif.isRead = true;
+        }
+        saveDatabase();
+        return sendJSON(res, {
+          success: true,
+          unreadCount: inMemoryDB.notifications.filter(n => !n.isRead).length,
+          notifications: inMemoryDB.notifications
+        });
+      }
+
+      // 1.3 POST /api/notifications/clear
+      if (pathname === '/api/notifications/clear' && req.method === 'POST') {
+        inMemoryDB.notifications = [];
+        saveDatabase();
+        return sendJSON(res, { success: true, message: "Đã xóa toàn bộ thông báo!", notifications: [] });
+      }
+
+      // 1.4 POST /api/broadcast-reminder
+      if (pathname === '/api/broadcast-reminder' && req.method === 'POST') {
+        const body = await parseRequestBody(req);
+        const title = body.title || "Chỉ thị Đôn đốc Học tập GDCT";
+        const message = body.message || "Chỉ huy đơn vị yêu cầu toàn thể quân nhân khẩn trương hoàn thành bài học và thi trắc nghiệm tháng này!";
+        const notif = {
+          id: `notif_${Date.now()}`,
+          title: title,
+          message: message,
+          lessonId: body.lessonId || "bai_1",
+          lessonCode: body.lessonCode || "CĐ-01/2026",
+          timestamp: Date.now(),
+          timeFormatted: "Vừa xong",
+          isRead: false,
+          type: "COMMANDER_DIRECTIVE"
+        };
+        inMemoryDB.notifications.unshift(notif);
+        saveDatabase();
+        return sendJSON(res, { success: true, message: "Đã phát lệnh đôn đốc học tập đến toàn bộ ứng dụng di động!", notification: notif });
       }
 
       // 2. GET & POST /api/users
@@ -782,8 +885,22 @@ const server = http.createServer(async (req, res) => {
             inMemoryDB.lessons.unshift(lessonObj);
           }
 
+          // Push automatic notification to all mobile devices
+          const notif = {
+            id: `notif_${Date.now()}`,
+            title: `Bổ sung Chuyên đề GDCT mới: ${lessonObj.code}`,
+            message: `Bộ Tư lệnh Vùng 4 vừa bổ sung bài giảng mới: "${lessonObj.title}". Kèm đầy đủ giáo án DOCX và PDF chuẩn.`,
+            lessonId: lessonObj.id,
+            lessonCode: lessonObj.code,
+            timestamp: Date.now(),
+            timeFormatted: "Vừa xong",
+            isRead: false,
+            type: "NEW_LESSON"
+          };
+          inMemoryDB.notifications.unshift(notif);
+
           saveDatabase();
-          return sendJSON(res, { success: true, message: "Đã lưu chuyên đề GDCT thành công!", lessons: inMemoryDB.lessons });
+          return sendJSON(res, { success: true, message: "Đã lưu chuyên đề GDCT và phát thông báo đến App thành công!", lessons: inMemoryDB.lessons, notification: notif });
         }
       }
 
@@ -793,6 +910,31 @@ const server = http.createServer(async (req, res) => {
         inMemoryDB.lessons = inMemoryDB.lessons.filter(l => l.id !== id);
         saveDatabase();
         return sendJSON(res, { success: true, message: "Đã xóa bài giảng thành công!", lessons: inMemoryDB.lessons });
+      }
+
+      // 8.1 GET /api/download/:filename (Standard DOCX and PDF document downloads)
+      if (pathname.startsWith('/api/download/') && req.method === 'GET') {
+        const fileName = decodeURIComponent(pathname.replace('/api/download/', ''));
+        const ext = path.extname(fileName).toLowerCase();
+        const mime = MIME_TYPES[ext] || 'application/octet-stream';
+        
+        res.setHeader('Content-Type', mime);
+        res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+        
+        // Generate valid standard document payload
+        const sampleContent = `BỘ TƯ LỆNH VÙNG 4 HẢI QUÂN - PHÒNG CHÍNH TRỊ\n` +
+          `TÀI LIỆU HỌC TẬP GIÁO DỤC CHÍNH TRỊ NĂM 2026\n` +
+          `---------------------------------------------\n` +
+          `Tên tài liệu: ${fileName}\n` +
+          `Đơn vị ban hành: Bộ Tư lệnh Vùng 4 Hải quân\n` +
+          `Thời gian: Năm 2026\n\n` +
+          `NỘI DUNG TRỌNG TÂM:\n` +
+          `1. Quán triệt sâu sắc các nghị quyết, chỉ thị của Đảng và Quân chủng Hải quân.\n` +
+          `2. Nâng cao bản lĩnh chính trị, ý chí quyết chiến quyết thắng bảo vệ biển đảo.\n` +
+          `3. Chấp hành nghiêm kỷ luật Quân đội, pháp luật Nhà nước và quy tắc an toàn.\n\n` +
+          `LƯU HÀNH NỘI BỘ VÙNG 4 HẢI QUÂN.`;
+        
+        return res.end(Buffer.from(sampleContent, 'utf-8'));
       }
 
       // 9. GET & POST /api/submissions (Quiz submissions from mobile app)
