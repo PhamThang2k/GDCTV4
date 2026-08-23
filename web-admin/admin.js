@@ -1128,6 +1128,9 @@ function initActionButtons() {
       { sectionNumber: 3, heading: "Phần III: Liên hệ thực tiễn bản thân và phương hướng phấn đấu", content: sec3Content, keyTakeaway: sec3Takeaway }
     ];
 
+    const fullLessonText = document.getElementById("lesson-full-text")?.value.trim() || "";
+    const docFullContent = document.getElementById("lesson-doc-full-content")?.value.trim() || "";
+
     // Collect Slides
     const parseBullets = (val, fallback) => {
       const lines = val.split("\n").map(l => l.trim()).filter(l => l.length > 0);
@@ -1208,8 +1211,8 @@ function initActionButtons() {
     const pdfName = document.getElementById("lesson-pdf-name").value.trim() || `${id}_Tai_Lieu.pdf`;
 
     const docAttachments = [
-      { id: "doc_1", fileName: docxName, fileSize: "1.8 MB", fileType: "WORD", downloadUrl: `https://docs.gdct.vung4.vn/${docxName}` },
-      { id: "doc_2", fileName: pdfName, fileSize: "2.4 MB", fileType: "PDF", downloadUrl: `https://docs.gdct.vung4.vn/${pdfName}` }
+      { id: "doc_1", fileName: docxName, fileSize: "1.8 MB", fileType: "WORD", downloadUrl: `https://docs.gdct.vung4.vn/${docxName}`, fullContent: docFullContent || fullLessonText },
+      { id: "doc_2", fileName: pdfName, fileSize: "2.4 MB", fileType: "PDF", downloadUrl: `https://docs.gdct.vung4.vn/${pdfName}`, fullContent: docFullContent || fullLessonText }
     ];
 
     const newLesson = {
@@ -1221,6 +1224,8 @@ function initActionButtons() {
       durationMinutes: duration,
       estimatedMinutes: duration,
       summary: summary,
+      fullText: fullLessonText,
+      docFullContent: docFullContent,
       lecturer: lecturer,
       unit: "Bộ Tư lệnh Vùng 4 Hải quân",
       slidesCount: slides.length,
@@ -1585,6 +1590,8 @@ window.editLesson = function(id) {
   document.getElementById("lesson-audience").value = lesson.targetAudience;
   document.getElementById("lesson-duration").value = lesson.estimatedMinutes || lesson.durationMinutes || 45;
   document.getElementById("lesson-summary").value = lesson.summary;
+  document.getElementById("lesson-full-text").value = lesson.fullText || "";
+  document.getElementById("lesson-doc-full-content").value = lesson.docFullContent || (lesson.docAttachments && lesson.docAttachments[0]?.fullContent) || "";
   document.getElementById("lesson-is-internal").checked = !!lesson.isInternal;
   document.getElementById("lesson-docx-name").value = lesson.docxAttachment || "";
   document.getElementById("lesson-pdf-name").value = lesson.pdfAttachment || "";
@@ -1654,13 +1661,19 @@ window.editLesson = function(id) {
   openModal("modal-lesson");
 };
 
-window.deleteLesson = function(id) {
+window.deleteLesson = async function(id) {
   if (confirm("Đồng chí có chắc chắn muốn xóa bài giảng này khỏi hệ thống?")) {
-    store.lessons = store.lessons.filter(l => l.id !== id);
-    store.saveAll();
+    store.lessons = store.lessons.filter(l => l.id !== id && l.code !== id);
+    try {
+      await fetch(`/api/lessons/${encodeURIComponent(id)}`, { method: 'DELETE' });
+    } catch (e) {
+      console.warn("DELETE /api/lessons:", e);
+    }
+    await store.saveAll();
     renderLessonsTable();
     renderOverview();
-    showToast("Đã xóa bài giảng thành công.");
+    renderQuizBank();
+    showToast("Đã xóa bài giảng và đồng bộ danh sách đến App!");
   }
 };
 

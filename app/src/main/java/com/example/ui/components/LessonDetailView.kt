@@ -1912,6 +1912,80 @@ fun DocumentReaderViewerDialog(
             }
           }
 
+          // Full Document Content (DOCX / PDF rich text from Web Admin)
+          val docText = doc.fullContent.ifBlank { lesson.docFullContent.ifBlank { lesson.fullText } }
+          if (docText.isNotBlank()) {
+            item {
+              Card(
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(
+                  containerColor = when (readingTheme) {
+                    "sepia" -> Color(0xFFFFFDF9)
+                    "dark" -> Color(0xFF1E293B)
+                    else -> Color.White
+                  }
+                ),
+                border = androidx.compose.foundation.BorderStroke(
+                  1.dp,
+                  if (readingTheme == "dark") GoldYellow.copy(alpha = 0.4f) else NavyPrimary.copy(alpha = 0.2f)
+                )
+              ) {
+                Column(modifier = Modifier.padding(14.dp)) {
+                  Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                  ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                      Icon(
+                        imageVector = Icons.Default.MenuBook,
+                        contentDescription = null,
+                        tint = if (readingTheme == "dark") GoldYellow else NavyPrimary,
+                        modifier = Modifier.size(18.dp)
+                      )
+                      Spacer(modifier = Modifier.width(6.dp))
+                      Text(
+                        text = "NỘI DUNG VĂN KIỆN TOÀN VĂN (${if (isPdf) "PDF" else "DOCX"})",
+                        fontSize = (fontSizeSp + 0.5f).sp,
+                        fontWeight = FontWeight.Black,
+                        color = if (readingTheme == "dark") GoldYellow else NavyPrimary
+                      )
+                    }
+
+                    Surface(
+                      shape = RoundedCornerShape(4.dp),
+                      color = if (isPdf) CrimsonRed.copy(alpha = 0.15f) else Color(0xFF0284C7).copy(alpha = 0.15f)
+                    ) {
+                      Text(
+                        text = if (isPdf) "Chuẩn PDF" else "Chuẩn DOCX",
+                        color = if (isPdf) CrimsonRed else Color(0xFF0284C7),
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                      )
+                    }
+                  }
+
+                  Spacer(modifier = Modifier.height(10.dp))
+
+                  // Paragraphs rendering
+                  docText.split("\n\n").forEach { paragraph ->
+                    val cleanP = paragraph.trim()
+                    if (cleanP.isNotBlank()) {
+                      Text(
+                        text = cleanP,
+                        fontSize = fontSizeSp.sp,
+                        color = if (readingTheme == "dark") Color(0xFFE2E8F0) else Color(0xFF1E293B),
+                        lineHeight = (fontSizeSp + 7).sp,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                      )
+                    }
+                  }
+                }
+              }
+            }
+          }
+
           // Render Sections in Document Format
           itemsIndexed(lesson.sections) { idx, sec ->
             val isChecked = checkedSections.contains(sec.sectionNumber)

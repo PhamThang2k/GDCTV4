@@ -567,31 +567,12 @@ const server = http.createServer(async (req, res) => {
         } else if (req.method === 'POST') {
           const body = await parseRequestBody(req);
           
-          if (body.users && Array.isArray(body.users) && body.users.length > 0) {
-            // Merge users by id/username
-            body.users.forEach(incomingUser => {
-              const idx = inMemoryDB.users.findIndex(u => 
-                (u.id && u.id === incomingUser.id) ||
-                (u.username && incomingUser.username && u.username.toLowerCase() === incomingUser.username.toLowerCase()) ||
-                (u.militaryCode && incomingUser.militaryCode && u.militaryCode.toLowerCase() === incomingUser.militaryCode.toLowerCase())
-              );
-              if (idx >= 0) {
-                inMemoryDB.users[idx] = { ...inMemoryDB.users[idx], ...incomingUser };
-              } else {
-                inMemoryDB.users.push(incomingUser);
-              }
-            });
+          if (body.users && Array.isArray(body.users)) {
+            inMemoryDB.users = body.users;
           }
 
-          if (body.lessons && Array.isArray(body.lessons) && body.lessons.length > 0) {
-            body.lessons.forEach(incomingLesson => {
-              const idx = inMemoryDB.lessons.findIndex(l => l.id === incomingLesson.id || (l.code && l.code === incomingLesson.code));
-              if (idx >= 0) {
-                inMemoryDB.lessons[idx] = { ...inMemoryDB.lessons[idx], ...incomingLesson };
-              } else {
-                inMemoryDB.lessons.push(incomingLesson);
-              }
-            });
+          if (body.lessons && Array.isArray(body.lessons)) {
+            inMemoryDB.lessons = body.lessons;
           }
 
           if (body.submissions && Array.isArray(body.submissions)) {
@@ -607,11 +588,7 @@ const server = http.createServer(async (req, res) => {
           }
 
           if (body.laws && Array.isArray(body.laws)) {
-            body.laws.forEach(incomingLaw => {
-              const idx = inMemoryDB.laws.findIndex(l => l.id === incomingLaw.id);
-              if (idx >= 0) inMemoryDB.laws[idx] = incomingLaw;
-              else inMemoryDB.laws.push(incomingLaw);
-            });
+            inMemoryDB.laws = body.laws;
           }
 
           inMemoryDB.syncLogs.push({
@@ -910,8 +887,13 @@ const server = http.createServer(async (req, res) => {
 
       // 8. DELETE /api/lessons/:id
       if (pathname.startsWith('/api/lessons/') && req.method === 'DELETE') {
-        const id = pathname.replace('/api/lessons/', '');
-        inMemoryDB.lessons = inMemoryDB.lessons.filter(l => l.id !== id);
+        const id = decodeURIComponent(pathname.replace('/api/lessons/', ''));
+        inMemoryDB.lessons = inMemoryDB.lessons.filter(l => 
+          l.id !== id && 
+          l.code !== id && 
+          (l.id && l.id.toLowerCase() !== id.toLowerCase()) &&
+          (l.code && l.code.toLowerCase() !== id.toLowerCase())
+        );
         saveDatabase();
         return sendJSON(res, { success: true, message: "Đã xóa bài giảng thành công!", lessons: inMemoryDB.lessons });
       }

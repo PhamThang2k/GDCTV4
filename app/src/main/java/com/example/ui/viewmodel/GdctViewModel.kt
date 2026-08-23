@@ -535,6 +535,8 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
           val duration = lJson.optInt("durationMinutes", lJson.optInt("estimatedMinutes", 45))
           val isInternal = lJson.optBoolean("isInternal", false)
           val code = lJson.optString("code", "CĐ-${String.format("%02d", i + 1)}/2026")
+          val fullText = lJson.optString("fullText", "")
+          val docFullContent = lJson.optString("docFullContent", "")
           val videoUrl = lJson.optString("videoUrl", "https://video.gdct.vung4.vn/$lessonId.mp4")
           val videoDuration = lJson.optString("videoDuration", "18:00")
           val audioUrl = lJson.optString("audioUrl", "https://audio.gdct.vung4.vn/$lessonId.mp3")
@@ -707,13 +709,15 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
               val dObj = docArray.getJSONObject(dIdx)
               val dFileName = dObj.optString("fileName", "${lessonId}_Tai_lieu.docx")
               val dType = if (dFileName.lowercase().endsWith(".pdf")) "PDF" else "WORD"
+              val dFullContent = dObj.optString("fullContent", if (docFullContent.isNotBlank()) docFullContent else fullText)
               docAttachments.add(
                 DocAttachment(
                   id = dObj.optString("id", "doc_${dIdx + 1}"),
                   fileName = dFileName,
                   fileSize = dObj.optString("fileSize", "1.8 MB"),
                   fileType = dObj.optString("fileType", dType),
-                  downloadUrl = dObj.optString("downloadUrl", "https://docs.gdct.vung4.vn/$dFileName")
+                  downloadUrl = dObj.optString("downloadUrl", "https://docs.gdct.vung4.vn/$dFileName"),
+                  fullContent = dFullContent
                 )
               )
             }
@@ -721,10 +725,10 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
             val docxName = lJson.optString("docxAttachment", "${lessonId}_Giao_an.docx")
             val pdfName = lJson.optString("pdfAttachment", "${lessonId}_Tai_lieu.pdf")
             docAttachments.add(
-              DocAttachment("doc_1", docxName, "1.8 MB", "WORD", "https://docs.gdct.vung4.vn/$docxName")
+              DocAttachment("doc_1", docxName, "1.8 MB", "WORD", "https://docs.gdct.vung4.vn/$docxName", fullContent = if (docFullContent.isNotBlank()) docFullContent else fullText)
             )
             docAttachments.add(
-              DocAttachment("doc_2", pdfName, "2.4 MB", "PDF", "https://docs.gdct.vung4.vn/$pdfName")
+              DocAttachment("doc_2", pdfName, "2.4 MB", "PDF", "https://docs.gdct.vung4.vn/$pdfName", fullContent = if (docFullContent.isNotBlank()) docFullContent else fullText)
             )
           }
 
@@ -737,6 +741,8 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
               targetAudience = lJson.optString("targetAudience", "Cán bộ, chiến sĩ Vùng 4"),
               durationMinutes = duration,
               summary = summary,
+              fullText = fullText,
+              docFullContent = docFullContent,
               lecturer = lecturer,
               videoUrl = videoUrl,
               videoDuration = videoDuration,

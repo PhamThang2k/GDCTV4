@@ -8,7 +8,8 @@ data class DocAttachment(
   val downloadUrl: String,
   val pageCount: Int = 12,
   val isDownloaded: Boolean = false,
-  val isInternal: Boolean = false
+  val isInternal: Boolean = false,
+  val fullContent: String = ""
 )
 
 data class SlideItem(
@@ -42,6 +43,8 @@ data class Lesson(
   val targetAudience: String,
   val durationMinutes: Int,
   val summary: String,
+  val fullText: String = "",
+  val docFullContent: String = "",
   val lecturer: String = "Ban Tuyên huấn Vùng 4",
   val videoUrl: String,
   val videoDuration: String,
