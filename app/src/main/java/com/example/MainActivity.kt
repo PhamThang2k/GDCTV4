@@ -117,8 +117,8 @@ fun GdctApp(viewModel: GdctViewModel = viewModel()) {
         )
       }
     ) { innerPadding ->
-      val activeLessons = uiState.adminLessons.ifEmpty { viewModel.allLessons }
-      val activeLaws = uiState.adminLaws.ifEmpty { viewModel.allLaws }
+      val activeLessons = if (uiState.hasServerSyncedOnce) uiState.adminLessons else uiState.adminLessons.ifEmpty { viewModel.allLessons }
+      val activeLaws = if (uiState.hasServerSyncedOnce) uiState.adminLaws else uiState.adminLaws.ifEmpty { viewModel.allLaws }
 
       Box(
         modifier = Modifier

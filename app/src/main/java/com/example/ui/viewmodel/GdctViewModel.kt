@@ -87,6 +87,7 @@ data class GdctUiState(
   val serverConnectionStatus: String = "Đã kết nối Máy chủ Giáo dục Chính trị Vùng 4",
   val notifications: List<AppNotification> = emptyList(),
   val showNotificationsDialog: Boolean = false,
+  val hasServerSyncedOnce: Boolean = false,
   val isDownloadingDoc: Boolean = false,
   val downloadingDocFileName: String? = null,
   val downloadProgress: Float = 0f
@@ -216,10 +217,10 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
     viewModelScope.launch(Dispatchers.IO) {
       // First immediate sync
       syncWithServerInternal()
-      
-      // Polling loop every 2.5 seconds for instant real-time sync with Web Admin
+
+      // Polling loop every 1.5 seconds for instant real-time sync with Web Admin
       while (true) {
-        delay(2500)
+        delay(1500)
         try {
           syncWithServerInternal()
         } catch (e: Exception) {
@@ -371,20 +372,22 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
     val cleanEndpoint = if (endpoint.startsWith("/")) endpoint else "/$endpoint"
     val list = mutableListOf<String>()
 
-    val custom = _uiState.value.customServerUrl.trim().trimEnd('/')
-    if (custom.isNotBlank()) {
-      list.add("$custom$cleanEndpoint")
-    }
-
     cachedWorkingHost?.let {
       val base = it.trimEnd('/')
       list.add("$base$cleanEndpoint")
+    }
+
+    val custom = _uiState.value.customServerUrl.trim().trimEnd('/')
+    if (custom.isNotBlank()) {
+      list.add("$custom$cleanEndpoint")
     }
 
     // Direct local / emulator connections first for instant real-time sync
     list.add("http://10.0.2.2:3000$cleanEndpoint")
     list.add("http://127.0.0.1:3000$cleanEndpoint")
     list.add("http://localhost:3000$cleanEndpoint")
+    list.add("http://10.0.2.2:8080$cleanEndpoint")
+    list.add("http://127.0.0.1:8080$cleanEndpoint")
     list.add("https://ais-dev-fg3vokzh3myfkmipyfaqdl-910262898976.asia-southeast1.run.app$cleanEndpoint")
     list.add("https://ais-pre-fg3vokzh3myfkmipyfaqdl-910262898976.asia-southeast1.run.app$cleanEndpoint")
     list.add("https://gdctv4.onrender.com$cleanEndpoint")
@@ -401,8 +404,8 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
         val conn = (url.openConnection() as HttpURLConnection).apply {
           requestMethod = "GET"
           setRequestProperty("Accept", "application/json")
-          connectTimeout = 1500
-          readTimeout = 2000
+          connectTimeout = 800
+          readTimeout = 1200
         }
         if (conn.responseCode in 200..299) {
           val reader = BufferedReader(InputStreamReader(conn.inputStream, Charsets.UTF_8))
@@ -431,8 +434,8 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
           setRequestProperty("Content-Type", "application/json; charset=utf-8")
           setRequestProperty("Accept", "application/json")
           doOutput = true
-          connectTimeout = 1500
-          readTimeout = 2000
+          connectTimeout = 800
+          readTimeout = 1200
         }
         conn.outputStream.use { os ->
           os.write(json.toString().toByteArray(Charsets.UTF_8))
@@ -523,7 +526,7 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
 
       // 2. Sync Lessons
       val lessonsArray = rootJson.optJSONArray("lessons")
-      if (lessonsArray != null && lessonsArray.length() > 0) {
+      if (lessonsArray != null) {
         val parsedLessons = mutableListOf<Lesson>()
         for (i in 0 until lessonsArray.length()) {
           val lJson = lessonsArray.getJSONObject(i)
@@ -766,17 +769,19 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
           val currentQuizLesson = _uiState.value.activeQuizLesson
 
           val updatedSelected = if (currentSelected != null) {
-            parsedLessons.find { it.id == currentSelected.id } ?: currentSelected
+            parsedLessons.find { it.id == currentSelected.id || it.code == currentSelected.code }
           } else null
 
           val updatedQuiz = if (currentQuizLesson != null) {
-            parsedLessons.find { it.id == currentQuizLesson.id } ?: currentQuizLesson
+            parsedLessons.find { it.id == currentQuizLesson.id || it.code == currentQuizLesson.code }
           } else null
 
           _uiState.value = _uiState.value.copy(
             adminLessons = parsedLessons,
             selectedLesson = updatedSelected,
-            activeQuizLesson = updatedQuiz
+            activeQuizLesson = updatedQuiz,
+            hasServerSyncedOnce = true,
+            serverConnectionStatus = "Đã kết nối thời gian thực (${parsedLessons.size} bài giảng)"
           )
         }
       }
