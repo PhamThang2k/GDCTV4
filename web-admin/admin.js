@@ -1025,6 +1025,27 @@ function initActionButtons() {
   document.getElementById("quiz-search")?.addEventListener("input", renderQuizBank);
   document.getElementById("quiz-filter-lesson")?.addEventListener("change", renderQuizBank);
 
+  // Lesson Modal Tabs Switcher
+  document.querySelectorAll(".lesson-tab-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".lesson-tab-btn").forEach(b => {
+        b.classList.remove("active");
+        b.style.borderBottom = "none";
+        b.style.fontWeight = "600";
+        b.style.color = "var(--slate-600)";
+      });
+      btn.classList.add("active");
+      btn.style.borderBottom = "2px solid var(--navy-primary)";
+      btn.style.fontWeight = "700";
+      btn.style.color = "var(--navy-primary)";
+
+      const target = btn.dataset.tab;
+      document.querySelectorAll(".lesson-tab-panel").forEach(p => p.style.display = "none");
+      const targetPanel = document.getElementById(target);
+      if (targetPanel) targetPanel.style.display = "block";
+    });
+  });
+
   // Lesson Modal
   document.getElementById("btn-add-lesson")?.addEventListener("click", () => {
     document.getElementById("modal-lesson-title").textContent = "Soạn Bài giảng Giáo dục Chính trị mới";
@@ -1034,17 +1055,54 @@ function initActionButtons() {
     document.getElementById("pdf-file-status").innerHTML = "";
     document.getElementById("video-file-status").innerHTML = "";
     document.getElementById("audio-file-status").innerHTML = "";
+
+    // Reset tabs to first tab
+    document.querySelector('.lesson-tab-btn[data-tab="tab-content-sections"]')?.click();
+
+    // Default template for sections
+    document.getElementById("lesson-sec-1-content").value = "Quán triệt sâu sắc các quan điểm của Đảng và Quân chủng về công tác giáo dục chính trị, xây dựng bản lĩnh vững vàng.";
+    document.getElementById("lesson-sec-1-takeaway").value = "Nắm vững tình hình nhiệm vụ, xác định rõ trách nhiệm và quyết tâm cao.";
+    document.getElementById("lesson-sec-2-content").value = "Thực hiện tốt phong trào thi đua quyết thắng, quản lý chặt chẽ vũ khí trang bị kỹ thuật, chấp hành nghiêm điều lệnh và kỷ luật quân đội.";
+    document.getElementById("lesson-sec-2-takeaway").value = "Gương mẫu đi đầu, đoàn kết hiệp đồng, lập công tập thể.";
+    document.getElementById("lesson-sec-3-content").value = "Mỗi cán bộ, chiến sĩ tự giác rèn luyện phẩm chất Bộ đội Cụ Hồ - Người chiến sĩ Hải quân, không ngại khó khăn sóng gió.";
+    document.getElementById("lesson-sec-3-takeaway").value = "Sẵn sàng chiến đấu hy sinh bảo vệ vững chắc chủ quyền biển đảo.";
+
+    // Default slides
+    document.getElementById("slide-1-title").value = "1. Tổng quan Chuyên đề";
+    document.getElementById("slide-1-bullets").value = "Quán triệt chủ trương, nghị quyết của Quân chủng Hải quân\nNâng cao bản lĩnh chính trị người chiến sĩ Vùng 4\nKhái quát toàn diện mục tiêu bài học";
+    document.getElementById("slide-2-title").value = "2. Ý nghĩa & Mục đích";
+    document.getElementById("slide-2-bullets").value = "Bồi dưỡng lý tưởng cách mạng, kiên định mục tiêu độc lập dân tộc\nCốt lõi nhận thức của người quân nhân cách mạng\nPhát huy phẩm chất cao đẹp Bộ đội Cụ Hồ";
+    document.getElementById("slide-3-title").value = "3. Nhiệm vụ & Yêu cầu";
+    document.getElementById("slide-3-bullets").value = "Nhiệm vụ trực sẵn sàng chiến đấu trên các tàu, đài trạm Vùng 4\nChấp hành nghiêm điều lệnh, kỷ luật và bảo đảm an toàn\nĐoàn kết hiệp đồng, lập công tập thể";
+    document.getElementById("slide-4-title").value = "4. Tổng kết & Hành động";
+    document.getElementById("slide-4-bullets").value = "Lời căn dặn và định hướng hành động thiết thực\nPhát huy truyền thống Vùng 4 Hải quân anh hùng\nQuyết tâm bảo vệ vững chắc chủ quyền biển đảo";
+
+    // Default questions
+    document.getElementById("lesson-q1-text").value = "Mục tiêu trọng tâm của chuyên đề GDCT này là gì?";
+    document.getElementById("lesson-q1-a").value = "Quán triệt sâu sắc các quan điểm của Đảng và Quân chủng";
+    document.getElementById("lesson-q1-b").value = "Chỉ học thuộc lòng lý thuyết đơn thuần";
+    document.getElementById("lesson-q1-c").value = "Không cần liên hệ thực tiễn đơn vị";
+    document.getElementById("lesson-q1-d").value = "Đọc lướt qua tài liệu cho xong";
+    document.getElementById("lesson-q1-exp").value = "Theo tài liệu GDCT chính thức của Bộ Tư lệnh Vùng 4 Hải quân.";
+
+    document.getElementById("lesson-q2-text").value = "Phương châm học tập GDCT hiệu quả nhất là gì?";
+    document.getElementById("lesson-q2-a").value = "Học đi đôi với hành, gắn lý luận với thực tiễn chiến đấu";
+    document.getElementById("lesson-q2-b").value = "Học chỉ để đối phó thi cử";
+    document.getElementById("lesson-q2-c").value = "Thụ động ghi chép không suy ngẫm";
+    document.getElementById("lesson-q2-d").value = "Học vẹt không cần áp dụng thực tế";
+    document.getElementById("lesson-q2-exp").value = "Gắn lý luận với thực tiễn tàu, đảo, đài trạm và nhiệm vụ trực SSCĐ.";
+
     openModal("modal-lesson");
   });
 
-  document.getElementById("btn-save-lesson")?.addEventListener("click", () => {
+  document.getElementById("btn-save-lesson")?.addEventListener("click", async () => {
     const code = document.getElementById("lesson-code").value.trim();
     const title = document.getElementById("lesson-title").value.trim();
     const lecturer = document.getElementById("lesson-lecturer").value.trim() || "Phòng Chính trị Vùng 4";
     const category = document.getElementById("lesson-category").value;
     const audience = document.getElementById("lesson-audience").value.trim();
     const duration = parseInt(document.getElementById("lesson-duration").value) || 45;
-    const summary = document.getElementById("lesson-summary").value.trim();
+    const summary = document.getElementById("lesson-summary").value.trim() || "Nội dung học tập chính trị trọng tâm năm 2026";
     const isInternal = document.getElementById("lesson-is-internal")?.checked || false;
     const id = document.getElementById("lesson-id").value || code.toLowerCase();
 
@@ -1056,37 +1114,155 @@ function initActionButtons() {
     const existingIdx = store.lessons.findIndex(l => l.id === id);
     const existingLesson = existingIdx >= 0 ? store.lessons[existingIdx] : null;
 
+    // Collect Sections
+    const sec1Content = document.getElementById("lesson-sec-1-content").value.trim() || summary;
+    const sec1Takeaway = document.getElementById("lesson-sec-1-takeaway").value.trim() || "Nắm vững tình hình nhiệm vụ, xác định rõ trách nhiệm.";
+    const sec2Content = document.getElementById("lesson-sec-2-content").value.trim() || "Thực hiện tốt phong trào thi đua quyết thắng, quản lý chặt chẽ vũ khí trang bị.";
+    const sec2Takeaway = document.getElementById("lesson-sec-2-takeaway").value.trim() || "Gương mẫu đi đầu, đoàn kết hiệp đồng, lập công tập thể.";
+    const sec3Content = document.getElementById("lesson-sec-3-content").value.trim() || "Mỗi cán bộ, chiến sĩ tự giác rèn luyện phẩm chất Bộ đội Cụ Hồ.";
+    const sec3Takeaway = document.getElementById("lesson-sec-3-takeaway").value.trim() || "Sẵn sàng chiến đấu hy sinh bảo vệ vững chắc chủ quyền biển đảo.";
+
+    const sections = [
+      { sectionNumber: 1, heading: "Phần I: Bối cảnh, mục đích và yêu cầu trọng tâm", content: sec1Content, keyTakeaway: sec1Takeaway },
+      { sectionNumber: 2, heading: "Phần II: Các nội dung cốt lõi và giải pháp thực hiện", content: sec2Content, keyTakeaway: sec2Takeaway },
+      { sectionNumber: 3, heading: "Phần III: Liên hệ thực tiễn bản thân và phương hướng phấn đấu", content: sec3Content, keyTakeaway: sec3Takeaway }
+    ];
+
+    // Collect Slides
+    const parseBullets = (val, fallback) => {
+      const lines = val.split("\n").map(l => l.trim()).filter(l => l.length > 0);
+      return lines.length > 0 ? lines : fallback;
+    };
+
+    const slides = [
+      {
+        slideNumber: 1,
+        title: document.getElementById("slide-1-title").value.trim() || "1. Tổng quan Chuyên đề",
+        bullets: parseBullets(document.getElementById("slide-1-bullets").value, [title, `Giảng viên: ${lecturer} • Đơn vị: Vùng 4 Hải quân`, "Khái quát toàn diện mục tiêu bài học"]),
+        highlightQuote: "Nắm vững mục tiêu và lý luận gắn liền thực tiễn Hải quân.",
+        note: "Trọng tâm bài giảng"
+      },
+      {
+        slideNumber: 2,
+        title: document.getElementById("slide-2-title").value.trim() || "2. Ý nghĩa & Mục đích",
+        bullets: parseBullets(document.getElementById("slide-2-bullets").value, ["Nâng cao nhận thức chính trị tư tưởng", summary, "Cốt lõi nhận thức của người quân nhân"]),
+        highlightQuote: "Bồi dưỡng lý tưởng cách mạng, bản lĩnh kiên định.",
+        note: "Nhận thức tư tưởng"
+      },
+      {
+        slideNumber: 3,
+        title: document.getElementById("slide-3-title").value.trim() || "3. Nhiệm vụ & Yêu cầu",
+        bullets: parseBullets(document.getElementById("slide-3-bullets").value, ["Nhiệm vụ trực sẵn sàng chiến đấu tại Vùng 4", "Luôn đề cao cảnh giác, sẵn sàng nhận và hoàn thành nhiệm vụ.", "Sẵn sàng chiến đấu cao"]),
+        highlightQuote: "Đoàn kết hiệp đồng, lập công tập thể.",
+        note: "Nhiệm vụ trọng tâm"
+      },
+      {
+        slideNumber: 4,
+        title: document.getElementById("slide-4-title").value.trim() || "4. Tổng kết & Hành động",
+        bullets: parseBullets(document.getElementById("slide-4-bullets").value, ["Lời căn dặn và định hướng phấn đấu", "Phát huy truyền thống Vùng 4 Hải quân anh hùng.", "Quyết chiến quyết thắng"]),
+        highlightQuote: "Bảo vệ vững chắc chủ quyền biển đảo Tổ quốc.",
+        note: "Định hướng phấn đấu"
+      }
+    ];
+
+    // Collect Questions
+    const q1Text = document.getElementById("lesson-q1-text").value.trim();
+    const q2Text = document.getElementById("lesson-q2-text").value.trim();
+    const questions = [];
+
+    if (q1Text) {
+      questions.push({
+        id: 1,
+        question: q1Text,
+        options: [
+          document.getElementById("lesson-q1-a").value.trim() || "Phương án A",
+          document.getElementById("lesson-q1-b").value.trim() || "Phương án B",
+          document.getElementById("lesson-q1-c").value.trim() || "Phương án C",
+          document.getElementById("lesson-q1-d").value.trim() || "Phương án D"
+        ],
+        correctAnswer: 0,
+        explanation: document.getElementById("lesson-q1-exp").value.trim() || "Theo tài liệu GDCT chính thức của Bộ Tư lệnh Vùng 4 Hải quân."
+      });
+    }
+
+    if (q2Text) {
+      questions.push({
+        id: 2,
+        question: q2Text,
+        options: [
+          document.getElementById("lesson-q2-a").value.trim() || "Phương án A",
+          document.getElementById("lesson-q2-b").value.trim() || "Phương án B",
+          document.getElementById("lesson-q2-c").value.trim() || "Phương án C",
+          document.getElementById("lesson-q2-d").value.trim() || "Phương án D"
+        ],
+        correctAnswer: 0,
+        explanation: document.getElementById("lesson-q2-exp").value.trim() || "Gắn lý luận với thực tiễn tàu, đảo, đài trạm."
+      });
+    }
+
+    if (questions.length === 0 && existingLesson?.questions?.length > 0) {
+      questions.push(...existingLesson.questions);
+    }
+
+    const docxName = document.getElementById("lesson-docx-name").value.trim() || `${id}_Giao_An.docx`;
+    const pdfName = document.getElementById("lesson-pdf-name").value.trim() || `${id}_Tai_Lieu.pdf`;
+
+    const docAttachments = [
+      { id: "doc_1", fileName: docxName, fileSize: "1.8 MB", fileType: "WORD", downloadUrl: `https://docs.gdct.vung4.vn/${docxName}` },
+      { id: "doc_2", fileName: pdfName, fileSize: "2.4 MB", fileType: "PDF", downloadUrl: `https://docs.gdct.vung4.vn/${pdfName}` }
+    ];
+
     const newLesson = {
       id,
+      code,
       title,
       category,
       targetAudience: audience || "Cán bộ, chiến sĩ Vùng 4",
+      durationMinutes: duration,
       estimatedMinutes: duration,
-      summary: summary || "Nội dung học tập chính trị trọng tâm năm 2026",
+      summary: summary,
       lecturer: lecturer,
       unit: "Bộ Tư lệnh Vùng 4 Hải quân",
-      slidesCount: 8,
-      docxAttachment: document.getElementById("lesson-docx-name").value || `${code}_Tai_Lieu.docx`,
-      pdfAttachment: document.getElementById("lesson-pdf-name").value || `${code}_Tai_Lieu.pdf`,
-      videoUrl: document.getElementById("lesson-video-url").value || `https://video.gdct.vung4.vn/${code}.mp4`,
-      audioUrl: document.getElementById("lesson-audio-url").value || `https://audio.gdct.vung4.vn/${code}.mp3`,
-      quizCount: existingLesson?.questions ? existingLesson.questions.length : 4,
+      slidesCount: slides.length,
+      docxAttachment: docxName,
+      pdfAttachment: pdfName,
+      docAttachments: docAttachments,
+      videoUrl: document.getElementById("lesson-video-url").value.trim() || `https://video.gdct.vung4.vn/${id}.mp4`,
+      videoDuration: "18:00",
+      audioUrl: document.getElementById("lesson-audio-url").value.trim() || `https://audio.gdct.vung4.vn/${id}.mp3`,
+      audioDuration: "18:00",
+      audioSpeaker: lecturer,
+      quizCount: questions.length,
       isInternal,
-      questions: existingLesson?.questions || []
+      securityLevel: isInternal ? "Lưu hành nội bộ" : "Công khai",
+      sections,
+      slides,
+      questions
     };
 
     if (existingIdx >= 0) {
       store.lessons[existingIdx] = newLesson;
-      showToast(`Đã cập nhật bài giảng: ${title}`);
     } else {
       store.lessons.unshift(newLesson);
-      showToast(`Đã thêm mới bài giảng: ${title}`);
     }
 
-    store.saveAll();
+    // Direct POST to /api/lessons for instant backend update & automatic notification broadcast
+    try {
+      await fetch('/api/lessons', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newLesson)
+      });
+    } catch (e) {
+      console.warn("Direct POST /api/lessons:", e);
+    }
+
+    await store.saveAll();
     closeModal("modal-lesson");
     renderLessonsTable();
     renderOverview();
+    renderQuizBank();
+    showToast(`Đã lưu chuyên đề "${title}" và đồng bộ tức thì đến toàn bộ App di động!`);
   });
 
   // User Modal
@@ -1400,20 +1576,80 @@ window.editLesson = function(id) {
   const lesson = store.lessons.find(l => l.id === id);
   if (!lesson) return;
 
-  document.getElementById("modal-lesson-title").textContent = `Chỉnh sửa: ${lesson.title}`;
+  document.getElementById("modal-lesson-title").textContent = `Chỉnh sửa Bài giảng: [${lesson.code || lesson.id.toUpperCase()}] ${lesson.title}`;
   document.getElementById("lesson-id").value = lesson.id;
-  document.getElementById("lesson-code").value = lesson.id;
+  document.getElementById("lesson-code").value = lesson.code || lesson.id;
   document.getElementById("lesson-title").value = lesson.title;
   document.getElementById("lesson-lecturer").value = lesson.lecturer || "";
   document.getElementById("lesson-category").value = lesson.category;
   document.getElementById("lesson-audience").value = lesson.targetAudience;
-  document.getElementById("lesson-duration").value = lesson.estimatedMinutes;
+  document.getElementById("lesson-duration").value = lesson.estimatedMinutes || lesson.durationMinutes || 45;
   document.getElementById("lesson-summary").value = lesson.summary;
   document.getElementById("lesson-is-internal").checked = !!lesson.isInternal;
   document.getElementById("lesson-docx-name").value = lesson.docxAttachment || "";
   document.getElementById("lesson-pdf-name").value = lesson.pdfAttachment || "";
   document.getElementById("lesson-video-url").value = lesson.videoUrl || "";
   document.getElementById("lesson-audio-url").value = lesson.audioUrl || "";
+
+  // Reset tab to tab 1
+  document.querySelector('.lesson-tab-btn[data-tab="tab-content-sections"]')?.click();
+
+  // Prefill Sections
+  const secs = lesson.sections || [];
+  document.getElementById("lesson-sec-1-content").value = (secs[0] && secs[0].content) || lesson.summary || "";
+  document.getElementById("lesson-sec-1-takeaway").value = (secs[0] && secs[0].keyTakeaway) || "Nắm vững tình hình nhiệm vụ, xác định rõ trách nhiệm.";
+  document.getElementById("lesson-sec-2-content").value = (secs[1] && secs[1].content) || "Thực hiện tốt phong trào thi đua quyết thắng, quản lý chặt chẽ vũ khí trang bị.";
+  document.getElementById("lesson-sec-2-takeaway").value = (secs[1] && secs[1].keyTakeaway) || "Gương mẫu đi đầu, đoàn kết hiệp đồng, lập công tập thể.";
+  document.getElementById("lesson-sec-3-content").value = (secs[2] && secs[2].content) || "Mỗi cán bộ, chiến sĩ tự giác rèn luyện phẩm chất Bộ đội Cụ Hồ.";
+  document.getElementById("lesson-sec-3-takeaway").value = (secs[2] && secs[2].keyTakeaway) || "Sẵn sàng chiến đấu hy sinh bảo vệ vững chắc chủ quyền biển đảo.";
+
+  // Prefill Slides
+  const slides = lesson.slides || [];
+  document.getElementById("slide-1-title").value = (slides[0] && slides[0].title) || "1. Tổng quan Chuyên đề";
+  document.getElementById("slide-1-bullets").value = (slides[0] && Array.isArray(slides[0].bullets)) ? slides[0].bullets.join("\n") : (lesson.title + "\nGiảng viên: " + (lesson.lecturer || "Phòng Chính trị Vùng 4"));
+
+  document.getElementById("slide-2-title").value = (slides[1] && slides[1].title) || "2. Ý nghĩa & Mục đích";
+  document.getElementById("slide-2-bullets").value = (slides[1] && Array.isArray(slides[1].bullets)) ? slides[1].bullets.join("\n") : "Nâng cao nhận thức chính trị tư tưởng\nBồi dưỡng phẩm chất cách mạng";
+
+  document.getElementById("slide-3-title").value = (slides[2] && slides[2].title) || "3. Nhiệm vụ & Yêu cầu";
+  document.getElementById("slide-3-bullets").value = (slides[2] && Array.isArray(slides[2].bullets)) ? slides[2].bullets.join("\n") : "Trực sẵn sàng chiến đấu cao\nChấp hành nghiêm điều lệnh, kỷ luật";
+
+  document.getElementById("slide-4-title").value = (slides[3] && slides[3].title) || "4. Tổng kết & Hành động";
+  document.getElementById("slide-4-bullets").value = (slides[3] && Array.isArray(slides[3].bullets)) ? slides[3].bullets.join("\n") : "Phát huy truyền thống Vùng 4 Hải quân anh hùng\nBảo vệ vững chắc chủ quyền biển đảo";
+
+  // Prefill Questions
+  const questions = lesson.questions || [];
+  if (questions[0]) {
+    document.getElementById("lesson-q1-text").value = questions[0].question || "";
+    document.getElementById("lesson-q1-a").value = (questions[0].options && questions[0].options[0]) || "";
+    document.getElementById("lesson-q1-b").value = (questions[0].options && questions[0].options[1]) || "";
+    document.getElementById("lesson-q1-c").value = (questions[0].options && questions[0].options[2]) || "";
+    document.getElementById("lesson-q1-d").value = (questions[0].options && questions[0].options[3]) || "";
+    document.getElementById("lesson-q1-exp").value = questions[0].explanation || "";
+  } else {
+    document.getElementById("lesson-q1-text").value = `Mục tiêu cốt lõi của bài giảng "${lesson.title}" là gì?`;
+    document.getElementById("lesson-q1-a").value = "Quán triệt sâu sắc các quan điểm của Đảng và Quân chủng";
+    document.getElementById("lesson-q1-b").value = "Chỉ học thuộc lý thuyết đơn thuần";
+    document.getElementById("lesson-q1-c").value = "Không cần vận dụng vào thực tế";
+    document.getElementById("lesson-q1-d").value = "Học đối phó thi cử";
+    document.getElementById("lesson-q1-exp").value = "Theo tài liệu GDCT chính thức của Bộ Tư lệnh Vùng 4 Hải quân.";
+  }
+
+  if (questions[1]) {
+    document.getElementById("lesson-q2-text").value = questions[1].question || "";
+    document.getElementById("lesson-q2-a").value = (questions[1].options && questions[1].options[0]) || "";
+    document.getElementById("lesson-q2-b").value = (questions[1].options && questions[1].options[1]) || "";
+    document.getElementById("lesson-q2-c").value = (questions[1].options && questions[1].options[2]) || "";
+    document.getElementById("lesson-q2-d").value = (questions[1].options && questions[1].options[3]) || "";
+    document.getElementById("lesson-q2-exp").value = questions[1].explanation || "";
+  } else {
+    document.getElementById("lesson-q2-text").value = "Phương châm học tập GDCT hiệu quả nhất đối với cán bộ, chiến sĩ là gì?";
+    document.getElementById("lesson-q2-a").value = "Học đi đôi với hành, gắn lý luận với thực tiễn chiến đấu";
+    document.getElementById("lesson-q2-b").value = "Học chỉ để đối phó";
+    document.getElementById("lesson-q2-c").value = "Thụ động ghi chép";
+    document.getElementById("lesson-q2-d").value = "Học vẹt không cần hiểu";
+    document.getElementById("lesson-q2-exp").value = "Gắn lý luận với thực tiễn tàu, đảo, đài trạm và nhiệm vụ trực SSCĐ.";
+  }
 
   openModal("modal-lesson");
 };

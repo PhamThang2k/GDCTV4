@@ -546,66 +546,160 @@
 
           <div class="form-group">
             <label class="form-label">Tóm tắt nội dung trọng tâm</label>
-            <textarea class="form-control" id="lesson-summary" rows="3" placeholder="Tóm tắt mục đích, yêu cầu và nội dung cốt lõi của bài giảng..."></textarea>
+            <textarea class="form-control" id="lesson-summary" rows="2" placeholder="Tóm tắt mục đích, yêu cầu và nội dung cốt lõi của bài giảng..."></textarea>
           </div>
 
-          <!-- Tabs inside Modal for Local File Uploads & Multimedia -->
-          <div style="margin-top: 14px; border: 1px solid var(--slate-200); border-radius: 8px; padding: 14px; background: var(--slate-50);">
-            <div style="font-size: 13px; font-weight: 700; color: var(--navy-primary); margin-bottom: 10px;">
-              <i class="fa-solid fa-cloud-arrow-up"></i> Tải Tệp từ Máy tính & Cấu hình Đa phương tiện
-            </div>
-            
-            <!-- DOCX & PDF File Picker -->
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label"><i class="fa-solid fa-file-word" style="color: #2563EB;"></i> Tệp Word (DOCX/DOC) từ máy tính</label>
-                <div style="display: flex; gap: 8px; align-items: center;">
-                  <input type="file" id="file-lesson-docx" accept=".docx,.doc" style="display: none;">
-                  <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('file-lesson-docx').click()">
-                    <i class="fa-solid fa-folder-open"></i> Chọn tệp DOCX...
-                  </button>
-                  <input type="text" class="form-control" id="lesson-docx-name" placeholder="Hoặc nhập tên tệp / URL" style="flex: 1;">
-                </div>
-                <div id="docx-file-status" style="font-size: 11px; color: #166534; margin-top: 3px;"></div>
-              </div>
-
-              <div class="form-group">
-                <label class="form-label"><i class="fa-solid fa-file-pdf" style="color: #DC2626;"></i> Tệp PDF Nghiên cứu từ máy tính</label>
-                <div style="display: flex; gap: 8px; align-items: center;">
-                  <input type="file" id="file-lesson-pdf" accept=".pdf" style="display: none;">
-                  <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('file-lesson-pdf').click()">
-                    <i class="fa-solid fa-folder-open"></i> Chọn tệp PDF...
-                  </button>
-                  <input type="text" class="form-control" id="lesson-pdf-name" placeholder="Hoặc nhập tên tệp / URL" style="flex: 1;">
-                </div>
-                <div id="pdf-file-status" style="font-size: 11px; color: #166534; margin-top: 3px;"></div>
-              </div>
+          <!-- Section Tabs: Soạn Giáo án chi tiết, Slide trình chiếu, Tệp đính kèm DOCX/PDF, Đề trắc nghiệm -->
+          <div style="margin-top: 14px; border: 1px solid var(--slate-200); border-radius: 8px; overflow: hidden; background: white;">
+            <div style="display: flex; border-bottom: 1px solid var(--slate-200); background: var(--slate-50); overflow-x: auto;">
+              <button type="button" class="lesson-tab-btn active" data-tab="tab-content-sections" style="padding: 10px 16px; border: none; background: transparent; font-weight: 700; font-size: 12.5px; color: var(--navy-primary); cursor: pointer; border-bottom: 2px solid var(--navy-primary);">
+                <i class="fa-solid fa-book-open"></i> 1. Soạn Giáo án 3 Phần
+              </button>
+              <button type="button" class="lesson-tab-btn" data-tab="tab-content-slides" style="padding: 10px 16px; border: none; background: transparent; font-weight: 600; font-size: 12.5px; color: var(--slate-600); cursor: pointer;">
+                <i class="fa-solid fa-chalkboard-user"></i> 2. Slide Bài giảng
+              </button>
+              <button type="button" class="lesson-tab-btn" data-tab="tab-content-files" style="padding: 10px 16px; border: none; background: transparent; font-weight: 600; font-size: 12.5px; color: var(--slate-600); cursor: pointer;">
+                <i class="fa-solid fa-file-arrow-up"></i> 3. Tệp DOCX / PDF / Media
+              </button>
+              <button type="button" class="lesson-tab-btn" data-tab="tab-content-quiz" style="padding: 10px 16px; border: none; background: transparent; font-weight: 600; font-size: 12.5px; color: var(--slate-600); cursor: pointer;">
+                <i class="fa-solid fa-list-check"></i> 4. Câu hỏi Trắc nghiệm
+              </button>
             </div>
 
-            <!-- Video & Audio File Picker -->
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label"><i class="fa-solid fa-video" style="color: #059669;"></i> Video bài giảng (MP4 / WebM từ máy)</label>
-                <div style="display: flex; gap: 8px; align-items: center;">
-                  <input type="file" id="file-lesson-video" accept="video/mp4,video/webm,video/*" style="display: none;">
-                  <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('file-lesson-video').click()">
-                    <i class="fa-solid fa-file-video"></i> Chọn video...
-                  </button>
-                  <input type="text" class="form-control" id="lesson-video-url" placeholder="Hoặc dán URL video (MP4/HLS)" style="flex: 1;">
+            <!-- Tab 1: Soạn 3 Phần Giáo án -->
+            <div id="tab-content-sections" class="lesson-tab-panel" style="padding: 14px;">
+              <div style="font-size: 12px; color: var(--slate-500); margin-bottom: 10px;">
+                <i class="fa-solid fa-circle-info"></i> Soạn nội dung chi tiết theo 3 phần giáo dục chính trị chuẩn Quân chủng Hải quân:
+              </div>
+              <div class="form-group" style="margin-bottom: 10px;">
+                <label class="form-label" style="font-weight: 700; color: #1E3A8A;"><i class="fa-solid fa-bookmark"></i> Phần I: Bối cảnh, mục đích và yêu cầu trọng tâm</label>
+                <textarea class="form-control" id="lesson-sec-1-content" rows="2" placeholder="Nhập nội dung chi tiết Phần I..."></textarea>
+                <input type="text" class="form-control" id="lesson-sec-1-takeaway" placeholder="Ý chính cốt lõi Phần I (VD: Nắm vững tình hình nhiệm vụ, xác định rõ trách nhiệm...)" style="margin-top: 4px; font-size: 12px;">
+              </div>
+              <div class="form-group" style="margin-bottom: 10px;">
+                <label class="form-label" style="font-weight: 700; color: #1E3A8A;"><i class="fa-solid fa-bookmark"></i> Phần II: Các nội dung cốt lõi và giải pháp thực hiện</label>
+                <textarea class="form-control" id="lesson-sec-2-content" rows="2" placeholder="Nhập nội dung chi tiết Phần II..."></textarea>
+                <input type="text" class="form-control" id="lesson-sec-2-takeaway" placeholder="Ý chính cốt lõi Phần II (VD: Thực hiện tốt phong trào thi đua quyết thắng...)" style="margin-top: 4px; font-size: 12px;">
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-weight: 700; color: #1E3A8A;"><i class="fa-solid fa-bookmark"></i> Phần III: Liên hệ thực tiễn bản thân và phương hướng phấn đấu</label>
+                <textarea class="form-control" id="lesson-sec-3-content" rows="2" placeholder="Nhập nội dung chi tiết Phần III..."></textarea>
+                <input type="text" class="form-control" id="lesson-sec-3-takeaway" placeholder="Ý chính cốt lõi Phần III (VD: Sẵn sàng chiến đấu hy sinh bảo vệ vững chắc biển đảo...)" style="margin-top: 4px; font-size: 12px;">
+              </div>
+            </div>
+
+            <!-- Tab 2: Slide Bài giảng -->
+            <div id="tab-content-slides" class="lesson-tab-panel" style="display: none; padding: 14px;">
+              <div style="font-size: 12px; color: var(--slate-500); margin-bottom: 10px;">
+                <i class="fa-solid fa-sliders"></i> Soạn nội dung 4 Slide trình chiếu điện tử cho bài giảng:
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div style="border: 1px solid var(--slate-200); border-radius: 6px; padding: 8px; background: var(--slate-50);">
+                  <div style="font-weight: 700; font-size: 12px; color: var(--navy-primary); margin-bottom: 4px;">Slide 1: Tổng quan Chuyên đề</div>
+                  <input type="text" class="form-control" id="slide-1-title" value="1. Tổng quan Chuyên đề" style="font-size: 12px; margin-bottom: 4px;">
+                  <textarea class="form-control" id="slide-1-bullets" rows="2" placeholder="Mỗi dòng là một ý gạch đầu dòng..." style="font-size: 12px;"></textarea>
                 </div>
-                <div id="video-file-status" style="font-size: 11px; color: #059669; margin-top: 3px;"></div>
+                <div style="border: 1px solid var(--slate-200); border-radius: 6px; padding: 8px; background: var(--slate-50);">
+                  <div style="font-weight: 700; font-size: 12px; color: var(--navy-primary); margin-bottom: 4px;">Slide 2: Ý nghĩa & Mục đích</div>
+                  <input type="text" class="form-control" id="slide-2-title" value="2. Ý nghĩa & Mục đích" style="font-size: 12px; margin-bottom: 4px;">
+                  <textarea class="form-control" id="slide-2-bullets" rows="2" placeholder="Mỗi dòng là một ý gạch đầu dòng..." style="font-size: 12px;"></textarea>
+                </div>
+                <div style="border: 1px solid var(--slate-200); border-radius: 6px; padding: 8px; background: var(--slate-50);">
+                  <div style="font-weight: 700; font-size: 12px; color: var(--navy-primary); margin-bottom: 4px;">Slide 3: Nhiệm vụ & Yêu cầu</div>
+                  <input type="text" class="form-control" id="slide-3-title" value="3. Nhiệm vụ & Yêu cầu" style="font-size: 12px; margin-bottom: 4px;">
+                  <textarea class="form-control" id="slide-3-bullets" rows="2" placeholder="Mỗi dòng là một ý gạch đầu dòng..." style="font-size: 12px;"></textarea>
+                </div>
+                <div style="border: 1px solid var(--slate-200); border-radius: 6px; padding: 8px; background: var(--slate-50);">
+                  <div style="font-weight: 700; font-size: 12px; color: var(--navy-primary); margin-bottom: 4px;">Slide 4: Tổng kết & Hành động</div>
+                  <input type="text" class="form-control" id="slide-4-title" value="4. Tổng kết & Hành động" style="font-size: 12px; margin-bottom: 4px;">
+                  <textarea class="form-control" id="slide-4-bullets" rows="2" placeholder="Mỗi dòng là một ý gạch đầu dòng..." style="font-size: 12px;"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab 3: Tệp đính kèm DOCX/PDF/Media -->
+            <div id="tab-content-files" class="lesson-tab-panel" style="display: none; padding: 14px;">
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label"><i class="fa-solid fa-file-word" style="color: #2563EB;"></i> Tệp Word (DOCX/DOC) từ máy tính</label>
+                  <div style="display: flex; gap: 8px; align-items: center;">
+                    <input type="file" id="file-lesson-docx" accept=".docx,.doc" style="display: none;">
+                    <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('file-lesson-docx').click()">
+                      <i class="fa-solid fa-folder-open"></i> Chọn tệp DOCX...
+                    </button>
+                    <input type="text" class="form-control" id="lesson-docx-name" placeholder="Tên tệp DOCX chuẩn (VD: Giao_An_Bai_07.docx)" style="flex: 1;">
+                  </div>
+                  <div id="docx-file-status" style="font-size: 11px; color: #166534; margin-top: 3px;"></div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label"><i class="fa-solid fa-file-pdf" style="color: #DC2626;"></i> Tệp PDF Nghiên cứu từ máy tính</label>
+                  <div style="display: flex; gap: 8px; align-items: center;">
+                    <input type="file" id="file-lesson-pdf" accept=".pdf" style="display: none;">
+                    <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('file-lesson-pdf').click()">
+                      <i class="fa-solid fa-folder-open"></i> Chọn tệp PDF...
+                    </button>
+                    <input type="text" class="form-control" id="lesson-pdf-name" placeholder="Tên tệp PDF chuẩn (VD: Tai_Lieu_Bai_07.pdf)" style="flex: 1;">
+                  </div>
+                  <div id="pdf-file-status" style="font-size: 11px; color: #166534; margin-top: 3px;"></div>
+                </div>
               </div>
 
-              <div class="form-group">
-                <label class="form-label"><i class="fa-solid fa-headphones" style="color: #D97706;"></i> Audio phát thanh (MP3 / M4A từ máy)</label>
-                <div style="display: flex; gap: 8px; align-items: center;">
-                  <input type="file" id="file-lesson-audio" accept="audio/mp3,audio/wav,audio/m4a,audio/*" style="display: none;">
-                  <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('file-lesson-audio').click()">
-                    <i class="fa-solid fa-file-audio"></i> Chọn audio...
-                  </button>
-                  <input type="text" class="form-control" id="lesson-audio-url" placeholder="Hoặc dán URL âm thanh (MP3)" style="flex: 1;">
+              <!-- Video & Audio File Picker -->
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label"><i class="fa-solid fa-video" style="color: #059669;"></i> Video bài giảng (MP4 / WebM từ máy)</label>
+                  <div style="display: flex; gap: 8px; align-items: center;">
+                    <input type="file" id="file-lesson-video" accept="video/mp4,video/webm,video/*" style="display: none;">
+                    <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('file-lesson-video').click()">
+                      <i class="fa-solid fa-file-video"></i> Chọn video...
+                    </button>
+                    <input type="text" class="form-control" id="lesson-video-url" placeholder="Hoặc dán URL video (MP4/HLS)" style="flex: 1;">
+                  </div>
+                  <div id="video-file-status" style="font-size: 11px; color: #059669; margin-top: 3px;"></div>
                 </div>
-                <div id="audio-file-status" style="font-size: 11px; color: #D97706; margin-top: 3px;"></div>
+
+                <div class="form-group">
+                  <label class="form-label"><i class="fa-solid fa-headphones" style="color: #D97706;"></i> Audio phát thanh (MP3 / M4A từ máy)</label>
+                  <div style="display: flex; gap: 8px; align-items: center;">
+                    <input type="file" id="file-lesson-audio" accept="audio/mp3,audio/wav,audio/m4a,audio/*" style="display: none;">
+                    <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('file-lesson-audio').click()">
+                      <i class="fa-solid fa-file-audio"></i> Chọn audio...
+                    </button>
+                    <input type="text" class="form-control" id="lesson-audio-url" placeholder="Hoặc dán URL âm thanh (MP3)" style="flex: 1;">
+                  </div>
+                  <div id="audio-file-status" style="font-size: 11px; color: #D97706; margin-top: 3px;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab 4: Câu hỏi Trắc nghiệm -->
+            <div id="tab-content-quiz" class="lesson-tab-panel" style="display: none; padding: 14px;">
+              <div style="font-size: 12px; color: var(--slate-500); margin-bottom: 10px;">
+                <i class="fa-solid fa-circle-question"></i> Soạn 2 câu hỏi trắc nghiệm kiểm tra nhận thức trực tiếp cho chuyên đề này:
+              </div>
+              <div style="border: 1px solid var(--slate-200); border-radius: 6px; padding: 10px; margin-bottom: 10px; background: var(--slate-50);">
+                <div style="font-weight: 700; font-size: 12px; color: var(--navy-primary); margin-bottom: 4px;">Câu hỏi 1:</div>
+                <input type="text" class="form-control" id="lesson-q1-text" placeholder="Nội dung câu hỏi 1..." style="font-size: 12px; margin-bottom: 4px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+                  <input type="text" class="form-control" id="lesson-q1-a" placeholder="Phương án A (Đáp án đúng mặc định)" style="font-size: 11.5px;">
+                  <input type="text" class="form-control" id="lesson-q1-b" placeholder="Phương án B" style="font-size: 11.5px;">
+                  <input type="text" class="form-control" id="lesson-q1-c" placeholder="Phương án C" style="font-size: 11.5px;">
+                  <input type="text" class="form-control" id="lesson-q1-d" placeholder="Phương án D" style="font-size: 11.5px;">
+                </div>
+                <input type="text" class="form-control" id="lesson-q1-exp" placeholder="Giải thích đáp án..." style="font-size: 11.5px; margin-top: 4px;">
+              </div>
+
+              <div style="border: 1px solid var(--slate-200); border-radius: 6px; padding: 10px; background: var(--slate-50);">
+                <div style="font-weight: 700; font-size: 12px; color: var(--navy-primary); margin-bottom: 4px;">Câu hỏi 2:</div>
+                <input type="text" class="form-control" id="lesson-q2-text" placeholder="Nội dung câu hỏi 2..." style="font-size: 12px; margin-bottom: 4px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+                  <input type="text" class="form-control" id="lesson-q2-a" placeholder="Phương án A (Đáp án đúng mặc định)" style="font-size: 11.5px;">
+                  <input type="text" class="form-control" id="lesson-q2-b" placeholder="Phương án B" style="font-size: 11.5px;">
+                  <input type="text" class="form-control" id="lesson-q2-c" placeholder="Phương án C" style="font-size: 11.5px;">
+                  <input type="text" class="form-control" id="lesson-q2-d" placeholder="Phương án D" style="font-size: 11.5px;">
+                </div>
+                <input type="text" class="form-control" id="lesson-q2-exp" placeholder="Giải thích đáp án..." style="font-size: 11.5px; margin-top: 4px;">
               </div>
             </div>
           </div>

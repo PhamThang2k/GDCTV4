@@ -857,7 +857,7 @@ const server = http.createServer(async (req, res) => {
           
           const lessonObj = {
             id,
-            code: body.code || "CĐ-NEW/2026",
+            code: body.code || (existingIdx >= 0 ? inMemoryDB.lessons[existingIdx].code : "CĐ-NEW/2026"),
             title: body.title || "Chuyên đề Giáo dục Chính trị mới",
             category: body.category || "Chuyên đề Sĩ quan & QNCN",
             targetAudience: body.targetAudience || "Cán bộ, chiến sĩ Vùng 4",
@@ -865,18 +865,22 @@ const server = http.createServer(async (req, res) => {
             estimatedMinutes: body.durationMinutes || body.estimatedMinutes || 45,
             summary: body.summary || "Nội dung học tập chính trị trọng tâm",
             lecturer: body.lecturer || "Phòng Chính trị Vùng 4",
+            unit: body.unit || "Bộ Tư lệnh Vùng 4 Hải quân",
             videoUrl: body.videoUrl || "https://video.gdct.vung4.vn/cd-new.mp4",
             videoDuration: body.videoDuration || "18:00",
             audioUrl: body.audioUrl || "https://audio.gdct.vung4.vn/cd-new.mp3",
             audioDuration: body.audioDuration || "18:00",
-            audioSpeaker: body.audioSpeaker || "Ban Tuyên huấn Vùng 4",
-            slidesCount: body.slidesCount || 8,
+            audioSpeaker: body.audioSpeaker || body.lecturer || "Ban Tuyên huấn Vùng 4",
+            slidesCount: (body.slides && body.slides.length) || body.slidesCount || 8,
             docxAttachment: body.docxAttachment || "Tai_Lieu.docx",
             pdfAttachment: body.pdfAttachment || "Tai_Lieu.pdf",
             isInternal: body.isInternal === true,
             securityLevel: body.isInternal ? "Lưu hành nội bộ" : "Công khai",
-            quizCount: body.questions ? body.questions.length : 4,
-            questions: body.questions || []
+            sections: body.sections || (existingIdx >= 0 ? inMemoryDB.lessons[existingIdx].sections : []),
+            slides: body.slides || (existingIdx >= 0 ? inMemoryDB.lessons[existingIdx].slides : []),
+            docAttachments: body.docAttachments || (existingIdx >= 0 ? inMemoryDB.lessons[existingIdx].docAttachments : []),
+            quizCount: body.questions ? body.questions.length : (existingIdx >= 0 && inMemoryDB.lessons[existingIdx].questions ? inMemoryDB.lessons[existingIdx].questions.length : 4),
+            questions: body.questions || (existingIdx >= 0 ? inMemoryDB.lessons[existingIdx].questions : [])
           };
 
           if (existingIdx >= 0) {

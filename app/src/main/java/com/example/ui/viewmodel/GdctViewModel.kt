@@ -217,9 +217,9 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
       // First immediate sync
       syncWithServerInternal()
       
-      // Polling loop every 3.5 seconds
+      // Polling loop every 2.5 seconds for instant real-time sync with Web Admin
       while (true) {
-        delay(3500)
+        delay(2500)
         try {
           syncWithServerInternal()
         } catch (e: Exception) {
@@ -381,14 +381,14 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
       list.add("$base$cleanEndpoint")
     }
 
-    // Primary official Render server for GDCT Vung 4
-    list.add("https://gdctv4.onrender.com$cleanEndpoint")
-    list.add("https://gdctv4.onrender.com/api$cleanEndpoint")
-    list.add("https://ais-dev-fg3vokzh3myfkmipyfaqdl-910262898976.asia-southeast1.run.app$cleanEndpoint")
-    list.add("https://ais-pre-fg3vokzh3myfkmipyfaqdl-910262898976.asia-southeast1.run.app$cleanEndpoint")
+    // Direct local / emulator connections first for instant real-time sync
     list.add("http://10.0.2.2:3000$cleanEndpoint")
     list.add("http://127.0.0.1:3000$cleanEndpoint")
     list.add("http://localhost:3000$cleanEndpoint")
+    list.add("https://ais-dev-fg3vokzh3myfkmipyfaqdl-910262898976.asia-southeast1.run.app$cleanEndpoint")
+    list.add("https://ais-pre-fg3vokzh3myfkmipyfaqdl-910262898976.asia-southeast1.run.app$cleanEndpoint")
+    list.add("https://gdctv4.onrender.com$cleanEndpoint")
+    list.add("https://gdctv4.onrender.com/api$cleanEndpoint")
 
     return list.distinct()
   }
@@ -401,8 +401,8 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
         val conn = (url.openConnection() as HttpURLConnection).apply {
           requestMethod = "GET"
           setRequestProperty("Accept", "application/json")
-          connectTimeout = 2500
-          readTimeout = 3000
+          connectTimeout = 1500
+          readTimeout = 2000
         }
         if (conn.responseCode in 200..299) {
           val reader = BufferedReader(InputStreamReader(conn.inputStream, Charsets.UTF_8))
@@ -431,8 +431,8 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
           setRequestProperty("Content-Type", "application/json; charset=utf-8")
           setRequestProperty("Accept", "application/json")
           doOutput = true
-          connectTimeout = 2500
-          readTimeout = 3000
+          connectTimeout = 1500
+          readTimeout = 2000
         }
         conn.outputStream.use { os ->
           os.write(json.toString().toByteArray(Charsets.UTF_8))
@@ -598,63 +598,135 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
             )
           }
 
-          // Build sections & slides
-          val sections = listOf(
-            LessonSection(
-              sectionNumber = 1,
-              heading = "Phần I: Bối cảnh, mục đích và yêu cầu trọng tâm của chuyên đề",
-              content = summary,
-              keyTakeaway = "Nắm vững tình hình nhiệm vụ, xác định rõ trách nhiệm và quyết tâm cao."
-            ),
-            LessonSection(
-              sectionNumber = 2,
-              heading = "Phần II: Các nội dung cốt lõi và giải pháp thực hiện tại đơn vị",
-              content = "Thực hiện tốt phong trào thi đua quyết thắng, quản lý chặt chẽ vũ khí trang bị kỹ thuật, chấp hành nghiêm điều lệnh và kỷ luật quân đội.",
-              keyTakeaway = "Gương mẫu đi đầu, đoàn kết hiệp đồng, lập công tập thể."
-            ),
-            LessonSection(
-              sectionNumber = 3,
-              heading = "Phần III: Liên hệ thực tiễn bản thân và phương hướng phấn đấu",
-              content = "Mỗi cán bộ, chiến sĩ tự giác rèn luyện phẩm chất Bộ đội Cụ Hồ - Người chiến sĩ Hải quân, không ngại khó khăn sóng gió.",
-              keyTakeaway = "Sẵn sàng chiến đấu hy sinh bảo vệ vững chắc chủ quyền biển đảo."
+          // Parse sections
+          val secArray = lJson.optJSONArray("sections")
+          val sections = mutableListOf<LessonSection>()
+          if (secArray != null && secArray.length() > 0) {
+            for (sIdx in 0 until secArray.length()) {
+              val sObj = secArray.getJSONObject(sIdx)
+              sections.add(
+                LessonSection(
+                  sectionNumber = sObj.optInt("sectionNumber", sIdx + 1),
+                  heading = sObj.optString("heading", "Phần ${sIdx + 1}: Nội dung chuyên đề trọng tâm"),
+                  content = sObj.optString("content", summary),
+                  keyTakeaway = sObj.optString("keyTakeaway", "Nắm vững lý luận và vận dụng sáng tạo vào thực tiễn.")
+                )
+              )
+            }
+          } else {
+            sections.addAll(
+              listOf(
+                LessonSection(
+                  sectionNumber = 1,
+                  heading = "Phần I: Bối cảnh, mục đích và yêu cầu trọng tâm của chuyên đề",
+                  content = summary,
+                  keyTakeaway = "Nắm vững tình hình nhiệm vụ, xác định rõ trách nhiệm và quyết tâm cao."
+                ),
+                LessonSection(
+                  sectionNumber = 2,
+                  heading = "Phần II: Các nội dung cốt lõi và giải pháp thực hiện tại đơn vị",
+                  content = "Thực hiện tốt phong trào thi đua quyết thắng, quản lý chặt chẽ vũ khí trang bị kỹ thuật, chấp hành nghiêm điều lệnh và kỷ luật quân đội.",
+                  keyTakeaway = "Gương mẫu đi đầu, đoàn kết hiệp đồng, lập công tập thể."
+                ),
+                LessonSection(
+                  sectionNumber = 3,
+                  heading = "Phần III: Liên hệ thực tiễn bản thân và phương hướng phấn đấu",
+                  content = "Mỗi cán bộ, chiến sĩ tự giác rèn luyện phẩm chất Bộ đội Cụ Hồ - Người chiến sĩ Hải quân, không ngại khó khăn sóng gió.",
+                  keyTakeaway = "Sẵn sàng chiến đấu hy sinh bảo vệ vững chắc chủ quyền biển đảo."
+                )
+              )
             )
-          )
+          }
 
-          val slides = listOf(
-            SlideItem(
-              slideNumber = 1,
-              title = "1. Tổng quan Chuyên đề",
-              bullets = listOf(title, "Giảng viên: $lecturer • Đơn vị: Vùng 4 Hải quân", "Khái quát toàn diện mục tiêu bài học"),
-              highlightQuote = "Nắm vững mục tiêu và lý luận gắn liền thực tiễn Hải quân.",
-              note = "Trọng tâm bài giảng"
-            ),
-            SlideItem(
-              slideNumber = 2,
-              title = "2. Ý nghĩa & Mục đích",
-              bullets = listOf("Nâng cao nhận thức chính trị tư tưởng", summary, "Cốt lõi nhận thức của người quân nhân"),
-              highlightQuote = "Bồi dưỡng lý tưởng cách mạng, bản lĩnh kiên định.",
-              note = "Nhận thức tư tưởng"
-            ),
-            SlideItem(
-              slideNumber = 3,
-              title = "3. Nhiệm vụ & Yêu cầu",
-              bullets = listOf("Nhiệm vụ trực sẵn sàng chiến đấu tại Vùng 4", "Luôn đề cao cảnh giác, sẵn sàng nhận và hoàn thành xuất sắc mọi nhiệm vụ được giao.", "Sẵn sàng chiến đấu cao"),
-              highlightQuote = "Đoàn kết hiệp đồng, lập công tập thể.",
-              note = "Nhiệm vụ trọng tâm"
-            ),
-            SlideItem(
-              slideNumber = 4,
-              title = "4. Tổng kết & Hành động",
-              bullets = listOf("Lời căn dặn và định hướng phấn đấu", "Phát huy truyền thống Chiến đấu anh dũng, mưu trí sáng tạo, làm chủ vùng biển.", "Quyết chiến quyết thắng"),
-              highlightQuote = "Bảo vệ vững chắc chủ quyền biển đảo Tổ quốc.",
-              note = "Định hướng phấn đấu"
+          // Parse slides
+          val slideArray = lJson.optJSONArray("slides")
+          val slides = mutableListOf<SlideItem>()
+          if (slideArray != null && slideArray.length() > 0) {
+            for (slIdx in 0 until slideArray.length()) {
+              val slObj = slideArray.getJSONObject(slIdx)
+              val bulletsJson = slObj.optJSONArray("bullets")
+              val bulletsList = mutableListOf<String>()
+              if (bulletsJson != null) {
+                for (b in 0 until bulletsJson.length()) {
+                  bulletsList.add(bulletsJson.optString(b))
+                }
+              }
+              if (bulletsList.isEmpty()) {
+                bulletsList.add(slObj.optString("content", summary))
+              }
+              slides.add(
+                SlideItem(
+                  slideNumber = slObj.optInt("slideNumber", slIdx + 1),
+                  title = slObj.optString("title", "${slIdx + 1}. Nội dung Slide bài giảng"),
+                  bullets = bulletsList,
+                  highlightQuote = slObj.optString("highlightQuote", "Gắn lý luận với thực tiễn chiến đấu."),
+                  note = slObj.optString("note", "Trọng tâm bài giảng")
+                )
+              )
+            }
+          } else {
+            slides.addAll(
+              listOf(
+                SlideItem(
+                  slideNumber = 1,
+                  title = "1. Tổng quan Chuyên đề",
+                  bullets = listOf(title, "Giảng viên: $lecturer • Đơn vị: Vùng 4 Hải quân", "Khái quát toàn diện mục tiêu bài học"),
+                  highlightQuote = "Nắm vững mục tiêu và lý luận gắn liền thực tiễn Hải quân.",
+                  note = "Trọng tâm bài giảng"
+                ),
+                SlideItem(
+                  slideNumber = 2,
+                  title = "2. Ý nghĩa & Mục đích",
+                  bullets = listOf("Nâng cao nhận thức chính trị tư tưởng", summary, "Cốt lõi nhận thức của người quân nhân"),
+                  highlightQuote = "Bồi dưỡng lý tưởng cách mạng, bản lĩnh kiên định.",
+                  note = "Nhận thức tư tưởng"
+                ),
+                SlideItem(
+                  slideNumber = 3,
+                  title = "3. Nhiệm vụ & Yêu cầu",
+                  bullets = listOf("Nhiệm vụ trực sẵn sàng chiến đấu tại Vùng 4", "Luôn đề cao cảnh giác, sẵn sàng nhận và hoàn thành xuất sắc mọi nhiệm vụ được giao.", "Sẵn sàng chiến đấu cao"),
+                  highlightQuote = "Đoàn kết hiệp đồng, lập công tập thể.",
+                  note = "Nhiệm vụ trọng tâm"
+                ),
+                SlideItem(
+                  slideNumber = 4,
+                  title = "4. Tổng kết & Hành động",
+                  bullets = listOf("Lời căn dặn và định hướng phấn đấu", "Phát huy truyền thống Chiến đấu anh dũng, mưu trí sáng tạo, làm chủ vùng biển.", "Quyết chiến quyết thắng"),
+                  highlightQuote = "Bảo vệ vững chắc chủ quyền biển đảo Tổ quốc.",
+                  note = "Định hướng phấn đấu"
+                )
+              )
             )
-          )
+          }
 
-          val docAttachments = listOf(
-            DocAttachment("doc_1", lJson.optString("docxAttachment", "${lessonId}_Giao_an.docx"), "1.8 MB", "WORD", "https://docs.gdct.vung4.vn/${lessonId}.docx"),
-            DocAttachment("doc_2", lJson.optString("pdfAttachment", "${lessonId}_Tai_lieu.pdf"), "2.4 MB", "PDF", "https://docs.gdct.vung4.vn/${lessonId}.pdf")
-          )
+          // Parse doc attachments
+          val docArray = lJson.optJSONArray("docAttachments")
+          val docAttachments = mutableListOf<DocAttachment>()
+          if (docArray != null && docArray.length() > 0) {
+            for (dIdx in 0 until docArray.length()) {
+              val dObj = docArray.getJSONObject(dIdx)
+              val dFileName = dObj.optString("fileName", "${lessonId}_Tai_lieu.docx")
+              val dType = if (dFileName.lowercase().endsWith(".pdf")) "PDF" else "WORD"
+              docAttachments.add(
+                DocAttachment(
+                  id = dObj.optString("id", "doc_${dIdx + 1}"),
+                  fileName = dFileName,
+                  fileSize = dObj.optString("fileSize", "1.8 MB"),
+                  fileType = dObj.optString("fileType", dType),
+                  downloadUrl = dObj.optString("downloadUrl", "https://docs.gdct.vung4.vn/$dFileName")
+                )
+              )
+            }
+          } else {
+            val docxName = lJson.optString("docxAttachment", "${lessonId}_Giao_an.docx")
+            val pdfName = lJson.optString("pdfAttachment", "${lessonId}_Tai_lieu.pdf")
+            docAttachments.add(
+              DocAttachment("doc_1", docxName, "1.8 MB", "WORD", "https://docs.gdct.vung4.vn/$docxName")
+            )
+            docAttachments.add(
+              DocAttachment("doc_2", pdfName, "2.4 MB", "PDF", "https://docs.gdct.vung4.vn/$pdfName")
+            )
+          }
 
           parsedLessons.add(
             Lesson(
@@ -684,7 +756,22 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         withContext(Dispatchers.Main) {
-          _uiState.value = _uiState.value.copy(adminLessons = parsedLessons)
+          val currentSelected = _uiState.value.selectedLesson
+          val currentQuizLesson = _uiState.value.activeQuizLesson
+
+          val updatedSelected = if (currentSelected != null) {
+            parsedLessons.find { it.id == currentSelected.id } ?: currentSelected
+          } else null
+
+          val updatedQuiz = if (currentQuizLesson != null) {
+            parsedLessons.find { it.id == currentQuizLesson.id } ?: currentQuizLesson
+          } else null
+
+          _uiState.value = _uiState.value.copy(
+            adminLessons = parsedLessons,
+            selectedLesson = updatedSelected,
+            activeQuizLesson = updatedQuiz
+          )
         }
       }
 
