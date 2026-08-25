@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Assignment
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Headphones
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.MilitaryTech
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
@@ -392,54 +393,65 @@ fun StudyScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Action Buttons Row (Slide / Document / Video / Quiz)
+            // Action Buttons Row (Slide / Document / Video / Audio / Quiz)
             Row(
               modifier = Modifier.fillMaxWidth(),
-              horizontalArrangement = Arrangement.spacedBy(6.dp)
+              horizontalArrangement = Arrangement.spacedBy(5.dp)
             ) {
               OutlinedButton(
                 onClick = { onOpenLesson(lesson, StudyMode.SLIDE) },
                 shape = RoundedCornerShape(8.dp),
-                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                contentPadding = PaddingValues(horizontal = 6.dp, vertical = 4.dp),
                 modifier = Modifier.weight(1f).testTag("btn_slide_${lesson.id}")
               ) {
-                Icon(Icons.Default.Slideshow, contentDescription = null, modifier = Modifier.size(14.dp), tint = NavyPrimary)
+                Icon(Icons.Default.Slideshow, contentDescription = null, modifier = Modifier.size(13.dp), tint = NavyPrimary)
                 Spacer(modifier = Modifier.width(3.dp))
-                Text("Slide PPT", fontSize = 10.5.sp, color = NavyPrimary, fontWeight = FontWeight.SemiBold)
+                Text("Slide", fontSize = 10.5.sp, color = NavyPrimary, fontWeight = FontWeight.SemiBold)
               }
 
               OutlinedButton(
                 onClick = { onOpenLesson(lesson, StudyMode.DOCUMENT) },
                 shape = RoundedCornerShape(8.dp),
-                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                contentPadding = PaddingValues(horizontal = 6.dp, vertical = 4.dp),
                 modifier = Modifier.weight(1f).testTag("btn_doc_${lesson.id}")
               ) {
-                Icon(Icons.Default.MenuBook, contentDescription = null, modifier = Modifier.size(14.dp), tint = NavyPrimary)
+                Icon(Icons.Default.MenuBook, contentDescription = null, modifier = Modifier.size(13.dp), tint = NavyPrimary)
                 Spacer(modifier = Modifier.width(3.dp))
-                Text("Đọc", fontSize = 11.sp, color = NavyPrimary)
+                Text("Đọc", fontSize = 10.5.sp, color = NavyPrimary)
               }
 
               OutlinedButton(
                 onClick = { onOpenLesson(lesson, StudyMode.VIDEO) },
                 shape = RoundedCornerShape(8.dp),
-                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                contentPadding = PaddingValues(horizontal = 6.dp, vertical = 4.dp),
                 modifier = Modifier.weight(1f).testTag("btn_video_${lesson.id}")
               ) {
-                Icon(Icons.Default.Videocam, contentDescription = null, modifier = Modifier.size(14.dp), tint = NavyPrimary)
+                Icon(Icons.Default.Videocam, contentDescription = null, modifier = Modifier.size(13.dp), tint = NavyPrimary)
                 Spacer(modifier = Modifier.width(3.dp))
-                Text("Video", fontSize = 11.sp, color = NavyPrimary)
+                Text("Video", fontSize = 10.5.sp, color = NavyPrimary)
+              }
+
+              OutlinedButton(
+                onClick = { onOpenLesson(lesson, StudyMode.AUDIO) },
+                shape = RoundedCornerShape(8.dp),
+                contentPadding = PaddingValues(horizontal = 6.dp, vertical = 4.dp),
+                modifier = Modifier.weight(1f).testTag("btn_audio_${lesson.id}")
+              ) {
+                Icon(Icons.Default.Headphones, contentDescription = null, modifier = Modifier.size(13.dp), tint = NavyPrimary)
+                Spacer(modifier = Modifier.width(3.dp))
+                Text("Audio", fontSize = 10.5.sp, color = NavyPrimary)
               }
 
               Button(
                 onClick = { onStartQuiz(lesson) },
                 colors = ButtonDefaults.buttonColors(containerColor = CrimsonRed),
                 shape = RoundedCornerShape(8.dp),
-                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
-                modifier = Modifier.weight(1.2f).testTag("btn_quiz_start_${lesson.id}")
+                contentPadding = PaddingValues(horizontal = 6.dp, vertical = 4.dp),
+                modifier = Modifier.weight(1.15f).testTag("btn_quiz_start_${lesson.id}")
               ) {
-                Icon(Icons.Default.Assignment, contentDescription = null, modifier = Modifier.size(14.dp))
-                Spacer(modifier = Modifier.width(3.dp))
-                Text("Kiểm tra", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                Icon(Icons.Default.Assignment, contentDescription = null, modifier = Modifier.size(13.dp))
+                Spacer(modifier = Modifier.width(2.dp))
+                Text("Thi", fontSize = 11.sp, fontWeight = FontWeight.Bold)
               }
             }
           }

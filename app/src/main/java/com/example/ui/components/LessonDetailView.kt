@@ -7,6 +7,10 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
+import coil.compose.SubcomposeAsyncImage
+import coil.request.ImageRequest
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -520,10 +524,13 @@ fun SlidePresentationViewer(
     }
 
     // 2. Main 16:9 Presentation Canvas Card
+    val hasSlideImage = currentSlide.imageUrl.isNotBlank() || currentSlide.imageData.isNotBlank()
+    val slideImgSrc = if (currentSlide.imageUrl.isNotBlank()) currentSlide.imageUrl else currentSlide.imageData
+
     Card(
       shape = RoundedCornerShape(14.dp),
       colors = CardDefaults.cardColors(
-        containerColor = when (slideTheme) {
+        containerColor = if (hasSlideImage) Color.Black else when (slideTheme) {
           "dark" -> Color(0xFF0F172A)
           "classic" -> Color(0xFFFAF8F5)
           else -> Color.White
@@ -531,143 +538,209 @@ fun SlidePresentationViewer(
       ),
       border = androidx.compose.foundation.BorderStroke(
         1.5.dp,
-        when (slideTheme) {
+        if (hasSlideImage) NavyPrimary else when (slideTheme) {
           "dark" -> Color(0xFF334155)
           "classic" -> Color(0xFFE2E8F0)
           else -> NavyPrimary.copy(alpha = 0.2f)
         }
       ),
-      elevation = CardDefaults.cardElevation(3.dp),
+      elevation = CardDefaults.cardElevation(4.dp),
       modifier = Modifier
         .weight(1f)
         .fillMaxWidth()
     ) {
-      Column(
-        modifier = Modifier
-          .fillMaxSize()
-          .verticalScroll(rememberScrollState())
-          .padding(16.dp),
-        verticalArrangement = Arrangement.SpaceBetween
-      ) {
-        Column {
-          // Slide Header Bar (PowerPoint Master Slide Banner)
-          Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-          ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-              Icon(
-                imageVector = Icons.Default.MilitaryTech,
-                contentDescription = null,
-                tint = if (slideTheme == "dark") GoldYellow else CrimsonRed,
-                modifier = Modifier.size(16.dp)
-              )
-              Spacer(modifier = Modifier.width(6.dp))
-              Text(
-                text = "VÙNG 4 HẢI QUÂN • ${lesson.code}",
-                color = if (slideTheme == "dark") GoldYellow else NavyPrimary,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 0.5.sp
-              )
-            }
-
-            Surface(
-              shape = RoundedCornerShape(4.dp),
-              color = if (slideTheme == "dark") Color(0xFF1E293B) else Color(0xFFF1F5F9)
-            ) {
-              Text(
-                text = "TRANG ${safeIndex + 1}",
-                color = if (slideTheme == "dark") Color(0xFF94A3B8) else Color(0xFF64748B),
-                fontSize = 9.5.sp,
-                fontWeight = FontWeight.Black,
-                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-              )
-            }
-          }
-
-          Spacer(modifier = Modifier.height(10.dp))
-
-          // Slide Title
-          Text(
-            text = currentSlide.title,
-            color = if (slideTheme == "dark") Color.White else NavyDeep,
-            fontSize = 16.5.sp,
-            fontWeight = FontWeight.Black,
-            lineHeight = 23.sp
-          )
-
-          // Decorative Gold Accent Line
-          Box(
-            modifier = Modifier
-              .padding(vertical = 8.dp)
-              .fillMaxWidth(0.35f)
-              .height(3.dp)
-              .clip(RoundedCornerShape(2.dp))
-              .background(if (slideTheme == "dark") GoldYellow else CrimsonRed)
-          )
-
-          Spacer(modifier = Modifier.height(6.dp))
-
-          // Structured Bullets Points
-          currentSlide.bullets.forEachIndexed { idx, bullet ->
-            Row(
-              modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 5.dp),
-              verticalAlignment = Alignment.Top
-            ) {
-              Box(
+      if (hasSlideImage) {
+        Box(
+          modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black),
+          contentAlignment = Alignment.Center
+        ) {
+          SubcomposeAsyncImage(
+            model = slideImgSrc,
+            contentDescription = currentSlide.title,
+            contentScale = ContentScale.Fit,
+            modifier = Modifier.fillMaxSize(),
+            loading = {
+              Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                  LinearProgressIndicator(modifier = Modifier.width(120.dp), color = CrimsonRed)
+                  Spacer(modifier = Modifier.height(6.dp))
+                  Text("Đang tải slide PPT...", color = Color.White, fontSize = 11.sp)
+                }
+              }
+            },
+            error = {
+              // Fallback to text presentation
+              Column(
                 modifier = Modifier
-                  .padding(top = 4.dp)
-                  .size(8.dp)
-                  .clip(CircleShape)
-                  .background(if (slideTheme == "dark") GoldYellow else NavyPrimary)
-              )
-              Spacer(modifier = Modifier.width(10.dp))
-              Text(
-                text = bullet,
-                color = if (slideTheme == "dark") Color(0xFFE2E8F0) else Color(0xFF1E293B),
-                fontSize = 13.5.sp,
-                lineHeight = 20.sp,
-                fontWeight = FontWeight.Normal
-              )
+                  .fillMaxSize()
+                  .background(Color.White)
+                  .padding(16.dp)
+                  .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.SpaceBetween
+              ) {
+                Column {
+                  Text(
+                    text = currentSlide.title,
+                    color = NavyDeep,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Black
+                  )
+                  Spacer(modifier = Modifier.height(8.dp))
+                  currentSlide.bullets.forEach { b ->
+                    Text(text = "• $b", color = Color(0xFF1E293B), fontSize = 13.sp, modifier = Modifier.padding(vertical = 3.dp))
+                  }
+                }
+              }
             }
+          )
+
+          // Floating Badge: Slide Number & Status
+          Surface(
+            shape = RoundedCornerShape(6.dp),
+            color = Color.Black.copy(alpha = 0.7f),
+            modifier = Modifier
+              .align(Alignment.TopEnd)
+              .padding(8.dp)
+          ) {
+            Text(
+              text = "Slide ${safeIndex + 1}/${slides.size}",
+              color = GoldYellow,
+              fontSize = 10.sp,
+              fontWeight = FontWeight.Bold,
+              modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp)
+            )
           }
         }
-
-        // Highlight Quote / Core Directive
-        if (currentSlide.highlightQuote != null) {
-          Spacer(modifier = Modifier.height(10.dp))
-          Surface(
-            shape = RoundedCornerShape(10.dp),
-            color = if (slideTheme == "dark") Color(0xFF1E293B) else Color(0xFFFEF3C7),
-            border = androidx.compose.foundation.BorderStroke(
-              1.dp,
-              if (slideTheme == "dark") GoldYellow.copy(alpha = 0.5f) else Color(0xFFFDE68A)
-            ),
-            modifier = Modifier.fillMaxWidth()
-          ) {
+      } else {
+        Column(
+          modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp),
+          verticalArrangement = Arrangement.SpaceBetween
+        ) {
+          Column {
+            // Slide Header Bar (PowerPoint Master Slide Banner)
             Row(
-              modifier = Modifier.padding(10.dp),
+              modifier = Modifier.fillMaxWidth(),
+              horizontalArrangement = Arrangement.SpaceBetween,
               verticalAlignment = Alignment.CenterVertically
             ) {
-              Icon(
-                imageVector = Icons.Default.FormatQuote,
-                contentDescription = null,
-                tint = if (slideTheme == "dark") GoldYellow else Color(0xFFD97706),
-                modifier = Modifier.size(20.dp)
-              )
-              Spacer(modifier = Modifier.width(8.dp))
-              Text(
-                text = currentSlide.highlightQuote!!,
-                color = if (slideTheme == "dark") GoldYellow else Color(0xFF92400E),
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold,
-                fontStyle = FontStyle.Italic,
-                lineHeight = 17.sp
-              )
+              Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                  imageVector = Icons.Default.MilitaryTech,
+                  contentDescription = null,
+                  tint = if (slideTheme == "dark") GoldYellow else CrimsonRed,
+                  modifier = Modifier.size(16.dp)
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(
+                  text = "VÙNG 4 HẢI QUÂN • ${lesson.code}",
+                  color = if (slideTheme == "dark") GoldYellow else NavyPrimary,
+                  fontSize = 11.sp,
+                  fontWeight = FontWeight.Bold,
+                  letterSpacing = 0.5.sp
+                )
+              }
+
+              Surface(
+                shape = RoundedCornerShape(4.dp),
+                color = if (slideTheme == "dark") Color(0xFF1E293B) else Color(0xFFF1F5F9)
+              ) {
+                Text(
+                  text = "TRANG ${safeIndex + 1}",
+                  color = if (slideTheme == "dark") Color(0xFF94A3B8) else Color(0xFF64748B),
+                  fontSize = 9.5.sp,
+                  fontWeight = FontWeight.Black,
+                  modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                )
+              }
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // Slide Title
+            Text(
+              text = currentSlide.title,
+              color = if (slideTheme == "dark") Color.White else NavyDeep,
+              fontSize = 16.5.sp,
+              fontWeight = FontWeight.Black,
+              lineHeight = 23.sp
+            )
+
+            // Decorative Gold Accent Line
+            Box(
+              modifier = Modifier
+                .padding(vertical = 8.dp)
+                .fillMaxWidth(0.35f)
+                .height(3.dp)
+                .clip(RoundedCornerShape(2.dp))
+                .background(if (slideTheme == "dark") GoldYellow else CrimsonRed)
+            )
+
+            Spacer(modifier = Modifier.height(6.dp))
+
+            // Structured Bullets Points
+            currentSlide.bullets.forEachIndexed { idx, bullet ->
+              Row(
+                modifier = Modifier
+                  .fillMaxWidth()
+                  .padding(vertical = 5.dp),
+                verticalAlignment = Alignment.Top
+              ) {
+                Box(
+                  modifier = Modifier
+                    .padding(top = 4.dp)
+                    .size(8.dp)
+                    .clip(CircleShape)
+                    .background(if (slideTheme == "dark") GoldYellow else NavyPrimary)
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(
+                  text = bullet,
+                  color = if (slideTheme == "dark") Color(0xFFE2E8F0) else Color(0xFF1E293B),
+                  fontSize = 13.5.sp,
+                  lineHeight = 20.sp,
+                  fontWeight = FontWeight.Normal
+                )
+              }
+            }
+          }
+
+          // Highlight Quote / Core Directive
+          if (currentSlide.highlightQuote != null) {
+            Spacer(modifier = Modifier.height(10.dp))
+            Surface(
+              shape = RoundedCornerShape(10.dp),
+              color = if (slideTheme == "dark") Color(0xFF1E293B) else Color(0xFFFEF3C7),
+              border = androidx.compose.foundation.BorderStroke(
+                1.dp,
+                if (slideTheme == "dark") GoldYellow.copy(alpha = 0.5f) else Color(0xFFFDE68A)
+              ),
+              modifier = Modifier.fillMaxWidth()
+            ) {
+              Row(
+                modifier = Modifier.padding(10.dp),
+                verticalAlignment = Alignment.CenterVertically
+              ) {
+                Icon(
+                  imageVector = Icons.Default.FormatQuote,
+                  contentDescription = null,
+                  tint = if (slideTheme == "dark") GoldYellow else Color(0xFFD97706),
+                  modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                  text = currentSlide.highlightQuote!!,
+                  color = if (slideTheme == "dark") GoldYellow else Color(0xFF92400E),
+                  fontSize = 12.sp,
+                  fontWeight = FontWeight.Bold,
+                  fontStyle = FontStyle.Italic,
+                  lineHeight = 17.sp
+                )
+              }
             }
           }
         }
@@ -720,52 +793,109 @@ fun SlidePresentationViewer(
     ) {
       itemsIndexed(slides) { idx, s ->
         val isSelected = idx == safeIndex
+        val hasThumbImage = s.imageUrl.isNotBlank() || s.imageData.isNotBlank()
+        val thumbSrc = if (s.imageUrl.isNotBlank()) s.imageUrl else s.imageData
+
         Surface(
           shape = RoundedCornerShape(8.dp),
           color = if (isSelected) NavyContainer else Color.White,
           border = androidx.compose.foundation.BorderStroke(
-            1.5.dp,
-            if (isSelected) NavyPrimary else Color(0xFFE2E8F0)
+            if (isSelected) 2.dp else 1.dp,
+            if (isSelected) CrimsonRed else Color(0xFFCBD5E1)
           ),
           modifier = Modifier
-            .width(80.dp)
-            .height(52.dp)
+            .width(86.dp)
+            .height(54.dp)
             .clickable { onSelect(idx) }
             .testTag("thumbnail_slide_$idx")
         ) {
-          Column(
-            modifier = Modifier
-              .fillMaxSize()
-              .padding(4.dp),
-            verticalArrangement = Arrangement.SpaceBetween
-          ) {
-            Row(
-              modifier = Modifier.fillMaxWidth(),
-              horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-              Text(
-                text = "${idx + 1}",
-                fontSize = 9.sp,
-                fontWeight = FontWeight.Black,
-                color = if (isSelected) NavyPrimary else Color(0xFF64748B)
+          if (hasThumbImage) {
+            Box(modifier = Modifier.fillMaxSize()) {
+              AsyncImage(
+                model = thumbSrc,
+                contentDescription = s.title,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
               )
-              if (isSelected) {
-                Box(
-                  modifier = Modifier
-                    .size(5.dp)
-                    .clip(CircleShape)
-                    .background(CrimsonRed)
+              Box(
+                modifier = Modifier
+                  .fillMaxSize()
+                  .background(
+                    Brush.verticalGradient(
+                      listOf(Color.Black.copy(alpha = 0.5f), Color.Transparent, Color.Black.copy(alpha = 0.75f))
+                    )
+                  )
+              )
+              Row(
+                modifier = Modifier
+                  .fillMaxWidth()
+                  .padding(horizontal = 4.dp, vertical = 2.dp)
+                  .align(Alignment.TopStart),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+              ) {
+                Text(
+                  text = "${idx + 1}",
+                  fontSize = 9.5.sp,
+                  fontWeight = FontWeight.Black,
+                  color = if (isSelected) GoldYellow else Color.White
                 )
+                if (isSelected) {
+                  Box(
+                    modifier = Modifier
+                      .size(6.dp)
+                      .clip(CircleShape)
+                      .background(CrimsonRed)
+                  )
+                }
               }
+              Text(
+                text = s.title,
+                fontSize = 8.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier
+                  .padding(3.dp)
+                  .align(Alignment.BottomStart)
+              )
             }
-            Text(
-              text = s.title,
-              fontSize = 8.5.sp,
-              fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-              color = if (isSelected) NavyDeep else Color(0xFF475569),
-              maxLines = 1,
-              overflow = TextOverflow.Ellipsis
-            )
+          } else {
+            Column(
+              modifier = Modifier
+                .fillMaxSize()
+                .padding(4.dp),
+              verticalArrangement = Arrangement.SpaceBetween
+            ) {
+              Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+              ) {
+                Text(
+                  text = "${idx + 1}",
+                  fontSize = 9.sp,
+                  fontWeight = FontWeight.Black,
+                  color = if (isSelected) NavyPrimary else Color(0xFF64748B)
+                )
+                if (isSelected) {
+                  Box(
+                    modifier = Modifier
+                      .size(5.dp)
+                      .clip(CircleShape)
+                      .background(CrimsonRed)
+                  )
+                }
+              }
+              Text(
+                text = s.title,
+                fontSize = 8.5.sp,
+                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                color = if (isSelected) NavyDeep else Color(0xFF475569),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+              )
+            }
           }
         }
       }
@@ -933,112 +1063,142 @@ fun FullscreenSlideShowDialog(
         }
 
         // Center 16:9 PowerPoint Slide Stage
+        val hasFullscreenImage = currentSlide.imageUrl.isNotBlank() || currentSlide.imageData.isNotBlank()
+        val fullscreenImgSrc = if (currentSlide.imageUrl.isNotBlank()) currentSlide.imageUrl else currentSlide.imageData
+
         Card(
           shape = RoundedCornerShape(16.dp),
-          colors = CardDefaults.cardColors(containerColor = Color.White),
+          colors = CardDefaults.cardColors(containerColor = if (hasFullscreenImage) Color.Black else Color.White),
           elevation = CardDefaults.cardElevation(8.dp),
           modifier = Modifier
             .fillMaxWidth()
             .weight(1f)
             .padding(vertical = 10.dp)
         ) {
-          Column(
-            modifier = Modifier
-              .fillMaxSize()
-              .padding(20.dp),
-            verticalArrangement = Arrangement.SpaceBetween
-          ) {
-            Column {
-              // Master Slide Top
-              Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-              ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                  Icon(Icons.Default.MilitaryTech, contentDescription = null, tint = CrimsonRed, modifier = Modifier.size(18.dp))
-                  Spacer(modifier = Modifier.width(6.dp))
-                  Text(
-                    text = "BỘ TƯ LỆNH VÙNG 4 HẢI QUÂN",
-                    color = NavyDeep,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Black
-                  )
+          if (hasFullscreenImage) {
+            Box(
+              modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black),
+              contentAlignment = Alignment.Center
+            ) {
+              SubcomposeAsyncImage(
+                model = fullscreenImgSrc,
+                contentDescription = currentSlide.title,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.fillMaxSize(),
+                loading = {
+                  Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    LinearProgressIndicator(modifier = Modifier.width(120.dp), color = CrimsonRed)
+                  }
                 }
-                Text(
-                  text = "Slide ${safeIndex + 1} / ${slides.size}",
-                  color = Color(0xFF64748B),
-                  fontSize = 10.5.sp,
-                  fontWeight = FontWeight.Bold
-                )
-              }
-
-              Spacer(modifier = Modifier.height(14.dp))
-
-              Text(
-                text = currentSlide.title,
-                color = NavyDeep,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Black,
-                lineHeight = 24.sp
               )
-
-              Box(
-                modifier = Modifier
-                  .padding(vertical = 10.dp)
-                  .fillMaxWidth(0.3f)
-                  .height(3.5.dp)
-                  .clip(RoundedCornerShape(2.dp))
-                  .background(CrimsonRed)
-              )
-
-              Spacer(modifier = Modifier.height(6.dp))
-
-              currentSlide.bullets.forEach { bullet ->
-                Row(
-                  modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 6.dp),
-                  verticalAlignment = Alignment.Top
-                ) {
-                  Box(
-                    modifier = Modifier
-                      .padding(top = 4.dp)
-                      .size(8.dp)
-                      .clip(CircleShape)
-                      .background(NavyPrimary)
-                  )
-                  Spacer(modifier = Modifier.width(10.dp))
-                  Text(
-                    text = bullet,
-                    color = Color(0xFF1E293B),
-                    fontSize = 14.sp,
-                    lineHeight = 21.sp
-                  )
-                }
-              }
             }
-
-            if (currentSlide.highlightQuote != null) {
-              Surface(
-                shape = RoundedCornerShape(10.dp),
-                color = Color(0xFFFEF3C7),
-                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFFDE68A)),
-                modifier = Modifier.fillMaxWidth()
-              ) {
+          } else {
+            Column(
+              modifier = Modifier
+                .fillMaxSize()
+                .padding(20.dp),
+              verticalArrangement = Arrangement.SpaceBetween
+            ) {
+              Column {
+                // Master Slide Top
                 Row(
-                  modifier = Modifier.padding(10.dp),
+                  modifier = Modifier.fillMaxWidth(),
+                  horizontalArrangement = Arrangement.SpaceBetween,
                   verticalAlignment = Alignment.CenterVertically
                 ) {
-                  Icon(Icons.Default.FormatQuote, contentDescription = null, tint = Color(0xFFD97706), modifier = Modifier.size(20.dp))
-                  Spacer(modifier = Modifier.width(8.dp))
+                  Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.MilitaryTech, contentDescription = null, tint = CrimsonRed, modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                      text = "BỘ TƯ LỆNH VÙNG 4 HẢI QUÂN",
+                      color = NavyDeep,
+                      fontSize = 11.sp,
+                      fontWeight = FontWeight.Black
+                    )
+                  }
                   Text(
-                    text = currentSlide.highlightQuote!!,
-                    color = Color(0xFF92400E),
-                    fontSize = 12.5.sp,
-                    fontWeight = FontWeight.Bold,
-                    fontStyle = FontStyle.Italic
+                    text = "Slide ${safeIndex + 1} / ${slides.size}",
+                    color = Color(0xFF64748B),
+                    fontSize = 10.5.sp,
+                    fontWeight = FontWeight.Bold
                   )
+                }
+
+                Spacer(modifier = Modifier.height(14.dp))
+
+                Text(
+                  text = currentSlide.title,
+                  color = NavyDeep,
+                  fontSize = 18.sp,
+                  fontWeight = FontWeight.Black,
+                  lineHeight = 24.sp
+                )
+
+                Box(
+                  modifier = Modifier
+                    .padding(vertical = 10.dp)
+                    .fillMaxWidth(0.3f)
+                    .height(3.5.dp)
+                    .clip(RoundedCornerShape(2.dp))
+                    .background(CrimsonRed)
+                )
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                currentSlide.bullets.forEach { bullet ->
+                  Row(
+                    modifier = Modifier
+                      .fillMaxWidth()
+                      .padding(vertical = 6.dp),
+                    verticalAlignment = Alignment.Top
+                  ) {
+                    Box(
+                      modifier = Modifier
+                        .padding(top = 4.dp)
+                        .size(8.dp)
+                        .clip(CircleShape)
+                        .background(NavyPrimary)
+                    )
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Text(
+                      text = bullet,
+                      color = Color(0xFF1E293B),
+                      fontSize = 14.sp,
+                      lineHeight = 21.sp
+                    )
+                  }
+                }
+              }
+
+              // Highlight Quote at bottom
+              if (currentSlide.highlightQuote != null) {
+                Surface(
+                  shape = RoundedCornerShape(10.dp),
+                  color = Color(0xFFFEF3C7),
+                  border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFFDE68A)),
+                  modifier = Modifier.fillMaxWidth()
+                ) {
+                  Row(
+                    modifier = Modifier.padding(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                  ) {
+                    Icon(
+                      imageVector = Icons.Default.FormatQuote,
+                      contentDescription = null,
+                      tint = Color(0xFFD97706),
+                      modifier = Modifier.size(22.dp)
+                    )
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Text(
+                      text = currentSlide.highlightQuote!!,
+                      color = Color(0xFF92400E),
+                      fontSize = 13.sp,
+                      fontWeight = FontWeight.Bold,
+                      fontStyle = FontStyle.Italic
+                    )
+                  }
                 }
               }
             }

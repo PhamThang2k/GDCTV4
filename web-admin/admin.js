@@ -1046,6 +1046,187 @@ function initActionButtons() {
     });
   });
 
+  // Slide state for modal
+  let currentEditingSlides = [];
+
+  function renderSlidesEditor() {
+    const container = document.getElementById("slides-editor-container");
+    if (!container) return;
+
+    if (currentEditingSlides.length === 0) {
+      container.innerHTML = `
+        <div style="text-align: center; padding: 24px; color: var(--slate-500); background: #F8FAFC; border: 1px dashed #CBD5E1; border-radius: 8px;">
+          <i class="fa-solid fa-file-powerpoint" style="font-size: 28px; color: #D97706; margin-bottom: 8px;"></i>
+          <p style="font-size: 13px; margin-bottom: 8px;">Chưa có slide nào. Bấm <b>"Nạp loạt ảnh Slide"</b> để chọn toàn bộ ảnh xuất từ PowerPoint hoặc <b>"Thêm Slide"</b>.</p>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = currentEditingSlides.map((s, idx) => {
+      const hasImg = (s.imageUrl && s.imageUrl.trim().length > 0) || (s.imageData && s.imageData.trim().length > 0);
+      const imgSrc = s.imageData || s.imageUrl;
+      const bulletsText = Array.isArray(s.bullets) ? s.bullets.join("\n") : (s.bullets || "");
+
+      return `
+        <div style="border: 1px solid var(--slate-200); border-radius: 10px; padding: 14px; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.05);" data-slide-idx="${idx}">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid var(--slate-100); padding-bottom: 6px;">
+            <div style="font-weight: 700; font-size: 13px; color: var(--navy-primary); display: flex; align-items: center; gap: 6px;">
+              <span class="badge badge-navy">Slide ${idx + 1}</span>
+              <span>${s.title || `Trang ${idx + 1}`}</span>
+            </div>
+            <div style="display: flex; gap: 6px;">
+              <button type="button" class="btn btn-outline btn-sm" onclick="moveSlideUp(${idx})" ${idx === 0 ? 'disabled style="opacity:0.4;"' : ''} title="Chuyển lên"><i class="fa-solid fa-arrow-up"></i></button>
+              <button type="button" class="btn btn-outline btn-sm" onclick="moveSlideDown(${idx})" ${idx === currentEditingSlides.length - 1 ? 'disabled style="opacity:0.4;"' : ''} title="Chuyển xuống"><i class="fa-solid fa-arrow-down"></i></button>
+              <button type="button" class="btn btn-outline btn-sm" onclick="deleteDynamicSlide(${idx})" style="color: var(--crimson-red);" title="Xóa slide"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 140px 1fr; gap: 14px; align-items: start;">
+            <!-- Slide Image Box -->
+            <div>
+              <div style="width: 140px; height: 85px; border-radius: 6px; border: 1.5px dashed ${hasImg ? '#10B981' : '#CBD5E1'}; background: #F8FAFC; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;">
+                ${hasImg ? `<img src="${imgSrc}" style="width: 100%; height: 100%; object-fit: cover;" alt="Slide ${idx + 1}">` : `<div style="text-align: center; color: #94A3B8; font-size: 10.5px; padding: 4px;"><i class="fa-solid fa-image" style="font-size: 18px; margin-bottom: 2px;"></i><br>Chưa có ảnh</div>`}
+              </div>
+              <input type="file" id="slide-img-input-${idx}" accept="image/*" style="display: none;" onchange="handleSingleSlideImage(${idx}, this)">
+              <div style="display: flex; gap: 4px; margin-top: 6px;">
+                <button type="button" class="btn btn-outline btn-sm" style="font-size: 10.5px; padding: 3px 6px; flex: 1;" onclick="document.getElementById('slide-img-input-${idx}').click()">
+                  <i class="fa-solid fa-upload"></i> ${hasImg ? 'Đổi ảnh' : 'Tải ảnh'}
+                </button>
+                ${hasImg ? `<button type="button" class="btn btn-outline btn-sm" style="color: #DC2626; padding: 3px 6px;" onclick="clearSlideImage(${idx})" title="Xóa ảnh"><i class="fa-solid fa-xmark"></i></button>` : ''}
+              </div>
+            </div>
+
+            <!-- Slide Content Fields -->
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <div>
+                <label style="font-size: 11px; font-weight: 700; color: #475569; margin-bottom: 2px; display: block;">Tiêu đề Slide:</label>
+                <input type="text" class="form-control" value="${s.title || ''}" placeholder="VD: 1. Bối cảnh tình hình..." oninput="updateSlideField(${idx}, 'title', this.value)" style="font-size: 12px; padding: 6px 10px;">
+              </div>
+              <div>
+                <label style="font-size: 11px; font-weight: 700; color: #475569; margin-bottom: 2px; display: block;">Nội dung gạch đầu dòng (Mỗi dòng một ý):</label>
+                <textarea class="form-control" rows="2" placeholder="Nhập các ý trình bày của slide..." oninput="updateSlideBullets(${idx}, this.value)" style="font-size: 12px; padding: 6px 10px;">${bulletsText}</textarea>
+              </div>
+              <div>
+                <label style="font-size: 11px; font-weight: 700; color: #475569; margin-bottom: 2px; display: block;">Ghi chú thuyết minh báo cáo viên (Tùy chọn):</label>
+                <input type="text" class="form-control" value="${s.note || ''}" placeholder="Ghi chú thêm cho giảng viên..." oninput="updateSlideField(${idx}, 'note', this.value)" style="font-size: 11.5px; padding: 5px 8px;">
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  window.moveSlideUp = function(idx) {
+    if (idx > 0) {
+      const temp = currentEditingSlides[idx];
+      currentEditingSlides[idx] = currentEditingSlides[idx - 1];
+      currentEditingSlides[idx - 1] = temp;
+      currentEditingSlides.forEach((s, i) => s.slideNumber = i + 1);
+      renderSlidesEditor();
+    }
+  };
+
+  window.moveSlideDown = function(idx) {
+    if (idx < currentEditingSlides.length - 1) {
+      const temp = currentEditingSlides[idx];
+      currentEditingSlides[idx] = currentEditingSlides[idx + 1];
+      currentEditingSlides[idx + 1] = temp;
+      currentEditingSlides.forEach((s, i) => s.slideNumber = i + 1);
+      renderSlidesEditor();
+    }
+  };
+
+  window.deleteDynamicSlide = function(idx) {
+    currentEditingSlides.splice(idx, 1);
+    currentEditingSlides.forEach((s, i) => s.slideNumber = i + 1);
+    renderSlidesEditor();
+  };
+
+  window.updateSlideField = function(idx, field, val) {
+    if (currentEditingSlides[idx]) {
+      currentEditingSlides[idx][field] = val;
+    }
+  };
+
+  window.updateSlideBullets = function(idx, val) {
+    if (currentEditingSlides[idx]) {
+      const lines = val.split("\n").map(l => l.trim()).filter(l => l.length > 0);
+      currentEditingSlides[idx].bullets = lines;
+    }
+  };
+
+  window.handleSingleSlideImage = function(idx, input) {
+    const file = input.files[0];
+    if (file && currentEditingSlides[idx]) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        currentEditingSlides[idx].imageData = e.target.result;
+        renderSlidesEditor();
+        showToast(`Đã nạp ảnh cho Slide ${idx + 1}`);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  window.clearSlideImage = function(idx) {
+    if (currentEditingSlides[idx]) {
+      currentEditingSlides[idx].imageUrl = "";
+      currentEditingSlides[idx].imageData = "";
+      renderSlidesEditor();
+    }
+  };
+
+  document.getElementById("btn-add-dynamic-slide")?.addEventListener("click", () => {
+    const num = currentEditingSlides.length + 1;
+    currentEditingSlides.push({
+      slideNumber: num,
+      title: `${num}. Nội dung Slide ${num}`,
+      bullets: ["Nội dung trọng tâm bài giảng", "Liên hệ thực tiễn tại đơn vị"],
+      imageUrl: "",
+      imageData: "",
+      highlightQuote: "Quân chủng Hải quân - Đơn vị Anh hùng Lực lượng Vũ trang",
+      note: "Nhấn mạnh liên hệ thực tiễn"
+    });
+    renderSlidesEditor();
+  });
+
+  // Batch PowerPoint images upload
+  document.getElementById("batch-slide-images")?.addEventListener("change", (e) => {
+    const files = Array.from(e.target.files);
+    if (!files || files.length === 0) return;
+
+    // Natural sort files by filename (e.g. Slide1, Slide2, Slide10)
+    files.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }));
+
+    let loadedCount = 0;
+    const newSlides = [];
+
+    files.forEach((file, index) => {
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        const slideName = file.name.replace(/\.[^/.]+$/, "");
+        newSlides[index] = {
+          slideNumber: index + 1,
+          title: `Slide ${index + 1}: ${slideName}`,
+          bullets: [`Trình chiếu ảnh bài giảng xuất từ PowerPoint (${file.name})`],
+          imageUrl: "",
+          imageData: evt.target.result,
+          highlightQuote: "Bộ Tư lệnh Vùng 4 Hải quân",
+          note: `Trang trình chiếu ${index + 1}`
+        };
+        loadedCount++;
+        if (loadedCount === files.length) {
+          currentEditingSlides = newSlides;
+          renderSlidesEditor();
+          showToast(`Đã nạp thành công ${files.length} ảnh slide PowerPoint theo đúng thứ tự!`);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  });
+
   // Lesson Modal
   document.getElementById("btn-add-lesson")?.addEventListener("click", () => {
     document.getElementById("modal-lesson-title").textContent = "Soạn Bài giảng Giáo dục Chính trị mới";
@@ -1067,15 +1248,46 @@ function initActionButtons() {
     document.getElementById("lesson-sec-3-content").value = "Mỗi cán bộ, chiến sĩ tự giác rèn luyện phẩm chất Bộ đội Cụ Hồ - Người chiến sĩ Hải quân, không ngại khó khăn sóng gió.";
     document.getElementById("lesson-sec-3-takeaway").value = "Sẵn sàng chiến đấu hy sinh bảo vệ vững chắc chủ quyền biển đảo.";
 
-    // Default slides
-    document.getElementById("slide-1-title").value = "1. Tổng quan Chuyên đề";
-    document.getElementById("slide-1-bullets").value = "Quán triệt chủ trương, nghị quyết của Quân chủng Hải quân\nNâng cao bản lĩnh chính trị người chiến sĩ Vùng 4\nKhái quát toàn diện mục tiêu bài học";
-    document.getElementById("slide-2-title").value = "2. Ý nghĩa & Mục đích";
-    document.getElementById("slide-2-bullets").value = "Bồi dưỡng lý tưởng cách mạng, kiên định mục tiêu độc lập dân tộc\nCốt lõi nhận thức của người quân nhân cách mạng\nPhát huy phẩm chất cao đẹp Bộ đội Cụ Hồ";
-    document.getElementById("slide-3-title").value = "3. Nhiệm vụ & Yêu cầu";
-    document.getElementById("slide-3-bullets").value = "Nhiệm vụ trực sẵn sàng chiến đấu trên các tàu, đài trạm Vùng 4\nChấp hành nghiêm điều lệnh, kỷ luật và bảo đảm an toàn\nĐoàn kết hiệp đồng, lập công tập thể";
-    document.getElementById("slide-4-title").value = "4. Tổng kết & Hành động";
-    document.getElementById("slide-4-bullets").value = "Lời căn dặn và định hướng hành động thiết thực\nPhát huy truyền thống Vùng 4 Hải quân anh hùng\nQuyết tâm bảo vệ vững chắc chủ quyền biển đảo";
+    // Initialize 4 default slides
+    currentEditingSlides = [
+      {
+        slideNumber: 1,
+        title: "1. Tổng quan Chuyên đề",
+        bullets: ["Quán triệt chủ trương, nghị quyết của Quân chủng Hải quân", "Nâng cao bản lĩnh chính trị người chiến sĩ Vùng 4", "Khái quát toàn diện mục tiêu bài học"],
+        imageUrl: "",
+        imageData: "",
+        highlightQuote: "Nắm vững mục tiêu và lý luận gắn liền thực tiễn Hải quân.",
+        note: "Trọng tâm bài giảng"
+      },
+      {
+        slideNumber: 2,
+        title: "2. Ý nghĩa & Mục đích",
+        bullets: ["Bồi dưỡng lý tưởng cách mạng, kiên định mục tiêu độc lập dân tộc", "Cốt lõi nhận thức của người quân nhân cách mạng", "Phát huy phẩm chất cao đẹp Bộ đội Cụ Hồ"],
+        imageUrl: "",
+        imageData: "",
+        highlightQuote: "Bồi dưỡng lý tưởng cách mạng, bản lĩnh kiên định.",
+        note: "Nhận thức tư tưởng"
+      },
+      {
+        slideNumber: 3,
+        title: "3. Nhiệm vụ & Yêu cầu",
+        bullets: ["Nhiệm vụ trực sẵn sàng chiến đấu trên các tàu, đài trạm Vùng 4", "Chấp hành nghiêm điều lệnh, kỷ luật và bảo đảm an toàn", "Đoàn kết hiệp đồng, lập công tập thể"],
+        imageUrl: "",
+        imageData: "",
+        highlightQuote: "Đoàn kết hiệp đồng, lập công tập thể.",
+        note: "Nhiệm vụ trọng tâm"
+      },
+      {
+        slideNumber: 4,
+        title: "4. Tổng kết & Hành động",
+        bullets: ["Lời căn dặn và định hướng hành động thiết thực", "Phát huy truyền thống Vùng 4 Hải quân anh hùng", "Quyết tâm bảo vệ vững chắc chủ quyền biển đảo"],
+        imageUrl: "",
+        imageData: "",
+        highlightQuote: "Bảo vệ vững chắc chủ quyền biển đảo Tổ quốc.",
+        note: "Định hướng phấn đấu"
+      }
+    ];
+    renderSlidesEditor();
 
     // Default questions
     document.getElementById("lesson-q1-text").value = "Mục tiêu trọng tâm của chuyên đề GDCT này là gì?";
@@ -1131,40 +1343,16 @@ function initActionButtons() {
     const fullLessonText = document.getElementById("lesson-full-text")?.value.trim() || "";
     const docFullContent = document.getElementById("lesson-doc-full-content")?.value.trim() || "";
 
-    // Collect Slides
-    const parseBullets = (val, fallback) => {
-      const lines = val.split("\n").map(l => l.trim()).filter(l => l.length > 0);
-      return lines.length > 0 ? lines : fallback;
-    };
-
-    const slides = [
+    // Collect Slides from dynamic state
+    const slides = currentEditingSlides.length > 0 ? currentEditingSlides : [
       {
         slideNumber: 1,
-        title: document.getElementById("slide-1-title").value.trim() || "1. Tổng quan Chuyên đề",
-        bullets: parseBullets(document.getElementById("slide-1-bullets").value, [title, `Giảng viên: ${lecturer} • Đơn vị: Vùng 4 Hải quân`, "Khái quát toàn diện mục tiêu bài học"]),
+        title: "1. Tổng quan Chuyên đề",
+        bullets: [title, `Giảng viên: ${lecturer} • Đơn vị: Vùng 4 Hải quân`, "Khái quát toàn diện mục tiêu bài học"],
+        imageUrl: "",
+        imageData: "",
         highlightQuote: "Nắm vững mục tiêu và lý luận gắn liền thực tiễn Hải quân.",
         note: "Trọng tâm bài giảng"
-      },
-      {
-        slideNumber: 2,
-        title: document.getElementById("slide-2-title").value.trim() || "2. Ý nghĩa & Mục đích",
-        bullets: parseBullets(document.getElementById("slide-2-bullets").value, ["Nâng cao nhận thức chính trị tư tưởng", summary, "Cốt lõi nhận thức của người quân nhân"]),
-        highlightQuote: "Bồi dưỡng lý tưởng cách mạng, bản lĩnh kiên định.",
-        note: "Nhận thức tư tưởng"
-      },
-      {
-        slideNumber: 3,
-        title: document.getElementById("slide-3-title").value.trim() || "3. Nhiệm vụ & Yêu cầu",
-        bullets: parseBullets(document.getElementById("slide-3-bullets").value, ["Nhiệm vụ trực sẵn sàng chiến đấu tại Vùng 4", "Luôn đề cao cảnh giác, sẵn sàng nhận và hoàn thành nhiệm vụ.", "Sẵn sàng chiến đấu cao"]),
-        highlightQuote: "Đoàn kết hiệp đồng, lập công tập thể.",
-        note: "Nhiệm vụ trọng tâm"
-      },
-      {
-        slideNumber: 4,
-        title: document.getElementById("slide-4-title").value.trim() || "4. Tổng kết & Hành động",
-        bullets: parseBullets(document.getElementById("slide-4-bullets").value, ["Lời căn dặn và định hướng phấn đấu", "Phát huy truyền thống Vùng 4 Hải quân anh hùng.", "Quyết chiến quyết thắng"]),
-        highlightQuote: "Bảo vệ vững chắc chủ quyền biển đảo Tổ quốc.",
-        note: "Định hướng phấn đấu"
       }
     ];
 
@@ -1612,17 +1800,22 @@ window.editLesson = function(id) {
 
   // Prefill Slides
   const slides = lesson.slides || [];
-  document.getElementById("slide-1-title").value = (slides[0] && slides[0].title) || "1. Tổng quan Chuyên đề";
-  document.getElementById("slide-1-bullets").value = (slides[0] && Array.isArray(slides[0].bullets)) ? slides[0].bullets.join("\n") : (lesson.title + "\nGiảng viên: " + (lesson.lecturer || "Phòng Chính trị Vùng 4"));
-
-  document.getElementById("slide-2-title").value = (slides[1] && slides[1].title) || "2. Ý nghĩa & Mục đích";
-  document.getElementById("slide-2-bullets").value = (slides[1] && Array.isArray(slides[1].bullets)) ? slides[1].bullets.join("\n") : "Nâng cao nhận thức chính trị tư tưởng\nBồi dưỡng phẩm chất cách mạng";
-
-  document.getElementById("slide-3-title").value = (slides[2] && slides[2].title) || "3. Nhiệm vụ & Yêu cầu";
-  document.getElementById("slide-3-bullets").value = (slides[2] && Array.isArray(slides[2].bullets)) ? slides[2].bullets.join("\n") : "Trực sẵn sàng chiến đấu cao\nChấp hành nghiêm điều lệnh, kỷ luật";
-
-  document.getElementById("slide-4-title").value = (slides[3] && slides[3].title) || "4. Tổng kết & Hành động";
-  document.getElementById("slide-4-bullets").value = (slides[3] && Array.isArray(slides[3].bullets)) ? slides[3].bullets.join("\n") : "Phát huy truyền thống Vùng 4 Hải quân anh hùng\nBảo vệ vững chắc chủ quyền biển đảo";
+  if (slides.length > 0) {
+    currentEditingSlides = JSON.parse(JSON.stringify(slides));
+  } else {
+    currentEditingSlides = [
+      {
+        slideNumber: 1,
+        title: "1. Tổng quan Chuyên đề",
+        bullets: [lesson.title, `Giảng viên: ${lesson.lecturer || 'Phòng Chính trị Vùng 4'}`],
+        imageUrl: "",
+        imageData: "",
+        highlightQuote: "Nắm vững mục tiêu và lý luận gắn liền thực tiễn Hải quân.",
+        note: "Trọng tâm bài giảng"
+      }
+    ];
+  }
+  renderSlidesEditor();
 
   // Prefill Questions
   const questions = lesson.questions || [];

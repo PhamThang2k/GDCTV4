@@ -659,11 +659,15 @@ class GdctViewModel(application: Application) : AndroidViewModel(application) {
               if (bulletsList.isEmpty()) {
                 bulletsList.add(slObj.optString("content", summary))
               }
+              val imgUrl = slObj.optString("imageUrl", slObj.optString("image", slObj.optString("slideImageUrl", "")))
+              val imgData = slObj.optString("imageData", "")
               slides.add(
                 SlideItem(
                   slideNumber = slObj.optInt("slideNumber", slIdx + 1),
                   title = slObj.optString("title", "${slIdx + 1}. Nội dung Slide bài giảng"),
                   bullets = bulletsList,
+                  imageUrl = imgUrl,
+                  imageData = imgData,
                   highlightQuote = slObj.optString("highlightQuote", "Gắn lý luận với thực tiễn chiến đấu."),
                   note = slObj.optString("note", "Trọng tâm bài giảng")
                 )

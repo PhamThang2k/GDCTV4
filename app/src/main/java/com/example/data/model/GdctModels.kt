@@ -16,6 +16,8 @@ data class SlideItem(
   val slideNumber: Int,
   val title: String,
   val bullets: List<String>,
+  val imageUrl: String = "",
+  val imageData: String = "",
   val highlightQuote: String? = null,
   val note: String? = null
 )

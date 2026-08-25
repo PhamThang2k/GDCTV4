@@ -592,32 +592,30 @@
               </div>
             </div>
 
-            <!-- Tab 2: Slide Bài giảng -->
+            <!-- Tab 2: Slide Bài giảng PPT -->
             <div id="tab-content-slides" class="lesson-tab-panel" style="display: none; padding: 16px;">
-              <div style="font-size: 12px; color: var(--slate-500); margin-bottom: 10px;">
-                <i class="fa-solid fa-sliders"></i> Soạn nội dung 4 Slide trình chiếu điện tử cho bài giảng:
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; background: #EFF6FF; border: 1px solid #BFDBFE; padding: 10px 14px; border-radius: 8px;">
+                <div>
+                  <div style="font-weight: 700; font-size: 13px; color: #1E3A8A;">
+                    <i class="fa-solid fa-file-powerpoint" style="color: #D97706;"></i> Xuất ảnh từ PowerPoint (.png / .jpg) đưa lên App
+                  </div>
+                  <div style="font-size: 11.5px; color: #3B82F6;">
+                    Khi tải ảnh slide lên, App di động sẽ hiển thị đúng thứ tự ảnh slide PowerPoint xuất ra.
+                  </div>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                  <input type="file" id="batch-slide-images" accept="image/*" multiple style="display: none;">
+                  <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('batch-slide-images').click()" style="background: white;">
+                    <i class="fa-solid fa-images"></i> Nạp loạt ảnh Slide...
+                  </button>
+                  <button type="button" class="btn btn-primary btn-sm" id="btn-add-dynamic-slide">
+                    <i class="fa-solid fa-plus"></i> Thêm Slide
+                  </button>
+                </div>
               </div>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                <div style="border: 1px solid var(--slate-200); border-radius: 8px; padding: 10px; background: var(--slate-50);">
-                  <div style="font-weight: 700; font-size: 12px; color: var(--navy-primary); margin-bottom: 6px;">Slide 1: Tổng quan Chuyên đề</div>
-                  <input type="text" class="form-control" id="slide-1-title" value="1. Tổng quan Chuyên đề" style="font-size: 12px; margin-bottom: 6px;">
-                  <textarea class="form-control" id="slide-1-bullets" rows="4" placeholder="Mỗi dòng là một ý gạch đầu dòng..." style="font-size: 12px;"></textarea>
-                </div>
-                <div style="border: 1px solid var(--slate-200); border-radius: 8px; padding: 10px; background: var(--slate-50);">
-                  <div style="font-weight: 700; font-size: 12px; color: var(--navy-primary); margin-bottom: 6px;">Slide 2: Ý nghĩa & Mục đích</div>
-                  <input type="text" class="form-control" id="slide-2-title" value="2. Ý nghĩa & Mục đích" style="font-size: 12px; margin-bottom: 6px;">
-                  <textarea class="form-control" id="slide-2-bullets" rows="4" placeholder="Mỗi dòng là một ý gạch đầu dòng..." style="font-size: 12px;"></textarea>
-                </div>
-                <div style="border: 1px solid var(--slate-200); border-radius: 8px; padding: 10px; background: var(--slate-50);">
-                  <div style="font-weight: 700; font-size: 12px; color: var(--navy-primary); margin-bottom: 6px;">Slide 3: Nhiệm vụ & Yêu cầu</div>
-                  <input type="text" class="form-control" id="slide-3-title" value="3. Nhiệm vụ & Yêu cầu" style="font-size: 12px; margin-bottom: 6px;">
-                  <textarea class="form-control" id="slide-3-bullets" rows="4" placeholder="Mỗi dòng là một ý gạch đầu dòng..." style="font-size: 12px;"></textarea>
-                </div>
-                <div style="border: 1px solid var(--slate-200); border-radius: 8px; padding: 10px; background: var(--slate-50);">
-                  <div style="font-weight: 700; font-size: 12px; color: var(--navy-primary); margin-bottom: 6px;">Slide 4: Tổng kết & Hành động</div>
-                  <input type="text" class="form-control" id="slide-4-title" value="4. Tổng kết & Hành động" style="font-size: 12px; margin-bottom: 6px;">
-                  <textarea class="form-control" id="slide-4-bullets" rows="4" placeholder="Mỗi dòng là một ý gạch đầu dòng..." style="font-size: 12px;"></textarea>
-                </div>
+
+              <div id="slides-editor-container" style="display: flex; flex-direction: column; gap: 14px;">
+                <!-- Dynamically rendered slide cards in JS -->
               </div>
             </div>
 
